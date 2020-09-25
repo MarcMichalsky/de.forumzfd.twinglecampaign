@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<menu>
+    <item>
+        <path>civicrm/admin/settings/twinglecampaign</path>
+        <page_callback>CRM_TwingleCampaign_Form_Settings</page_callback>
+        <title>Twingle Campaign API Configuration</title>
+        <access_arguments>administer CiviCRM</access_arguments>
+        <desc>Configure the Twingle API extension</desc>
+        <adminGroup>System Settings</adminGroup>
+        <icon>admin/option.png</icon>
+    </item>
+</menu>

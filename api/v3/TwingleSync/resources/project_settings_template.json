@@ -1,0 +1,73 @@
+{
+  "id": 2237,
+  "has_confirmation_mail": false,
+  "has_confirmation_mail_api": false,
+  "has_donation_receipt": true,
+  "has_contact_data": false,
+  "donation_rhythm": {
+    "yearly": true,
+    "halfyearly": false,
+    "quarterly": false,
+    "monthly": true,
+    "one_time": true
+  },
+  "has_newsletter_registration": false,
+  "has_postinfo_registration": false,
+  "design_background_color": "",
+  "design_primary_color": "",
+  "design_font": "",
+  "design_font_color": "",
+  "design_button_font_color": "",
+  "design_button_font_color_light": "",
+  "image": "",
+  "bcc_email_address": "demo-zfd@twingle.de",
+  "donation_value_min": 5,
+  "donation_value_max": 500,
+  "donation_value_default": 50,
+  "exclude_contact_fields": "birthday",
+  "custom_js": null,
+  "custom_css": null,
+  "share_url": null,
+  "has_contact_mandatory": false,
+  "has_doi": true,
+  "doi_redirect": null,
+  "has_force_donation_target_buttons": false,
+  "has_show_single_target": false,
+  "betterpayment_credit_card_theme": null,
+  "last_update": 1600433614,
+  "app_js": null,
+  "slidericon": "heart",
+  "extra_field": [],
+  "has_hidden_logo": false,
+  "has_projecttarget_as_money": false,
+  "rapidmail_recipient_list": null,
+  "mailchimp_recipient_list": null,
+  "has_mailchimp_add_all_user": null,
+  "has_mail_hide_paymentblock": false,
+  "has_mail_hide_paymentblock_api": false,
+  "has_donationtarget_textfield": false,
+  "has_civi_crm_activated": false,
+  "has_step_index": false,
+  "gift_donation": "",
+  "gift_donation_icon": null,
+  "gift_donation_image": null,
+  "languages": "de",
+  "has_buttons": false,
+  "has_no_slider": false,
+  "buttons": {
+    "button1": {
+      "amount": ""
+    },
+    "button2": {
+      "amount": ""
+    },
+    "button3": {
+      "amount": ""
+    }
+  },
+  "has_newsletter_namerequest": false,
+  "has_show_donator_data": false,
+  "has_donation_letter": false,
+  "has_donation_letter_api": false,
+  "amount_images": []
+}
