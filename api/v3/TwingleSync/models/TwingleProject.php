@@ -7,7 +7,7 @@ use CRM_TwingleCampaign_ExtensionUtil as E;
 use DateTime;
 use CRM\TwingleCampaign\Models\CustomField as CustomField;
 
-include E::path() . '/CRM/Twingle/Upgrader/models/CustomField.php';
+include_once E::path() . '/CRM/TwingleCampaign/Upgrader/models/CustomField.php';
 
 
 class TwingleProject {
@@ -61,7 +61,7 @@ class TwingleProject {
     }
 
     $json_file = file_get_contents(E::path() .
-      '/CRM/Twingle/Upgrader/resources/campaigns.json');
+      '/CRM/TwingleCampaign/Upgrader/resources/campaigns.json');
     $campaign_info = json_decode($json_file, TRUE);
 
     if (!$campaign_info) {
