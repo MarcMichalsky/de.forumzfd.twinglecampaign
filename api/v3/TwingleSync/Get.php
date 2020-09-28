@@ -1,7 +1,7 @@
 <?php
 
 use CRM_TwingleCampaign_ExtensionUtil as E;
-use TwingleCampaign\Models\TwingleApiCall as TwingleApiCall;
+use CRM\TwingleCampaign\Models\TwingleApiCall as TwingleApiCall;
 
 include_once E::path() . '/api/v3/TwingleSync/models/TwingleApiCall.php';
 

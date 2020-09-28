@@ -1,11 +1,11 @@
 <?php
 
 
-namespace TwingleCampaign\Models;
+namespace CRM\TwingleCampaign\Models;
 
 use CRM_TwingleCampaign_ExtensionUtil as E;
 use DateTime;
-use TwingleCampaign\Models\CustomField as CustomField;
+use CRM\TwingleCampaign\Models\CustomField as CustomField;
 
 include E::path() . '/CRM/Twingle/Upgrader/models/CustomField.php';
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace TwingleCampaign\Models;
+namespace CRM\TwingleCampaign\Models;
 
 use CRM_Core_BAO_Setting;
 use CRM_TwingleCampaign_ExtensionUtil as E;
-use TwingleCampaign\Models\TwingleProject as TwingleProject;
+use CRM\TwingleCampaign\Models\TwingleProject as TwingleProject;
 
 include_once E::path() . '/api/v3/TwingleSync/models/TwingleProject.php';
 

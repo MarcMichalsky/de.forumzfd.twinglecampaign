@@ -1,7 +1,7 @@
 <?php
 
 
-namespace TwingleCampaign\Models;
+namespace CRM\TwingleCampaign\Models;
 
 use CRM_TwingleCampaign_ExtensionUtil as E;
 
@@ -125,7 +125,7 @@ class CustomField {
   /**
    * @param $name
    *
-   * @return \TwingleCampaign\Models\CustomField
+   * @return \CRM\TwingleCampaign\Models\CustomField
    * @throws \CiviCRM_API3_Exception
    */
   public static function fetch($name) {

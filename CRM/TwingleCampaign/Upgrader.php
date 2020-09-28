@@ -1,7 +1,7 @@
 <?php
 
 use CRM_TwingleCampaign_ExtensionUtil as E;
-use TwingleCampaign\Models as Models;
+use CRM\TwingleCampaign\Models as Models;
 
 include E::path() . '/CRM/TwingleCampaign/Upgrader/models/CampaignType.php';
 include E::path() . '/CRM/TwingleCampaign/Upgrader/models/CustomField.php';

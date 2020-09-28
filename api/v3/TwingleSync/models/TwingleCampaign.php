@@ -1,7 +1,7 @@
 <?php
 
 
-namespace TwingleCampaign\Models;
+namespace CRM\TwingleCampaign\Models;
 
 
 class TwingleCampaign {

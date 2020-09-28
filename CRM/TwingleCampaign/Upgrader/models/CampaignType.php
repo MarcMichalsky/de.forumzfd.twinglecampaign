@@ -106,7 +106,7 @@ class CampaignType {
   /**
    * @param $name
    *
-   * @return \TwingleCampaign\Models\CampaignType|null
+   * @return \CRM\TwingleCampaign\Models\CampaignType|null
    * @throws \CiviCRM_API3_Exception
    */
   public static function fetch($name) {

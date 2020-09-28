@@ -1,7 +1,7 @@
 <?php
 
 
-namespace TwingleCampaign\Models;
+namespace CRM\TwingleCampaign\Models;
 
 use CRM_Civirules_Utils_LoggerFactory as Civi;
 
