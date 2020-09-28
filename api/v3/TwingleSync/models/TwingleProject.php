@@ -14,7 +14,13 @@ class TwingleProject {
 
   private static $bInitialized = FALSE;
 
+  private $id;
+
+  private $project_id;
+
   private $values;
+
+  private $orig_values;
 
   private $timestamp;
 
@@ -42,6 +48,9 @@ class TwingleProject {
 
     // Fetch custom fields once and store them in static attribute
     self::init();
+
+    // Copy values
+    $this->orig_values = $values;
 
     // Map parameters to custom field names (e.g. "custom_21")
     foreach (self::$customFields as $customField) {
