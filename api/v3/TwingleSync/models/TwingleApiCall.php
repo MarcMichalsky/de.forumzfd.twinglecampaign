@@ -99,10 +99,13 @@ class TwingleApiCall {
     return $result;
   }
 
-  public function createProject($values) {
-    try {
-      if (is_array($values)) {
-        $project = new TwingleProject($values);
+  /**
+   * @param $values
+   *
+   * @return array|null
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
+   */
         return $project->create();
       }
     } catch (\Exception $e) {

@@ -53,6 +53,10 @@ class TwingleProject {
   }
 
   /**
+   * Get all related custom fields as CustomField objects in an static array.
+   * This function will be fully executed only once, when the TwingleProject
+   * class gets instantiated for the first time.
+   *
    * @throws \Exception
    */
   private static function init() {
@@ -77,6 +81,12 @@ class TwingleProject {
     self::$bInitialized = TRUE;
   }
 
+  /**
+   * Create the project as a campaign in CiviCRM if it does not exist
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
   public function create() {
     $values = $this->values;
     try {
@@ -86,6 +96,11 @@ class TwingleProject {
     }
   }
 
+  /**
+   * Formats values to import them as campaigns
+   *
+   * @param $values
+   */
   private function formatForImport(&$values) {
 
     // Change timestamp into DateTime string
@@ -100,6 +115,11 @@ class TwingleProject {
     }
   }
 
+  /**
+   * Formats values to send them to Twingle API
+   *
+   * @param $values
+   */
   private function formatForExport(&$values) {
 
     // Change DateTime string into timestamp

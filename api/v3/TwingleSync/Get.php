@@ -19,7 +19,7 @@ function _civicrm_api3_twingle_sync_Get_spec(&$spec) {
     'title'        => E::ts('Twingle API key'),
     'type'         => CRM_Utils_Type::T_STRING,
     'api.required' => 0,
-    'description'  => E::ts('The key you need to access the Twingle API'),
+    'description'  => E::ts('The key to access the Twingle API'),
   ];
   $spec['test'] = [
     'name'         => 'test',
@@ -45,13 +45,15 @@ function _civicrm_api3_twingle_sync_Get_spec(&$spec) {
 function civicrm_api3_twingle_sync_Get($params) {
   $result_values = [];
 
+  // If function call provides an API key, use it instead of the API key set
+  // on the extension settings page
   $apiKey = empty($params['twingle_api_key'])
     ? CRM_Core_BAO_Setting::getItem('', 'twingle_api_key')
     : $params['twingle_api_key'];
 
-  // TODO: Do the magic!
+  // Get all projects from Twingle and store them in $projects
 
-  $twingleApi = new TwingleApiCall($apiKey);
+  // Create projects as campaigns if they do not exist and store results in
   $result_values['projects'] = $twingleApi->getProject();
   foreach ($result_values['projects'] as $project) {
     if (is_array($project)) {
