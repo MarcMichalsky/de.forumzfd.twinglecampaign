@@ -105,7 +105,7 @@ class TwingleProject {
     // Give information back if project already exists
     return [
       'title'      => $this->values['title'],
-      'id'         => is_array($this->id) ? implode(', ', $this->id) : $this->id,
+      'id'         => $this->id,
       'project_id' => $this->values['id'],
       'state'      => 'exists',
     ];
