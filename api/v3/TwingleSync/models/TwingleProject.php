@@ -117,6 +117,54 @@ class TwingleProject {
   }
 
   /**
+   * Check if a project already exists
+   *
+   * @return bool
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function exists() {
+
+    // Get custom field names
+    $cf_project_id = TwingleProject::$customFieldMapping['twingle_project_id'];
+    $cf_last_update = TwingleProject::$customFieldMapping['twingle_project_last_update'];
+
+    $count = FALSE;
+    $result = [];
+
+    // If there is more than one campaign for a project, handle the duplicates
+    while (!$count) {
+      $result = civicrm_api3('Campaign', 'get', [
+        'sequential'   => 1,
+        'return'       => ['id', $cf_last_update],
+        'is_active'    => '1',
+        $cf_project_id => $this->values['id'],
+      ]);
+
+      if ($result['count'] > 1) {
+        TwingleProject::handleDuplicates($result);
+      }
+      else {
+        $count = TRUE;
+      }
+    }
+
+    if ($result['count'] == 1) {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+  }
+
+  public static function fetch($id) {
+    $result = civicrm_api3('Campaign', 'getsingle', [
+      'sequential' => 1,
+      'id'         => $id,
+    ]);
+
+    return new TwingleProject($result, TRUE);
+  }
+  /**
    * Translate $value keys to custom field names
    *
    * @param bool $rev
