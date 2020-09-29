@@ -199,22 +199,37 @@ class TwingleProject {
    *
    * @return array
    */
-  private function translateValues() {
+  private function translateValues($rev = FALSE) {
     $values = [];
-    foreach (TwingleProject::$customFieldMapping as $field => $custom) {
-      if (array_key_exists(
-        str_replace('twingle_project_', '', $field),
-        $this->values)
-      ) {
-        $values[$custom] = $this->values[str_replace(
-          'twingle_project_',
-          '',
-          $field)];
+    if (!$rev) {
+      foreach (TwingleProject::$customFieldMapping as $field => $custom) {
+        if (array_key_exists(
+          str_replace('twingle_project_', '', $field),
+          $this->values)
+        ) {
+          $values[$custom] = $this->values[str_replace(
+            'twingle_project_',
+            '',
+            $field
+          )];
+        }
       }
     }
-    // Add necessary attributes
-    $values['title'] = $this->values['name'];
+    else {
+      foreach (TwingleProject::$customFieldMapping as $field => $custom) {
+        if (array_key_exists($custom, $this->values)
+        ) {
+          $values[str_replace(
+            'twingle_project_',
+            '',
+            $field
+          )] = $this->values[$custom];
+        }
+      }
+    }
+    // Add necessary values
     $values['campaign_type_id'] = 'twingle_project';
+    $values['title'] = $this->values['name'];
     return $values;
   }
 
