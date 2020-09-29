@@ -41,6 +41,7 @@ class TwingleProject {
 
     // Import values
     $this->values = $values;
+    $this->project_id = $this->values['id'];
 
     // Translate values if values come from CiviCRM Campaign API
     if ($translate) {
@@ -49,7 +50,7 @@ class TwingleProject {
     }
 
     // Format data types of the values for import into CiviCRM
-    $this->formatForImport($values);
+    $this->formatForImport($this->values);
 
     // Fetch custom field mapping once
     self::init();
