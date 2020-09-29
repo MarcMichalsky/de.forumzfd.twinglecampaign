@@ -1,5 +1,5 @@
 Package: de.forumzfd.twinglecampaign
-Copyright (C) 2020, FIXME <FIXME>
+Copyright (C) 2020, Forum Ziviler Friedensdienst e.V. <kontakt@forumzfd.de>
 Licensed under the GNU Affero Public License 3.0 (below).
 
 -------------------------------------------------------------------------------
