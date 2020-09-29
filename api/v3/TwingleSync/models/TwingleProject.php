@@ -20,13 +20,11 @@ class TwingleProject {
 
   private $values;
 
-  private $orig_values;
-
   private $timestamp;
 
   private $settings;
 
-  private static $customFields = [];
+  private static $customFieldMapping;
 
   /**
    * TwingleProject constructor.
@@ -42,23 +40,9 @@ class TwingleProject {
     // Format data types of the values for import into CiviCRM
     $this->formatForImport($values);
 
-    // Add necessary attributes
-    $this->values['title'] = $values['name'];
-    $this->values['campaign_type_id'] = 'twingle_project';
-
-    // Fetch custom fields once and store them in static attribute
+    // Fetch custom field mapping once
     self::init();
 
-    // Copy values
-    $this->orig_values = $values;
-
-    // Map parameters to custom field names (e.g. "custom_21")
-    foreach (self::$customFields as $customField) {
-      if (!empty($values[str_replace('twingle_project_', '', $customField->getName())])) {
-        $this->values['custom_' . $customField->getId()] =
-          $values[str_replace('twingle_project_', '', $customField->getName())];
-      }
-    }
   }
 
   /**
@@ -72,6 +56,9 @@ class TwingleProject {
     if (self::$bInitialized) {
       return;
     }
+    self::$customFieldMapping = CustomField::getMapping();
+    self::$bInitialized = TRUE;
+  }
 
     $json_file = file_get_contents(E::path() .
       '/CRM/TwingleCampaign/Upgrader/resources/campaigns.json');
