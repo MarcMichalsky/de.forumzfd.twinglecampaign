@@ -260,6 +260,7 @@ class TwingleProject {
       }
     }
     // Add necessary values
+    $values['id'] = $this->id;
     $values['campaign_type_id'] = 'twingle_project';
     $values['title'] = $this->values['name'];
     return $values;
