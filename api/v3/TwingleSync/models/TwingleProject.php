@@ -35,7 +35,9 @@ class TwingleProject {
    */
   public function __construct(array $values) {
 
-    $this->timestamp = $values['last_update'];
+    $this->values = $values;
+
+    $this->project_id = $values['project_id'];
 
     // Format data types of the values for import into CiviCRM
     $this->formatForImport($values);
@@ -46,7 +48,7 @@ class TwingleProject {
   }
 
   /**
-   * Get all related custom fields as CustomField objects in an static array.
+   * Get custom field mapping.
    * This function will be fully executed only once, when the TwingleProject
    * class gets instantiated for the first time.
    *
@@ -142,12 +144,12 @@ class TwingleProject {
 
     // Change timestamp into DateTime string
     if (!empty($values['last_update'])) {
-      $date = DateTime::createFromFormat('U', $values['last_update'] );
+      $date = DateTime::createFromFormat('U', $values['last_update']);
       $values['last_update'] = $date->format('Y-m-d H:i:s');
     }
 
     // Change event type empty string into 'default'
-    if ($values['type'] == ''){
+    if ($values['type'] == '') {
       $values['type'] = 'default';
     }
   }
@@ -161,12 +163,12 @@ class TwingleProject {
 
     // Change DateTime string into timestamp
     if (!empty($values['last_update'])) {
-      $date = DateTime::createFromFormat('Y-m-d H:i:s', $values['last_update'] );
+      $date = DateTime::createFromFormat('Y-m-d H:i:s', $values['last_update']);
       $values['last_update'] = $date->getTimestamp();
     }
 
     // Change event type 'default' into empty string
-    if ($values['type'] == 'default'){
+    if ($values['type'] == 'default') {
       $values['type'] = '';
     }
   }

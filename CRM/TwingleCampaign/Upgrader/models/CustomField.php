@@ -8,20 +8,35 @@ use CRM_TwingleCampaign_ExtensionUtil as E;
 class CustomField {
 
   private $id;
+
   private $custom_group_id;
+
   private $label;
+
   private $name;
+
   private $is_required;
+
   private $is_searchable;
+
   private $data_type;
+
   private $html_type;
+
   private $option_values;
+
   private $text_length;
+
   private $is_active;
+
   private $is_view;
+
   private $weight;
+
   private $help_post;
+
   private $default_value;
+
   private $result;
 
   /**
@@ -50,12 +65,11 @@ class CustomField {
       'get',
       [
         'sequential' => 1,
-        'name' => $this->getName()
+        'name'       => $this->getName(),
       ]
     );
 
-    if ($field['count'] == 0)
-    {
+    if ($field['count'] == 0) {
       $this->result = civicrm_api3(
         'CustomField',
         'create',
@@ -101,6 +115,8 @@ class CustomField {
   }
 
   /**
+   * Alter a custom field
+   *
    * @param $values
    *
    * @return bool
@@ -122,7 +138,7 @@ class CustomField {
   /**
    * @param $name
    *
-   * @return \CRM\TwingleCampaign\Models\CustomField
+   * @return array|\CRM\TwingleCampaign\Models\CustomField
    * @throws \CiviCRM_API3_Exception
    */
   public static function fetch($name = NULL) {
@@ -163,6 +179,11 @@ class CustomField {
     }
   }
 
+  /**
+   * Delete a custom field
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   public function delete() {
     $this->result = civicrm_api3(
       'CustomField',
