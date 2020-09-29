@@ -164,6 +164,32 @@ class TwingleProject {
 
     return new TwingleProject($result, TRUE);
   }
+
+  /**
+   * Deactivate all duplicates but the newest one
+   *
+   * @param array $result
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function handleDuplicates(array $result) {
+
+    // Sort projects by last_update
+    uasort($result['values'], function ($a, $b) {
+      return $a['last_update'] <=> $b['last_update'];
+    });
+
+    // Delete newest project from array
+    array_shift($result['values']);
+
+    // Instantiate projects to deactivate them
+    foreach ($result['values'] as $p) {
+      $project = TwingleProject::fetch($p['id']);
+      $project->deactivate();
+    }
+
+  }
+
   /**
    * Translate $value keys to custom field names
    *
