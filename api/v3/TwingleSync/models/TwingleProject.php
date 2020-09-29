@@ -31,13 +31,18 @@ class TwingleProject {
    *
    * @param array $values
    *
+   * If values come from CiviCRM Campaign API, it is necessary to
+   * translate the custom field names back
+   * @param bool $translate
+   *
    * @throws \Exception
    */
-  public function __construct(array $values) {
+  public function __construct(array $values, $translate = FALSE) {
 
+    // Import values
     $this->values = $values;
 
-    $this->project_id = $values['project_id'];
+    // Translate values if values come from CiviCRM Campaign API
 
     // Format data types of the values for import into CiviCRM
     $this->formatForImport($values);
@@ -113,6 +118,8 @@ class TwingleProject {
 
   /**
    * Translate $value keys to custom field names
+   *
+   * @param bool $rev
    *
    * @return array
    */
