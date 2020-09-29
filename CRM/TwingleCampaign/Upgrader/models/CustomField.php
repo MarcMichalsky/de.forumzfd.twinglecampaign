@@ -7,7 +7,6 @@ use CRM_TwingleCampaign_ExtensionUtil as E;
 
 class CustomField {
 
-  private static $customFields = [];
   private $id;
   private $custom_group_id;
   private $label;
@@ -39,8 +38,6 @@ class CustomField {
         $this->help_post = E::ts($this->help_post);
       }
     }
-
-    array_push(self::$customFields, $this);
   }
 
   /**
@@ -310,13 +307,6 @@ class CustomField {
    */
   public function setDefaultValue($default_value) {
     $this->default_value = $default_value;
-  }
-
-  /**
-   * @return array
-   */
-  public static function getCustomFields(): array {
-    return self::$customFields;
   }
 
   /**

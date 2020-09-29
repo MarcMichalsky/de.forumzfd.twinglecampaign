@@ -66,18 +66,14 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
           $custom_group['extends_entity_column_value'] = $campaign_type->getValue();
         }
       }
-      new Models\CustomGroup($custom_group);
-    }
-    foreach (Models\CustomGroup::getCustomGroups() as $custom_group) {
-      $custom_group->create();
+      $cg = new Models\CustomGroup($custom_group);
+      $cg->create();
     }
 
     // Create custom fields
     foreach ($campaign_info['custom_fields'] as $custom_field) {
-      new Models\CustomField($custom_field);
-    }
-    foreach (Models\CustomField::getCustomFields() as $custom_field) {
-      $custom_field->create();
+      $cf = new Models\CustomField($custom_field);
+      $cf->create();
     }
   }
 
