@@ -271,6 +271,27 @@ class TwingleProject {
     }
   }
 
+  /**
+   * Deactivate a project
+   *
+   * @return bool
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function deactivate() {
+    $result = civicrm_api3('Campaign', 'create', [
+      'title'     => $this->values['title'],
+      'id'        => $this->id,
+      'is_active' => '0',
+    ]);
+
+    if ($result['is_error'] == 0) {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+  }
+
   public function syncSettings() {
 
   }
