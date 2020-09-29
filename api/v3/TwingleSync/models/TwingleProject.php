@@ -179,6 +179,15 @@ class TwingleProject {
     }
   }
 
+  /**
+   * Instantiate an existing project by campaign id
+   *
+   * @param $id
+   *
+   * @return \CRM\TwingleCampaign\Models\TwingleProject
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
+   */
   public static function fetch($id) {
     $result = civicrm_api3('Campaign', 'getsingle', [
       'sequential' => 1,
@@ -222,6 +231,7 @@ class TwingleProject {
    */
   private function translateValues($rev = FALSE) {
     $values = [];
+    // Translate from field name to custom field name
     if (!$rev) {
       foreach (TwingleProject::$customFieldMapping as $field => $custom) {
         if (array_key_exists(
@@ -236,6 +246,7 @@ class TwingleProject {
         }
       }
     }
+    // Translate from custom field name to field name
     else {
       foreach (TwingleProject::$customFieldMapping as $field => $custom) {
         if (array_key_exists($custom, $this->values)
@@ -358,8 +369,6 @@ class TwingleProject {
   public function setTimestamp($timestamp): void {
     $this->timestamp = $timestamp;
   }
-
-
 
 
 }
