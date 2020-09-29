@@ -125,23 +125,42 @@ class CustomField {
    * @return \CRM\TwingleCampaign\Models\CustomField
    * @throws \CiviCRM_API3_Exception
    */
-  public static function fetch($name) {
+  public static function fetch($name = NULL) {
 
-    $custom_field = civicrm_api3(
-      'CustomField',
-      'get',
-      [
-        'sequential' => 1,
-        'name' => $name
-      ]
-    );
-    if ($custom_field = array_shift($custom_field['values'])) {
-      return new CustomField($custom_field);
+    if (!$name) {
+      $customFields = [];
+
+      $json_file = file_get_contents(E::path() .
+        '/CRM/TwingleCampaign/Upgrader/resources/campaigns.json');
+      $campaign_info = json_decode($json_file, TRUE);
+
+      if (!$campaign_info) {
+        \Civi::log()->error("Could not read json file");
+        throw new \Exception('Could not read json file');
+      }
+
+      foreach ($campaign_info['custom_fields'] as $custom_field) {
+        $result = CustomField::fetch($custom_field['name']);
+        array_push($customFields, $result);
+      }
+      return $customFields;
     }
     else {
-      return NULL;
+      $custom_field = civicrm_api3(
+        'CustomField',
+        'get',
+        [
+          'sequential' => 1,
+          'name'       => $name,
+        ]
+      );
+      if ($custom_field = array_shift($custom_field['values'])) {
+        return new CustomField($custom_field);
+      }
+      else {
+        return NULL;
+      }
     }
-
   }
 
   public function delete() {
