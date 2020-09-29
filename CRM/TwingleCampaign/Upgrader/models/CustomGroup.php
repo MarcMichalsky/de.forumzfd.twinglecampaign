@@ -7,7 +7,6 @@ use CRM_Civirules_Utils_LoggerFactory as Civi;
 
 class CustomGroup {
 
-  private static $customGroups = [];
   private $id;
   private $title;
   private $name;
@@ -26,8 +25,6 @@ class CustomGroup {
       if (array_key_exists($var, $attributes))
         $this->$var = $attributes[$var];
     }
-
-    array_push(self::$customGroups, $this);
   }
 
   /**
@@ -215,13 +212,6 @@ class CustomGroup {
    */
   public function setColumnValue(string $column_value) {
     return $this->alter(['column_value', $column_value]);
-  }
-
-  /**
-   * @return array
-   */
-  public static function getCustomGroups() {
-    return self::$customGroups;
   }
 
   /**
