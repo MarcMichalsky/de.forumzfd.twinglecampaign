@@ -43,14 +43,21 @@ class TwingleProject {
     $this->values = $values;
     $this->project_id = $this->values['id'];
 
+    // Set timestamp
+    $this->timestamp = $this->values['last_update'];
+
     // Translate values if values come from CiviCRM Campaign API
     if ($translate) {
       $this->values = $this->translateValues(TRUE);
       $this->id = $values['id'];
+    } else {
+      // Format data types for import into CiviCRM
+      $this->formatForImport($this->values);
     }
 
-    // Format data types of the values for import into CiviCRM
-    $this->formatForImport($this->values);
+    // Add necessary values
+    $this->values['campaign_type_id'] = 'twingle_project';
+    $this->values['title'] = $this->values['name'];
 
     // Fetch custom field mapping once
     self::init();
