@@ -163,6 +163,15 @@ class TwingleProject {
     }
 
     if ($result['count'] == 1) {
+
+      // get campaign id
+      $this->id = $result['values'][0]['id'];
+
+      // set object timestamp to project last_update
+      $date = $result['values'][0][$cf_last_update];
+      $date = DateTime::createFromFormat('Y-m-d H:i:s', $date);
+      $this->timestamp = $date->getTimestamp();
+
       return TRUE;
     }
     else {
