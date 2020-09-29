@@ -43,6 +43,10 @@ class TwingleProject {
     $this->values = $values;
 
     // Translate values if values come from CiviCRM Campaign API
+    if ($translate) {
+      $this->values = $this->translateValues(TRUE);
+      $this->id = $values['id'];
+    }
 
     // Format data types of the values for import into CiviCRM
     $this->formatForImport($values);
