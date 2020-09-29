@@ -60,23 +60,6 @@ class TwingleProject {
     self::$bInitialized = TRUE;
   }
 
-    $json_file = file_get_contents(E::path() .
-      '/CRM/TwingleCampaign/Upgrader/resources/campaigns.json');
-    $campaign_info = json_decode($json_file, TRUE);
-
-    if (!$campaign_info) {
-      \Civi::log()->error("Could not read json file");
-      throw new \Exception('Could not read json file');
-    }
-
-    foreach ($campaign_info['custom_fields'] as $custom_field) {
-      $result = CustomField::fetch($custom_field['name']);
-      array_push(self::$customFields, $result);
-    }
-
-    self::$bInitialized = TRUE;
-  }
-
   /**
    * Create the project as a campaign in CiviCRM if it does not exist
    *
@@ -84,12 +67,70 @@ class TwingleProject {
    * @throws \CiviCRM_API3_Exception
    */
   public function create() {
-    $values = $this->values;
-    try {
-      return civicrm_api3('Campaign', 'create', $values);
-    } catch (\CiviCRM_API3_Exception $e) {
-      return null;
+
+    // Translate $value keys to custom field names
+    $translatedValues = $this->translateValues();
+
+    // Create project if it does not exist yet and give back the result
+    if (!$this->exists()) {
+      $result = civicrm_api3('Campaign', 'create', $translatedValues);
+      $this->id = $result['id'];
+      $this->timestamp = $result['last_update'];
+      return [
+        'id'         => $this->id,
+        'project_id' => $this->values['id'],
+        'state'      => 'created',
+      ];
     }
+    // Give information back if project already exists
+    return [
+      'id'         => is_array($this->id) ? implode(', ', $this->id) : $this->id,
+      'project_id' => $this->values['id'],
+      'state'      => 'exists',
+    ];
+  }
+
+  /**
+   * Update an existing project
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function update() {
+    // Translate $value keys to custom field names
+    $translatedValues = $this->translateValues();
+
+    $result = civicrm_api3('Campaign', 'create', $translatedValues);
+    return [
+      'title'      => $this->values['title'],
+      'id'         => $this->id,
+      'project_id' => $this->values['id'],
+      'state'      => 'updated',
+    ];
+  }
+
+  /**
+   * Translate $value keys to custom field names
+   *
+   * @return array
+   */
+  private function translateValues() {
+    $values = [];
+    foreach (TwingleProject::$customFieldMapping as $field => $custom) {
+      if (array_key_exists(
+        str_replace('twingle_project_', '', $field),
+        $this->values)
+      ) {
+        $values[$custom] = $this->values[str_replace(
+          'twingle_project_',
+          '',
+          $field)];
+      }
+    }
+    // Add necessary attributes
+    $values['title'] = $this->values['name'];
+    $values['campaign_type_id'] = 'twingle_project';
+    return $values;
   }
 
   /**
