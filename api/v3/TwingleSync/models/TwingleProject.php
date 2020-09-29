@@ -131,6 +131,15 @@ class TwingleProject {
   }
 
   /**
+   * Export values
+   *
+   * @return array
+   */
+  public function export() {
+    return $this->values;
+  }
+
+  /**
    * Check if a project already exists
    *
    * @return bool

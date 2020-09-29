@@ -119,15 +119,24 @@ class TwingleApiCall {
       ) {
           $result = $project->update();
       }
+      elseif (
+        $result['state'] == 'exists' &&
+        $values['last_update'] < $project->getTimestamp()
+      ) {
+        $result = $this->updateProject($project->export());
+      }
 
       return $result;
-    } else {
-      return null;
+    }
+    else {
+      return NULL;
     }
 
   }
 
-  public function updateProject() {
+  public function updateProject(array $values) {
+    $url = $this->protocol . 'project' . $this->baseUrl . $values['id'];
+    return $this->curlPost($url, $values);
   }
 
   public function updateEvent() {
@@ -160,6 +169,23 @@ class TwingleApiCall {
       "x-access-code: $this->apiKey",
       'Content-Type: application/json',
     ]);
+    $response = json_decode(curl_exec($curl), TRUE);
+    if (empty($response)) {
+      $response = curl_error($curl);
+    }
+    curl_close($curl);
+    return $response;
+  }
+
+  private function curlPost($url, $data) {
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+    curl_setopt($curl, CURLOPT_POST, true);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, [
+      "x-access-code: $this->apiKey",
+      'Content-Type: application/json',
+    ]);
+    curl_setopt($curl, CURLOPT_POSTFIELDS,  json_encode($data));
     $response = json_decode(curl_exec($curl), TRUE);
     if (empty($response)) {
       $response = curl_error($curl);
