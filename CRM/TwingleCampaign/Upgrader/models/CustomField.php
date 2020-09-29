@@ -198,6 +198,25 @@ class CustomField {
   }
 
   /**
+   * Get a custom field mapping
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getMapping() {
+
+    $customFields = CustomField::fetch();
+    $customFieldMapping = [];
+
+    foreach ($customFields as $customField) {
+      $customFieldMapping[$customField->getName()] = 'custom_' . $customField->getId();
+    }
+
+    return $customFieldMapping;
+  }
+
+
+  /**
    * @param string $custom_group_id
    *
    * @return bool
