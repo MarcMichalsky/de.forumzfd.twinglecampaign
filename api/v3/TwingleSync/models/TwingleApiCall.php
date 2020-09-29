@@ -106,10 +106,23 @@ class TwingleApiCall {
    * @throws \CiviCRM_API3_Exception
    * @throws \Exception
    */
-        return $project->create();
+  public function syncProject($values) {
+
+    if (is_array($values)) {
+      $project = new TwingleProject($values);
+
+      $result = $project->create();
+
+      if (
+        $result['state'] == 'exists' &&
+        $values['last_update'] > $project->getTimestamp()
+      ) {
+          $result = $project->update();
       }
-    } catch (\Exception $e) {
-      // TODO: Handle Exception
+
+      return $result;
+    } else {
+      return null;
     }
 
   }
