@@ -50,14 +50,17 @@ function civicrm_api3_twingle_sync_Get($params) {
   $apiKey = empty($params['twingle_api_key'])
     ? CRM_Core_BAO_Setting::getItem('', 'twingle_api_key')
     : $params['twingle_api_key'];
+  $twingleApi = new TwingleApiCall($apiKey);
 
   // Get all projects from Twingle and store them in $projects
+  $projects = $twingleApi->getProject();
 
   // Create projects as campaigns if they do not exist and store results in
-  $result_values['projects'] = $twingleApi->getProject();
-  foreach ($result_values['projects'] as $project) {
+  // $result_values
+  $i = 0;
+  foreach ($projects as $project) {
     if (is_array($project)) {
-      $result_values['campaigns_created'][$project['id']] = $twingleApi->createProject($project);
+      $result_values['sync']['projects'][$i++] = $twingleApi->syncProject($project);
     }
   }
 
