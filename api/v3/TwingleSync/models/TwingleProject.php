@@ -84,6 +84,7 @@ class TwingleProject {
       $this->id = $result['id'];
       $this->timestamp = $result['last_update'];
       return [
+        'title'      => $this->values['title'],
         'id'         => $this->id,
         'project_id' => $this->values['id'],
         'state'      => 'created',
@@ -91,6 +92,7 @@ class TwingleProject {
     }
     // Give information back if project already exists
     return [
+      'title'      => $this->values['title'],
       'id'         => is_array($this->id) ? implode(', ', $this->id) : $this->id,
       'project_id' => $this->values['id'],
       'state'      => 'exists',
@@ -112,7 +114,7 @@ class TwingleProject {
       'title'      => $this->values['title'],
       'id'         => $this->id,
       'project_id' => $this->values['id'],
-      'state'      => 'updated',
+      'state'      => 'fetched',
     ];
   }
 
