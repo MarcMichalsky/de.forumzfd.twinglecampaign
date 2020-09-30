@@ -52,7 +52,8 @@ class TwingleProject {
     if ($translate) {
       $this->values = $this->translateValues(TRUE);
       $this->id = $values['id'];
-    } else {
+    }
+    else {
       // Format data types for import into CiviCRM
       $this->formatForImport($this->values);
     }
@@ -91,6 +92,10 @@ class TwingleProject {
   /**
    * Create the project as a campaign in CiviCRM if it does not exist
    *
+   * If true: don't do any changes
+   *
+   * @param bool $is_test
+   *
    * @return array
    * @throws \CiviCRM_API3_Exception
    */
@@ -99,7 +104,7 @@ class TwingleProject {
     // Translate $value keys to custom field names
     $translatedValues = $this->translateValues();
 
-    // Create project if it does not exist yet and give back the result
+    // Create campaign if it does not already exist and give back the result
     if (!$this->exists()) {
       if (!$is_test) {
         $result = civicrm_api3('Campaign', 'create', $translatedValues);
@@ -309,6 +314,10 @@ class TwingleProject {
       $values['last_update'] = $date->format('Y-m-d H:i:s');
     }
 
+    // Change name to title
+    $values['title'] = $values['name'];
+    unset($values['name']);
+
     // Change event type empty string into 'default'
     if ($values['type'] == '') {
       $values['type'] = 'default';
@@ -327,6 +336,10 @@ class TwingleProject {
       $date = DateTime::createFromFormat('Y-m-d H:i:s', $values['last_update']);
       $values['last_update'] = $date->getTimestamp();
     }
+
+    // Change title to name
+    $values['name'] = $values['title'];
+    unset($values['title']);
 
     // Change event type 'default' into empty string
     if ($values['type'] == 'default') {

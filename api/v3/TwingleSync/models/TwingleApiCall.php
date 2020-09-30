@@ -103,7 +103,14 @@ class TwingleApiCall {
   }
 
   /**
-   * @param $values
+   *
+   * Synchronizes projects between Twingle and CiviCRM (both directions)
+   * based on the timestamp.
+   *
+   * @param array $values
+   *
+   * If true: don't do any changes
+   * @param bool $is_test
    *
    * @return array|null
    * @throws \CiviCRM_API3_Exception
@@ -182,12 +189,12 @@ class TwingleApiCall {
   private function curlPost($url, $data) {
     $curl = curl_init($url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($curl, CURLOPT_POST, true);
+    curl_setopt($curl, CURLOPT_POST, TRUE);
     curl_setopt($curl, CURLOPT_HTTPHEADER, [
       "x-access-code: $this->apiKey",
       'Content-Type: application/json',
     ]);
-    curl_setopt($curl, CURLOPT_POSTFIELDS,  json_encode($data));
+    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
     $response = json_decode(curl_exec($curl), TRUE);
     if (empty($response)) {
       $response = curl_error($curl);
