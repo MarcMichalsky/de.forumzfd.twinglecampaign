@@ -16,7 +16,7 @@ class TwingleApiCall {
 
   private $protocol = 'https://';
 
-  private $organisationIds;
+  private $organisationId;
 
   /**
    * TwingleApiCall constructor.
@@ -28,6 +28,7 @@ class TwingleApiCall {
   public function __construct($apiKey) {
     $this->apiKey = $apiKey;
 
+    // Get organisation id
     $curl = curl_init($this->protocol . 'organisation' . $this->baseUrl);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
     curl_setopt($curl, CURLOPT_HTTPHEADER, [
@@ -42,7 +43,7 @@ class TwingleApiCall {
       throw new \API_Exception("Twingle API call failed");
     }
 
-    $this->organisationIds = array_column($response, 'id');
+    $this->organisationId = array_column($response, 'id');
   }
 
   /**
@@ -57,7 +58,7 @@ class TwingleApiCall {
    */
   public function getProject($projectId = NULL) {
     $response = [];
-    foreach ($this->organisationIds as $organisationId) {
+    foreach ($this->organisationId as $organisationId) {
       $url = empty($projectId)
         ? $this->protocol . 'project' . $this->baseUrl . 'by-organisation/' . $organisationId
         : $this->protocol . 'project' . $this->baseUrl . $projectId;
@@ -146,8 +147,8 @@ class TwingleApiCall {
   /**
    * @return array
    */
-  public function getOrganisationIds() {
-    return $this->organisationIds;
+  public function getOrganisationId() {
+    return $this->organisationId;
   }
 
   /**
