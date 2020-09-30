@@ -92,15 +92,18 @@ class TwingleProject {
 
     // Create project if it does not exist yet and give back the result
     if (!$this->exists()) {
-      $result = civicrm_api3('Campaign', 'create', $translatedValues);
+      if (!$is_test) {
+        $result = civicrm_api3('Campaign', 'create', $translatedValues);
       $this->id = $result['id'];
       $this->timestamp = $result['last_update'];
       return [
-        'title'      => $this->values['title'],
-        'id'         => $this->id,
-        'project_id' => $this->values['id'],
+      }
+      // If this is a test, do not create campaign
+      else {
         'state'      => 'created',
-      ];
+      }
+    }
+    else {
     }
     // Give information back if project already exists
     return [
@@ -114,14 +117,20 @@ class TwingleProject {
   /**
    * Update an existing project
    *
+   * If true: don't do any changes
+   *
+   * @param bool $is_test
+   *
    * @return array
    * @throws \CiviCRM_API3_Exception
    */
-  public function update() {
+  public function update(bool $is_test = FALSE) {
+
     // Translate $value keys to custom field names
     $translatedValues = $this->translateValues();
 
-    $result = civicrm_api3('Campaign', 'create', $translatedValues);
+    if (!$is_test) {
+      $result = civicrm_api3('Campaign', 'create', $translatedValues);
     return [
       'title'      => $this->values['title'],
       'id'         => $this->id,

@@ -106,18 +106,18 @@ class TwingleApiCall {
    * @throws \CiviCRM_API3_Exception
    * @throws \Exception
    */
-  public function syncProject($values) {
+  public function syncProject(array $values, bool $is_test = FALSE) {
 
     if (is_array($values)) {
       $project = new TwingleProject($values);
-
+      $result = $project->create($is_test);
       $result = $project->create();
 
       if (
         $result['state'] == 'exists' &&
         $values['last_update'] > $project->getTimestamp()
       ) {
-          $result = $project->update();
+        $result = $project->update($is_test);
       }
       elseif (
         $result['state'] == 'exists' &&
@@ -134,7 +134,8 @@ class TwingleApiCall {
 
   }
 
-  public function updateProject(array $values) {
+  public function updateProject(array $values, bool $is_test = FALSE) {
+    // TODO: Implement $is_test
     $url = $this->protocol . 'project' . $this->baseUrl . $values['id'];
     return $this->curlPost($url, $values);
   }

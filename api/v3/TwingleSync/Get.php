@@ -22,7 +22,7 @@ function _civicrm_api3_twingle_sync_Get_spec(&$spec) {
     'description'  => E::ts('The key to access the Twingle API'),
   ];
   $spec['test'] = [
-    'name'         => 'test',
+    'name'         => 'is_test',
     'title'        => E::ts('Test'),
     'type'         => CRM_Utils_Type::T_BOOLEAN,
     'api.required' => 0,
@@ -45,6 +45,9 @@ function _civicrm_api3_twingle_sync_Get_spec(&$spec) {
 function civicrm_api3_twingle_sync_Get($params) {
   $result_values = [];
 
+  // Is this call a test?
+  $is_test = (boolean) $params['is_test'];
+
   // If function call provides an API key, use it instead of the API key set
   // on the extension settings page
   $apiKey = empty($params['twingle_api_key'])
@@ -60,7 +63,8 @@ function civicrm_api3_twingle_sync_Get($params) {
   $i = 0;
   foreach ($projects as $project) {
     if (is_array($project)) {
-      $result_values['sync']['projects'][$i++] = $twingleApi->syncProject($project);
+      $result_values['sync']['projects'][$i++] = $twingleApi
+        ->syncProject($project, $is_test);
     }
   }
 
