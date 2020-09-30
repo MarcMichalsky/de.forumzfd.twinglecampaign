@@ -114,8 +114,6 @@ class TwingleApiCall {
     if (is_array($values)) {
       $project = new TwingleProject($values);
       $result = $project->create($is_test);
-      $result = $project->create();
-
       if (
         $result['state'] == 'exists' &&
         $values['last_update'] > $project->getTimestamp()

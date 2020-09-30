@@ -94,7 +94,7 @@ class TwingleProject {
    * @return array
    * @throws \CiviCRM_API3_Exception
    */
-  public function create() {
+  public function create(bool $is_test = FALSE) {
 
     // Translate $value keys to custom field names
     $translatedValues = $this->translateValues();
