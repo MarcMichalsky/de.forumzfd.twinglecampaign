@@ -40,7 +40,9 @@ class TwingleApiCall {
     curl_close($curl);
 
     if (empty($response)) {
-      throw new \API_Exception("Twingle API call failed");
+      throw new \API_Exception(
+        "Twingle API call failed" . PHP_EOL .
+        "Please check your api key.");
     }
 
     $this->organisationId = array_column($response, 'id');
