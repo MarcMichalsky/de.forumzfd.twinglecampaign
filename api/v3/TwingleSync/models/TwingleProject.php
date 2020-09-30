@@ -26,6 +26,8 @@ class TwingleProject {
 
   private static $customFieldMapping;
 
+  private $state;
+
   /**
    * TwingleProject constructor.
    *
@@ -58,6 +60,13 @@ class TwingleProject {
     // Add necessary values
     $this->values['campaign_type_id'] = 'twingle_project';
     $this->values['title'] = $this->values['name'];
+
+    // Set state
+    $this->state = [
+      'title' => $this->values['title'],
+      'id' => $this->id,
+      'project_id' => $this->values['id'],
+    ];
 
     // Fetch custom field mapping once
     self::init();
@@ -94,24 +103,20 @@ class TwingleProject {
     if (!$this->exists()) {
       if (!$is_test) {
         $result = civicrm_api3('Campaign', 'create', $translatedValues);
-      $this->id = $result['id'];
-      $this->timestamp = $result['last_update'];
-      return [
+        $this->id = $result['id'];
+        $this->timestamp = $result['last_update'];
+        $this->state['state'] = 'TwingleProject created';
       }
       // If this is a test, do not create campaign
       else {
-        'state'      => 'created',
+        $this->state['state'] = 'TwingleProject not yet created';
       }
     }
     else {
+      // Give information back if campaign already exists
+      $this->state['state'] = 'TwingleProject exists';
     }
-    // Give information back if project already exists
-    return [
-      'title'      => $this->values['title'],
-      'id'         => $this->id,
-      'project_id' => $this->values['id'],
-      'state'      => 'exists',
-    ];
+    return $this->state;
   }
 
   /**
@@ -131,12 +136,19 @@ class TwingleProject {
 
     if (!$is_test) {
       $result = civicrm_api3('Campaign', 'create', $translatedValues);
-    return [
-      'title'      => $this->values['title'],
-      'id'         => $this->id,
-      'project_id' => $this->values['id'],
-      'state'      => 'fetched',
-    ];
+
+      if ($result['is_error'] == 0) {
+        $this->state['state'] = 'TwingleProject updated form Twingle';
+      }
+      else {
+        $this->state['state'] = 'Updated from Twingle failed';
+      }
+    }
+    else {
+      $this->state['state'] = 'TwingleProject outdated';
+    }
+
+    return $this->state;
   }
 
   /**
