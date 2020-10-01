@@ -121,13 +121,13 @@ class TwingleApiCall {
       $project = new TwingleProject($values);
       $result = $project->create($is_test);
       if (
-        $result['state'] == 'exists' &&
+        $result['state'] == 'TwingleProject exists' &&
         $values['last_update'] > $project->getTimestamp()
       ) {
         $result = $project->update($is_test);
       }
       elseif (
-        $result['state'] == 'exists' &&
+        $result['state'] == 'TwingleProject exists' &&
         $values['last_update'] < $project->getTimestamp()
       ) {
         $result = $this->updateProject($project->export());

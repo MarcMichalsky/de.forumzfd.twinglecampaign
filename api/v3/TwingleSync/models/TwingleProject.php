@@ -26,8 +26,6 @@ class TwingleProject {
 
   private static $customFieldMapping;
 
-  private $state;
-
   /**
    * TwingleProject constructor.
    *
@@ -101,6 +99,8 @@ class TwingleProject {
    */
   public function create(bool $is_test = FALSE) {
 
+    $response = '';
+
     // Translate $value keys to custom field names
     $translatedValues = $this->translateValues();
 
@@ -110,18 +110,18 @@ class TwingleProject {
         $result = civicrm_api3('Campaign', 'create', $translatedValues);
         $this->id = $result['id'];
         $this->timestamp = $result['last_update'];
-        $this->state['state'] = 'TwingleProject created';
+        $response = $this->getResponse('TwingleProject created');
       }
       // If this is a test, do not create campaign
       else {
-        $this->state['state'] = 'TwingleProject not yet created';
+        $response = $this->getResponse('TwingleProject not yet created');
       }
     }
     else {
       // Give information back if campaign already exists
-      $this->state['state'] = 'TwingleProject exists';
+      $response = $this->getResponse('TwingleProject exists');
     }
-    return $this->state;
+    return $response;
   }
 
   /**
@@ -136,6 +136,8 @@ class TwingleProject {
    */
   public function update(bool $is_test = FALSE) {
 
+    $response = '';
+
     // Translate $value keys to custom field names
     $translatedValues = $this->translateValues();
 
@@ -143,17 +145,17 @@ class TwingleProject {
       $result = civicrm_api3('Campaign', 'create', $translatedValues);
 
       if ($result['is_error'] == 0) {
-        $this->state['state'] = 'TwingleProject updated form Twingle';
+        $response = $this->getResponse('TwingleProject updated form Twingle');
       }
       else {
-        $this->state['state'] = 'Updated from Twingle failed';
+        $response = $this->getResponse('Updated from Twingle failed');
       }
     }
     else {
-      $this->state['state'] = 'TwingleProject outdated';
+      $response = $this->getResponse('TwingleProject outdated');
     }
 
-    return $this->state;
+    return $response;
   }
 
   /**
@@ -370,6 +372,15 @@ class TwingleProject {
 
   public function syncSettings() {
 
+  }
+
+  public function getResponse(string $state) {
+    return [
+      'title'      => $this->values['title'],
+      'id'         => $this->id,
+      'project_id' => $this->values['id'],
+      'state'      => $state,
+    ];
   }
 
   /**
