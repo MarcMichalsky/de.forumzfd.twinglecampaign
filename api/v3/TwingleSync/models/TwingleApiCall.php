@@ -41,8 +41,7 @@ class TwingleApiCall {
 
     if (empty($response)) {
       throw new \API_Exception(
-        "Twingle API call failed" . PHP_EOL .
-        "Please check your api key.");
+        "Twingle API call failed. Please check your api key.");
     }
 
     $this->organisationId = array_column($response, 'id');
