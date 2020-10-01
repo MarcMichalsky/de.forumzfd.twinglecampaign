@@ -56,17 +56,6 @@ class TwingleProject {
       $this->formatForImport($this->values);
     }
 
-    // Add necessary values
-    $this->values['campaign_type_id'] = 'twingle_project';
-    $this->values['title'] = $this->values['name'];
-
-    // Set state
-    $this->state = [
-      'title' => $this->values['title'],
-      'id' => $this->id,
-      'project_id' => $this->values['id'],
-    ];
-
     // Fetch custom field mapping once
     self::init();
 
@@ -164,7 +153,9 @@ class TwingleProject {
    * @return array
    */
   public function export() {
-    return $this->values;
+    $values = $this->values;
+    $this->formatForExport($values);
+    return $values;
   }
 
   /**
@@ -175,9 +166,8 @@ class TwingleProject {
    */
   public function exists() {
 
-    // Get custom field names
+    // Get custom field name for project_id
     $cf_project_id = TwingleProject::$customFieldMapping['twingle_project_id'];
-    $cf_last_update = TwingleProject::$customFieldMapping['twingle_project_last_update'];
 
     $count = FALSE;
     $result = [];
@@ -186,7 +176,7 @@ class TwingleProject {
     while (!$count) {
       $result = civicrm_api3('Campaign', 'get', [
         'sequential'   => 1,
-        'return'       => ['id', $cf_last_update],
+        'return'       => ['id', 'last_modified_date'],
         'is_active'    => '1',
         $cf_project_id => $this->values['id'],
       ]);
@@ -204,8 +194,8 @@ class TwingleProject {
       // get campaign id
       $this->id = $result['values'][0]['id'];
 
-      // set object timestamp to project last_update
-      $date = $result['values'][0][$cf_last_update];
+      // set object timestamp to project last_modified_date
+      $date = $result['values'][0]['last_modified_date'];
       $date = DateTime::createFromFormat('Y-m-d H:i:s', $date);
       $this->timestamp = $date->getTimestamp();
 
@@ -299,7 +289,7 @@ class TwingleProject {
     // Add necessary values
     $values['id'] = $this->id;
     $values['campaign_type_id'] = 'twingle_project';
-    $values['title'] = $this->values['name'];
+    $values['title'] = $this->values['title'];
     return $values;
   }
 
@@ -320,10 +310,14 @@ class TwingleProject {
     $values['title'] = $values['name'];
     unset($values['name']);
 
+    // Add necessary value
+    $values['campaign_type_id'] = 'twingle_project';
+
     // Change event type empty string into 'default'
     if ($values['type'] == '') {
       $values['type'] = 'default';
     }
+
   }
 
   /**
