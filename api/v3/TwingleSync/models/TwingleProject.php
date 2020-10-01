@@ -12,54 +12,68 @@ include_once E::path() . '/CRM/TwingleCampaign/Upgrader/models/CustomField.php';
 
 class TwingleProject {
 
+  public const IN = 'IN';
+
+  public const OUT = 'OUT';
+
+  public const CIVICRM = 'CIVICRM';
+
+  public const TWINGLE = 'TWINGLE';
+
   private static $bInitialized = FALSE;
+
+  private static $customFieldMapping;
 
   private $id;
 
-  private $project_id;
-
   private $values;
-
-  private $timestamp;
 
   private $settings;
 
-  private static $customFieldMapping;
 
   /**
    * TwingleProject constructor.
    *
    * @param array $values
+   * Array of values from which to create a TwingleProject
    *
-   * If values come from CiviCRM Campaign API, it is necessary to
-   * translate the custom field names back
-   * @param bool $translate
-   *
-   * @throws \Exception
+   * @param string $origin
+   * Origin of the array. It can be one of two constants:
+   *   TwingleProject::TWINGLE|CIVICRM
    */
-  public function __construct(array $values, $translate = FALSE) {
+  public function __construct(array $values, string $origin) {
+
+    // If values come from CiviCRM Campaign API
+    if ($origin == self::CIVICRM) {
+
+      // Set id (campaign id) attribute
+      $this->id = $values['id'];
+
+      // Translate custom field names into Twingle field names
+      self::translateCustomFields($values, self::$OUT);
+
+    }
+    // If values come from Twingle API
+    elseif ($origin == self::TWINGLE) {
+
+      // Translate keys for import
+      self::translateKeys($values, self::IN);
+
+      // Format values for import
+      self::formatValues($values, self::IN);
+
+    }
+
+    // Add value for campaign type
+    $values['campaign_type_id'] = 'twingle_project';
 
     // Import values
     $this->values = $values;
-    $this->project_id = $this->values['id'];
-
-    // Set timestamp
-    $this->timestamp = $this->values['last_update'];
-
-    // Translate values if values come from CiviCRM Campaign API
-    if ($translate) {
-      $this->values = $this->translateValues(TRUE);
-      $this->id = $values['id'];
-    }
-    else {
-      // Format data types for import into CiviCRM
-      $this->formatForImport($this->values);
-    }
 
     // Fetch custom field mapping once
     self::init();
-
   }
+
 
   /**
    * Get custom field mapping.
@@ -76,30 +90,43 @@ class TwingleProject {
     self::$bInitialized = TRUE;
   }
 
+
   /**
-   * Create the project as a campaign in CiviCRM if it does not exist
-   *
-   * If true: don't do any changes
+   * Create the TwingleProject as a campaign in CiviCRM if it does not exist
    *
    * @param bool $is_test
+   * If true: don't do any changes
    *
    * @return array
+   * Returns a response array that contains title, id, project_id and state
+   *
    * @throws \CiviCRM_API3_Exception
    */
   public function create(bool $is_test = FALSE) {
 
-    $response = '';
 
-    // Translate $value keys to custom field names
-    $translatedValues = $this->translateValues();
-
-    // Create campaign if it does not already exist and give back the result
+    // Create campaign only if it does not already exist
     if (!$this->exists()) {
       if (!$is_test) {
-        $result = civicrm_api3('Campaign', 'create', $translatedValues);
+
+        // Translate Twingle field names into custom field names
+        $translatedFields = $this->values;
+        self::translateCustomFields($translatedFields);
+
+        // Create campaign
+        $result = civicrm_api3('Campaign', 'create', $translatedFields);
+
+        // Set id attribute
         $this->id = $result['id'];
-        $this->timestamp = $result['last_update'];
-        $response = $this->getResponse('TwingleProject created');
+
+        // Check if campaign was created successfully
+        if ($result['is_error'] == 0) {
+          $response = $this->getResponse('TwingleProject created');
+        }
+        else {
+          $response = $this->getResponse('TwingleProject creation failed');
+        }
+
       }
       // If this is a test, do not create campaign
       else {
@@ -108,10 +135,11 @@ class TwingleProject {
     }
     else {
       // Give information back if campaign already exists
-      $response = $this->getResponse('TwingleProject exists');
+      $response = $this->getResponse('TwingleProject already exists');
     }
     return $response;
   }
+
 
   /**
    * Update an existing project
@@ -127,14 +155,15 @@ class TwingleProject {
 
     $response = '';
 
-    // Translate $value keys to custom field names
-    $translatedValues = $this->translateValues();
+    // Translate Twingle field names to custom field names
+    $translatedFields = $this->values;
+    self::translateCustomFields($translatedFields, self::OUT);
 
     if (!$is_test) {
-      $result = civicrm_api3('Campaign', 'create', $translatedValues);
+      $result = civicrm_api3('Campaign', 'create', $translatedFields);
 
       if ($result['is_error'] == 0) {
-        $response = $this->getResponse('TwingleProject updated form Twingle');
+        $response = $this->getResponse('TwingleProject updated from Twingle');
       }
       else {
         $response = $this->getResponse('Updated from Twingle failed');
@@ -147,6 +176,7 @@ class TwingleProject {
     return $response;
   }
 
+
   /**
    * Export values
    *
@@ -157,6 +187,7 @@ class TwingleProject {
     $this->formatForExport($values);
     return $values;
   }
+
 
   /**
    * Check if a project already exists
@@ -169,11 +200,11 @@ class TwingleProject {
     // Get custom field name for project_id
     $cf_project_id = TwingleProject::$customFieldMapping['twingle_project_id'];
 
-    $count = FALSE;
+    $single = FALSE;
     $result = [];
 
     // If there is more than one campaign for a project, handle the duplicates
-    while (!$count) {
+    while (!$single) {
       $result = civicrm_api3('Campaign', 'get', [
         'sequential'   => 1,
         'return'       => ['id', 'last_modified_date'],
@@ -185,19 +216,20 @@ class TwingleProject {
         TwingleProject::handleDuplicates($result);
       }
       else {
-        $count = TRUE;
+        $single = TRUE;
       }
     }
 
+    // If the campaign for the TwingleProject already exists, some of the
+    // project's attributes must be updated from the campaign
     if ($result['count'] == 1) {
 
-      // get campaign id
+      // set campaign id attribute
       $this->id = $result['values'][0]['id'];
 
-      // set object timestamp to project last_modified_date
-      $date = $result['values'][0]['last_modified_date'];
-      $date = DateTime::createFromFormat('Y-m-d H:i:s', $date);
-      $this->timestamp = $date->getTimestamp();
+      // set last_modified_date
+      $this->values['last_modified_date'] =
+        $result['values'][0]['last_modified_date'];
 
       return TRUE;
     }
@@ -205,6 +237,7 @@ class TwingleProject {
       return FALSE;
     }
   }
+
 
   /**
    * Instantiate an existing project by campaign id
@@ -224,24 +257,26 @@ class TwingleProject {
     return new TwingleProject($result, TRUE);
   }
 
+
   /**
-   * Deactivate all duplicates but the newest one
+   * Deactivate all duplicates of a project but the newest one
    *
    * @param array $result
+   * The $result array of a civicrm_api3-get-project call
    *
    * @throws \CiviCRM_API3_Exception
    */
   private function handleDuplicates(array $result) {
 
-    // Sort projects by last_update
+    // Sort projects ascending by the value of the last_modified_date
     uasort($result['values'], function ($a, $b) {
-      return $a['last_update'] <=> $b['last_update'];
+      return $a['last_modified_date'] <=> $b['last_modified_date'];
     });
 
-    // Delete newest project from array
+    // Delete the newest project from array to keep it active
     array_shift($result['values']);
 
-    // Instantiate projects to deactivate them
+    // Instantiate the left projects to deactivate them
     foreach ($result['values'] as $p) {
       $project = TwingleProject::fetch($p['id']);
       $project->deactivate();
@@ -249,104 +284,161 @@ class TwingleProject {
 
   }
 
+
   /**
-   * Translate $value keys to custom field names
+   * Translate array keys between CiviCRM Campaigns and Twingle
    *
-   * @param bool $rev
+   * @param array $values
+   * array of which keys shall be translated
    *
-   * @return array
+   * @param string $direction
+   * TwingleProject::IN -> translate array keys from Twingle format into
+   * CiviCRM format <br>
+   * TwingleProject::OUT -> translate array keys from CiviCRM format into
+   * Twingle format
+   *
+   * @throws \Exception
    */
-  private function translateValues($rev = FALSE) {
-    $values = [];
-    // Translate from field name to custom field name
-    if (!$rev) {
+  private static function translateKeys(array &$values, string $direction) {
+
+    // Get json file with translations
+    $file_path = E::path() .
+      '/api/v3/TwingleSync/resources/dictionary.json';
+    $json_file = file_get_contents($file_path);
+    $json_file_name = pathinfo($file_path)['filename'];
+    $translations = json_decode($json_file, TRUE);
+
+    // Throw an error if json file can't be read
+    if (!$translations) {
+      $message = ($json_file_name)
+        ? "Could not read json file $json_file_name"
+        : "Could not locate json file in path: $file_path";
+      throw new \Exception($message);
+      //TODO: use specific exception or create own
+    }
+
+    // Select only fields
+    $fields = $translations['fields'];
+
+    // Set the direction of the translation
+    if ($direction == self::OUT) {
+      array_flip($fields);
+    }
+    // Throw error if $direction constant does not match IN or OUT
+    elseif ($direction != self::IN) {
+      throw new \Exception(
+        "Invalid Parameter $direction for translateKeys()"
+      );
+      // TODO: use specific exception or create own
+    }
+
+    // Translate keys
+    foreach ($translations as $origin => $translation) {
+      $values[$translation] = $values[$origin];
+      unset($values[$origin]);
+    }
+  }
+
+
+  /**
+   * Translate values between CiviCRM Campaigns and Twingle
+   *
+   * @param array $values
+   * array of which values shall be translated
+   *
+   * @param string $direction
+   * TwingleProject::IN -> translate array values from Twingle to CiviCRM <br>
+   * TwingleProject::OUT -> translate array values from CiviCRM to Twingle
+   *
+   * @throws \Exception
+   */
+  private function formatValues(array &$values, string $direction) {
+
+    if ($direction == self::IN) {
+
+      // Change timestamp into DateTime string
+      $values['last_modified_date'] =
+        self::getDateTime($values['last_modified_date']);
+
+    }
+    elseif ($direction == self::OUT) {
+
+      // Change DateTime string into timestamp
+      $values['last_modified_date'] =
+        self::getTimestamp($values['last_modified_date']);
+
+    }
+    else {
+
+      throw new \Exception(
+        "Invalid Parameter $direction for formatValues()"
+      );
+      // TODO: use specific exception or create own
+
+    }
+  }
+
+
+  /**
+   * Translate between Twingle field names and custom field names
+   *
+   * @param array $values
+   * array of which keys shall be translated
+   *
+   * @param string $direction
+   * TwingleProject::IN -> translate field names into custom field names <br>
+   * TwingleProject::OUT -> translate custom field names into Twingle field
+   * names
+   *
+   */
+  private static function translateCustomFields(array &$values, string $direction) {
+
+    // Translate from Twingle field name to custom field name
+    if ($direction == self::IN) {
       foreach (TwingleProject::$customFieldMapping as $field => $custom) {
         if (array_key_exists(
-          str_replace('twingle_project_', '', $field),
-          $this->values)
+          str_replace(
+            'twingle_project_',
+            '',
+            $field
+          ),
+          $values)
         ) {
-          $values[$custom] = $this->values[str_replace(
+          $values[$custom] = $values[str_replace(
             'twingle_project_',
             '',
             $field
           )];
+          unset($values[$field]);
         }
       }
     }
-    // Translate from custom field name to field name
-    else {
+    // Translate from custom field name to Twingle field name
+    elseif ($direction == self::OUT) {
       foreach (TwingleProject::$customFieldMapping as $field => $custom) {
-        if (array_key_exists($custom, $this->values)
+        if (array_key_exists(
+          $custom,
+          $values
+        )
         ) {
           $values[str_replace(
             'twingle_project_',
             '',
             $field
-          )] = $this->values[$custom];
+          )] = $values[$custom];
+          unset($values[$custom]);
         }
       }
     }
-    // Add necessary values
-    $values['id'] = $this->id;
-    $values['campaign_type_id'] = 'twingle_project';
-    $values['title'] = $this->values['title'];
-    return $values;
   }
 
-  /**
-   * Formats values to import them as campaigns
-   *
-   * @param $values
-   */
-  private function formatForImport(&$values) {
-
-    // Change timestamp into DateTime string
-    if (!empty($values['last_update'])) {
-      $date = DateTime::createFromFormat('U', $values['last_update']);
-      $values['last_update'] = $date->format('Y-m-d H:i:s');
-    }
-
-    // Change name to title
-    $values['title'] = $values['name'];
-    unset($values['name']);
-
-    // Add necessary value
-    $values['campaign_type_id'] = 'twingle_project';
-
-    // Change event type empty string into 'default'
-    if ($values['type'] == '') {
-      $values['type'] = 'default';
-    }
-
-  }
-
-  /**
-   * Formats values to send them to Twingle API
-   *
-   * @param $values
-   */
-  private function formatForExport(&$values) {
-
-    // Change DateTime string into timestamp
-    if (!empty($values['last_update'])) {
-      $date = DateTime::createFromFormat('Y-m-d H:i:s', $values['last_update']);
-      $values['last_update'] = $date->getTimestamp();
-    }
-
-    // Change title to name
-    $values['name'] = $values['title'];
-    unset($values['title']);
-
-    // Change event type 'default' into empty string
-    if ($values['type'] == 'default') {
-      $values['type'] = '';
-    }
-  }
 
   /**
    * Deactivate a project
    *
    * @return bool
+   * TRUE if deactivation was successful
+   *
    * @throws \CiviCRM_API3_Exception
    */
   public function deactivate() {
@@ -362,12 +454,24 @@ class TwingleProject {
     else {
       return FALSE;
     }
+
   }
+
 
   public function syncSettings() {
-
+    // TODO: sync project settings
   }
 
+
+  /**
+   * Get a response that describes the state of a TwingleProject
+   *
+   * @param string $state
+   * State of the TwingleProject you want the response for
+   *
+   * @return array
+   * Returns a response array that contains title, id, project_id and state
+   */
   public function getResponse(string $state) {
     return [
       'title'      => $this->values['title'],
@@ -377,47 +481,83 @@ class TwingleProject {
     ];
   }
 
+
+  /**
+   * Validates $input to be either a DateTime string or an Unix timestamp
+   *
+   * @param $input
+   * Pass a DateTime string or a Unix timestamp
+   *
+   * @return int
+   * Returns a Unix timestamp or NULL if $input is invalid
+   */
+  public static function getTimestamp($input) {
+
+    // Check whether $input is a Unix timestamp
+    if (
+    $dateTime = DateTime::createFromFormat('U', $input)
+    ) {
+      return $input;
+    }
+    // ... or a DateTime string
+    elseif (
+    $dateTime = DateTime::createFromFormat('Y-m-d H:i:s', $input)
+    ) {
+      return $dateTime->getTimestamp();
+    }
+    // ... or invalid
+    else {
+      return NULL;
+    }
+
+  }
+
+
+  /**
+   * Validates $input to be either a DateTime string or an Unix timestamp
+   *
+   * @param $input
+   * Pass a DateTime string or a Unix timestamp
+   *
+   * @return string
+   * Returns a DateTime string or NULL if $input is invalid
+   */
+  public static function getDateTime($input) {
+
+    // Check whether $input is a Unix timestamp
+    if (
+    $dateTime = DateTime::createFromFormat('U', $input)
+    ) {
+      return $dateTime->format('Y-m-d H:i:s');
+    }
+    // ... or a DateTime string
+    elseif (
+    $dateTime = DateTime::createFromFormat('Y-m-d H:i:s', $input)
+    ) {
+      return $input;
+    }
+    // ... or invalid
+    else {
+      return NULL;
+    }
+
+  }
+
+  /**
+   * Return a timestamp of the last update of the TwingleProject
+   *
+   * @return int|null
+   */
+  public function lastUpdate() {
+    return self::getTimestamp($this->values['last_modified_date']);
+  }
+
+
   /**
    * @return mixed
    */
   public function getId() {
     return $this->id;
   }
-
-  /**
-   * @param mixed $id
-   */
-  public function setId($id): void {
-    $this->id = $id;
-  }
-
-  /**
-   * @return mixed
-   */
-  public function getProjectId() {
-    return $this->project_id;
-  }
-
-  /**
-   * @param mixed $project_id
-   */
-  public function setProjectId($project_id): void {
-    $this->project_id = $project_id;
-  }
-
-  /**
-   * @return mixed
-   */
-  public function getTimestamp() {
-    return $this->timestamp;
-  }
-
-  /**
-   * @param mixed $timestamp
-   */
-  public function setTimestamp($timestamp): void {
-    $this->timestamp = $timestamp;
-  }
-
 
 }

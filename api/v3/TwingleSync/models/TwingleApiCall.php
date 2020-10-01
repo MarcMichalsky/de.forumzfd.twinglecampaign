@@ -102,37 +102,47 @@ class TwingleApiCall {
   }
 
   /**
-   *
    * Synchronizes projects between Twingle and CiviCRM (both directions)
    * based on the timestamp.
    *
    * @param array $values
    *
-   * If true: don't do any changes
    * @param bool $is_test
+   * If TRUE, don't do any changes
    *
    * @return array|null
+   * Returns a response array that contains title, id, project_id and state or
+   * NULL if $values is not an array
+   *
    * @throws \CiviCRM_API3_Exception
    * @throws \Exception
    */
   public function syncProject(array $values, bool $is_test = FALSE) {
 
+    // If $values is an array
     if (is_array($values)) {
-      $project = new TwingleProject($values);
+
+      $project = new TwingleProject($values, TwingleProject::TWINGLE);
       $result = $project->create($is_test);
+
+      // If Twingle's version of the project is newer than the CiviCRM
+      // TwingleProject campaign update the campaign
       if (
-        $result['state'] == 'TwingleProject exists' &&
-        $values['last_update'] > $project->getTimestamp()
+        $result['state'] == 'TwingleProject already exists' &&
+        $values['last_update'] > $project->lastUpdate()
       ) {
         $result = $project->update($is_test);
       }
+      // If the CiviCRM TwingleProject campaign was changed, update the project
+      // on Twingle's side
       elseif (
-        $result['state'] == 'TwingleProject exists' &&
-        $values['last_update'] < $project->getTimestamp()
+        $result['state'] == 'TwingleProject already exists' &&
+        $values['last_update'] < $project->lastUpdate()
       ) {
         $result = $this->updateProject($project->export());
       }
 
+      // Return a response of the synchronization
       return $result;
     }
     else {

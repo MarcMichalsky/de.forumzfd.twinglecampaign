@@ -1,0 +1,7 @@
+{
+  "fields": {
+    "name": "title",
+    "last_update": "last_modified_date",
+    "" : "default"
+  }
+}
