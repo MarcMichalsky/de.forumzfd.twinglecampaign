@@ -161,14 +161,16 @@ class TwingleProject {
 
     if (!$is_test) {
       $result = civicrm_api3('Campaign', 'create', $translatedFields);
-
+      // If the TwingleProject campaign was updated successfully
       if ($result['is_error'] == 0) {
         $response = $this->getResponse('TwingleProject updated from Twingle');
       }
+      // If the update failed for any reason
       else {
         $response = $this->getResponse('Updated from Twingle failed');
       }
     }
+    // If the TwingleProjects campaign has to get updated but this is in test mode
     else {
       $response = $this->getResponse('TwingleProject outdated');
     }
@@ -444,7 +446,7 @@ class TwingleProject {
 
 
   /**
-   * Deactivate a project
+   * Deactivate a TwingleProject campaign
    *
    * @return bool
    * TRUE if deactivation was successful
@@ -458,9 +460,11 @@ class TwingleProject {
       'is_active' => '0',
     ]);
 
+    // Return TRUE if TwingleProject campaign was deactivated successfully
     if ($result['is_error'] == 0) {
       return TRUE;
     }
+    // Return FALSE if deactivation failed
     else {
       return FALSE;
     }
