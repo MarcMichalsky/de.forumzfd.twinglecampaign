@@ -111,7 +111,7 @@ class TwingleProject {
 
         // Translate Twingle field names into custom field names
         $translatedFields = $this->values;
-        self::translateCustomFields($translatedFields);
+        self::translateCustomFields($translatedFields, self::OUT);
 
         // Create campaign
         $result = civicrm_api3('Campaign', 'create', $translatedFields);
