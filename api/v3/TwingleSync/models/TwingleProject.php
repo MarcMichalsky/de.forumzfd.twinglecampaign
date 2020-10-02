@@ -320,7 +320,7 @@ class TwingleProject {
     }
 
     // Select only fields
-    $fields = $translations['fields'];
+    $translations = $translations['fields'];
 
     // Set the direction of the translation
     if ($direction == self::OUT) {
