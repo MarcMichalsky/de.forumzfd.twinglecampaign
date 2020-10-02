@@ -360,12 +360,22 @@ class TwingleProject {
       $values['last_modified_date'] =
         self::getDateTime($values['last_modified_date']);
 
+      // empty project_type to 'default
+      $values['type'] = $values['type'] == ''
+        ? 'default'
+        : $values['type'];
+
     }
     elseif ($direction == self::OUT) {
 
       // Change DateTime string into timestamp
       $values['last_modified_date'] =
         self::getTimestamp($values['last_modified_date']);
+
+      // default project_type to ''
+      $values['type'] = $values['type'] == 'default'
+        ? ''
+        : $values['type'];
 
     }
     else {
