@@ -1,11 +1,11 @@
 <?php
 
 use CRM_TwingleCampaign_ExtensionUtil as E;
-use CRM\TwingleCampaign\Models as Models;
+use CRM\TwingleCampaign\BAO as BAO;
 
-include E::path() . '/CRM/TwingleCampaign/Upgrader/models/CampaignType.php';
-include E::path() . '/CRM/TwingleCampaign/Upgrader/models/CustomField.php';
-include E::path() . '/CRM/TwingleCampaign/Upgrader/models/CustomGroup.php';
+include E::path() . '/CRM/TwingleCampaign/Upgrader/BAO/CampaignType.php';
+include E::path() . '/CRM/TwingleCampaign/Upgrader/BAO/CustomField.php';
+include E::path() . '/CRM/TwingleCampaign/Upgrader/BAO/CustomGroup.php';
 
 /**
  * Collection of upgrade steps.
@@ -53,26 +53,26 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
 
     // Create campaign types
     foreach ($campaign_info['campaign_types'] as $campaign_type) {
-      new Models\CampaignType($campaign_type);
+      new BAO\CampaignType($campaign_type);
     }
-    foreach (Models\CampaignType::getCampaignTypes() as $campaign_type) {
+    foreach (BAO\CampaignType::getCampaignTypes() as $campaign_type) {
       $campaign_type->create();
     }
 
     // Create custom groups
     foreach ($campaign_info['custom_groups'] as $custom_group) {
-      foreach (Models\CampaignType::getCampaignTypes() as $campaign_type) {
+      foreach (BAO\CampaignType::getCampaignTypes() as $campaign_type) {
         if ($campaign_type->getName() == $custom_group['campaign_type']) {
           $custom_group['extends_entity_column_value'] = $campaign_type->getValue();
         }
       }
-      $cg = new Models\CustomGroup($custom_group);
+      $cg = new BAO\CustomGroup($custom_group);
       $cg->create();
     }
 
     // Create custom fields
     foreach ($campaign_info['custom_fields'] as $custom_field) {
-      $cf = new Models\CustomField($custom_field);
+      $cf = new BAO\CustomField($custom_field);
       $cf->create();
     }
   }
@@ -95,7 +95,7 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
 
    // Delete campaign types
    foreach ($campaign_info['campaign_types'] as $campaign_type) {
-     $result = Models\CampaignType::fetch($campaign_type['name']);
+     $result = BAO\CampaignType::fetch($campaign_type['name']);
      if ($result) {
        $result->delete();
      }
@@ -103,7 +103,7 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
 
    // Delete custom groups
    foreach ($campaign_info['custom_groups'] as $custom_group) {
-     $result = Models\CustomGroup::fetch($custom_group['name']);
+     $result = BAO\CustomGroup::fetch($custom_group['name']);
      if ($result) {
        $result->delete();
      }

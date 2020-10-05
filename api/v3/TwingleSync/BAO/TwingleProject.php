@@ -1,13 +1,13 @@
 <?php
 
 
-namespace CRM\TwingleCampaign\Models;
+namespace CRM\TwingleCampaign\BAO;
 
 use CRM_TwingleCampaign_ExtensionUtil as E;
 use DateTime;
-use CRM\TwingleCampaign\Models\CustomField as CustomField;
+use CRM\TwingleCampaign\BAO\CustomField as CustomField;
 
-include_once E::path() . '/CRM/TwingleCampaign/Upgrader/models/CustomField.php';
+include_once E::path() . '/CRM/TwingleCampaign/Upgrader/BAO/CustomField.php';
 
 
 class TwingleProject {
@@ -40,6 +40,8 @@ class TwingleProject {
    * @param string $origin
    * Origin of the array. It can be one of two constants:
    *   TwingleProject::TWINGLE|CIVICRM
+   *
+   * @throws \Exception
    */
   public function __construct(array $values, string $origin) {
 
@@ -183,10 +185,13 @@ class TwingleProject {
    * Export values
    *
    * @return array
+   * @throws \Exception
    */
   public function export() {
     $values = $this->values;
-    $this->formatForExport($values);
+    self::formatValues($values, self::OUT);
+    self::translateKeys($values, self::OUT);
+    unset($values['campaign_type_id']);
     return $values;
   }
 
@@ -246,7 +251,7 @@ class TwingleProject {
    *
    * @param $id
    *
-   * @return \CRM\TwingleCampaign\Models\TwingleProject
+   * @return \CRM\TwingleCampaign\BAO\TwingleProject
    * @throws \CiviCRM_API3_Exception
    * @throws \Exception
    */
@@ -324,7 +329,7 @@ class TwingleProject {
 
     // Set the direction of the translation
     if ($direction == self::OUT) {
-      array_flip($fields);
+      $translations = array_flip($translations);
     }
     // Throw error if $direction constant does not match IN or OUT
     elseif ($direction != self::IN) {

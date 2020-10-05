@@ -1,12 +1,12 @@
 <?php
 
-namespace CRM\TwingleCampaign\Models;
+namespace CRM\TwingleCampaign\BAO;
 
 use CRM_Core_BAO_Setting;
 use CRM_TwingleCampaign_ExtensionUtil as E;
-use CRM\TwingleCampaign\Models\TwingleProject as TwingleProject;
+use CRM\TwingleCampaign\BAO\TwingleProject as TwingleProject;
 
-include_once E::path() . '/api/v3/TwingleSync/models/TwingleProject.php';
+include_once E::path() . '/api/v3/TwingleSync/BAO/TwingleProject.php';
 
 class TwingleApiCall {
 
@@ -139,7 +139,16 @@ class TwingleApiCall {
         $result['state'] == 'TwingleProject already exists' &&
         $values['last_update'] < $project->lastUpdate()
       ) {
-        $result = $this->updateProject($project->export());
+        // If this is a test do not make database changes
+        if ($is_test) {
+          $result = TwingleProject::fetch($values['id'])->getResponse(
+            'TwingleProject ready to push'
+          );
+        }
+        else {
+          $result = $this->updateProject($project->export());
+        }
+
       }
 
       // Return a response of the synchronization
@@ -151,12 +160,30 @@ class TwingleApiCall {
 
   }
 
-  public function updateProject(array $values, bool $is_test = FALSE) {
-    // TODO: Implement $is_test
+  /**
+   * @param array $values
+   * @param bool $is_test
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
+   */
+  public function updateProject(array $values) {
+
+    // Prepare url for curl
     $url = $this->protocol . 'project' . $this->baseUrl . $values['id'];
-    return $this->curlPost($url, $values);
+
+    // Send curl
+    $result = $this->curlPost($url, $values);
+
+    // Update TwingleProject in Civi with results from api call
+    $updated_project = new TwingleProject($result, TwingleProject::TWINGLE);
+    $updated_project->create();
+    return $updated_project->getResponse("TwingleProject pushed to Twingle");
+
   }
 
+  
   public function updateEvent() {
   }
 

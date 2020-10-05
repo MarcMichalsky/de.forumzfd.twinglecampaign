@@ -1,9 +1,9 @@
 <?php
 
 use CRM_TwingleCampaign_ExtensionUtil as E;
-use CRM\TwingleCampaign\Models\TwingleApiCall as TwingleApiCall;
+use CRM\TwingleCampaign\BAO\TwingleApiCall as TwingleApiCall;
 
-include_once E::path() . '/api/v3/TwingleSync/models/TwingleApiCall.php';
+include_once E::path() . '/api/v3/TwingleSync/BAO/TwingleApiCall.php';
 
 /**
  * TwingleSync.Get API specification (optional)

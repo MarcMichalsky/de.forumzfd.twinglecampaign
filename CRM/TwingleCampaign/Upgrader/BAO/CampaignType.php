@@ -1,6 +1,6 @@
 <?php
 
-namespace CRM\TwingleCampaign\Models;
+namespace CRM\TwingleCampaign\BAO;
 
 use CRM_Civirules_Utils_LoggerFactory as Civi;
 
@@ -106,7 +106,7 @@ class CampaignType {
   /**
    * @param $name
    *
-   * @return \CRM\TwingleCampaign\Models\CampaignType|null
+   * @return \CRM\TwingleCampaign\BAO\CampaignType|null
    * @throws \CiviCRM_API3_Exception
    */
   public static function fetch($name) {
