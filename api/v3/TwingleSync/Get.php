@@ -21,7 +21,7 @@ function _civicrm_api3_twingle_sync_Get_spec(&$spec) {
     'api.required' => 0,
     'description'  => E::ts('The key to access the Twingle API'),
   ];
-  $spec['test'] = [
+  $spec['is_test'] = [
     'name'         => 'is_test',
     'title'        => E::ts('Test'),
     'type'         => CRM_Utils_Type::T_BOOLEAN,

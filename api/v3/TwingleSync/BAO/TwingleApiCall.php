@@ -123,32 +123,43 @@ class TwingleApiCall {
     if (is_array($values)) {
 
       $project = new TwingleProject($values, TwingleProject::TWINGLE);
-      $result = $project->create($is_test);
+
+      // Check if the TwingleProject campaign already exists
+      if (!$project->exists()) {
+        // ... if not, create it
+        $result = $project->create($is_test);
+      }
+      else {
+        $result = $project->getResponse('TwingleProject exists');
+      }
 
       // If Twingle's version of the project is newer than the CiviCRM
       // TwingleProject campaign update the campaign
       if (
-        $result['state'] == 'TwingleProject already exists' &&
+        $result['state'] == 'TwingleProject exists' &&
         $values['last_update'] > $project->lastUpdate()
       ) {
-        $result = $project->update($is_test);
+        $project->update($values, TwingleProject::TWINGLE);
+        $result = $project->create();
       }
       // If the CiviCRM TwingleProject campaign was changed, update the project
       // on Twingle's side
       elseif (
-        $result['state'] == 'TwingleProject already exists' &&
+        $result['state'] == 'TwingleProject exists' &&
         $values['last_update'] < $project->lastUpdate()
       ) {
         // If this is a test do not make database changes
         if ($is_test) {
-          $result = TwingleProject::fetch($values['id'])->getResponse(
+          $result = $project->getResponse(
             'TwingleProject ready to push'
           );
         }
         else {
-          $result = $this->updateProject($project->export());
+          $result = $this->updateProject($project);
         }
-
+      }
+      elseif ($result['state'] == 'TwingleProject exists') {
+        $result = $project->getResponse('TwingleProject up to date');
       }
 
       // Return a response of the synchronization
@@ -161,14 +172,19 @@ class TwingleApiCall {
   }
 
   /**
-   * @param array $values
-   * @param bool $is_test
+   * Sends an curl post call to Twingle to update an existing project and then
+   * updates the TwingleProject campaign.
+   *
+   * @param \CRM\TwingleCampaign\BAO\TwingleProject $project
+   * The TwingleProject object that should get pushed to Twingle
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
-   * @throws \Exception
+   * Returns a response array that contains title, id, project_id and state
+   *
    */
-  public function updateProject(array $values) {
+  public function updateProject(TwingleProject $project) {
+
+    $values = $project->export();
 
     // Prepare url for curl
     $url = $this->protocol . 'project' . $this->baseUrl . $values['id'];
@@ -177,13 +193,23 @@ class TwingleApiCall {
     $result = $this->curlPost($url, $values);
 
     // Update TwingleProject in Civi with results from api call
-    $updated_project = new TwingleProject($result, TwingleProject::TWINGLE);
-    $updated_project->create();
-    return $updated_project->getResponse("TwingleProject pushed to Twingle");
+    if (is_array($result) && !array_key_exists('message', $result)) {
+      $project->update($result, TwingleProject::TWINGLE);
+      $project->create();
+      return $project->getResponse('TwingleProject pushed to Twingle');
+    }
+    else {
+      $message = $result['message'];
+      return $project->getResponse(
+        $message
+          ? "TwingleProject could not get pushed to Twingle: $message"
+          : 'TwingleProject could not get pushed to Twingle'
+      );
+    }
 
   }
 
-  
+
   public function updateEvent() {
   }
 
@@ -202,7 +228,8 @@ class TwingleApiCall {
    *
    * @param null $params
    *
-   * @return mixed
+   * @return array|bool
+   * Returns the result array of the curl or FALSE, if the curl failed
    */
   private function curlGet($url, $params = NULL) {
     if (!empty($params)) {
@@ -230,10 +257,11 @@ class TwingleApiCall {
       "x-access-code: $this->apiKey",
       'Content-Type: application/json',
     ]);
-    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+    $json = json_encode($data);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
     $response = json_decode(curl_exec($curl), TRUE);
     if (empty($response)) {
-      $response = curl_error($curl);
+      $response = FALSE;
     }
     curl_close($curl);
     return $response;

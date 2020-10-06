@@ -108,37 +108,35 @@ class TwingleProject {
 
 
     // Create campaign only if it does not already exist
-    if (!$this->exists()) {
-      if (!$is_test) {
+    if (!$is_test) {
 
-        // Translate Twingle field names into custom field names
-        $translatedFields = $this->values;
-        self::translateCustomFields($translatedFields, self::OUT);
+      // Translate Twingle field names into custom field names
+      $translatedFields = $this->values;
+      self::translateCustomFields($translatedFields, self::IN);
 
-        // Create campaign
-        $result = civicrm_api3('Campaign', 'create', $translatedFields);
+      // Set id
+      $translatedFields['id'] = $this->id;
 
-        // Set id attribute
-        $this->id = $result['id'];
+      // Create campaign
+      $result = civicrm_api3('Campaign', 'create', $translatedFields);
 
-        // Check if campaign was created successfully
-        if ($result['is_error'] == 0) {
-          $response = $this->getResponse('TwingleProject created');
-        }
-        else {
-          $response = $this->getResponse('TwingleProject creation failed');
-        }
+      // Update id
+      $this->id = $result['id'];
 
+      // Check if campaign was created successfully
+      if ($result['is_error'] == 0) {
+        $response = $this->getResponse('TwingleProject created');
       }
-      // If this is a test, do not create campaign
       else {
-        $response = $this->getResponse('TwingleProject not yet created');
+        $response = $this->getResponse('TwingleProject creation failed');
       }
+
     }
+    // If this is a test, do not create campaign
     else {
-      // Give information back if campaign already exists
-      $response = $this->getResponse('TwingleProject already exists');
+      $response = $this->getResponse('TwingleProject not yet created');
     }
+
     return $response;
   }
 
@@ -146,38 +144,35 @@ class TwingleProject {
   /**
    * Update an existing project
    *
-   * If true: don't do any changes
+   * @param array $values
+   * Array with values to update
    *
-   * @param bool $is_test
+   * @param string $origin
+   * Origin of the array. It can be one of two constants:
+   *   TwingleProject::TWINGLE|CIVICRM
    *
-   * @return array
-   * @throws \CiviCRM_API3_Exception
    */
-  public function update(bool $is_test = FALSE) {
+  public function update(array $values, string $origin) {
 
-    $response = '';
+    if ($origin == self::TWINGLE) {
+      // Format values and translate keys
+      self::translateKeys($values, self::IN);
+      self::formatValues($values, self::IN);
+    }
+    elseif ($origin == self::CIVICRM) {
+      $this->id = $values['id'];
+      self::translateCustomFields($values, self::OUT);
+    }
 
-    // Translate Twingle field names to custom field names
+    // Update attributes
+    $this->values = array_merge($this->values, $values);
+
+    // Translate Twingle field names into custom field names
     $translatedFields = $this->values;
-    self::translateCustomFields($translatedFields, self::OUT);
+    self::translateCustomFields($translatedFields, self::IN);
 
-    if (!$is_test) {
-      $result = civicrm_api3('Campaign', 'create', $translatedFields);
-      // If the TwingleProject campaign was updated successfully
-      if ($result['is_error'] == 0) {
-        $response = $this->getResponse('TwingleProject updated from Twingle');
-      }
-      // If the update failed for any reason
-      else {
-        $response = $this->getResponse('Updated from Twingle failed');
-      }
-    }
-    // If the TwingleProjects campaign has to get updated but this is in test mode
-    else {
-      $response = $this->getResponse('TwingleProject outdated');
-    }
-
-    return $response;
+    // Set id
+    $translatedFields['id'] = $this->id;
   }
 
 
@@ -191,7 +186,23 @@ class TwingleProject {
     $values = $this->values;
     self::formatValues($values, self::OUT);
     self::translateKeys($values, self::OUT);
-    unset($values['campaign_type_id']);
+
+    $json_file = file_get_contents(E::path() .
+      '/api/v3/TwingleSync/resources/twingle_api_templates.json');
+    $twingle_api_templates = json_decode($json_file, TRUE);
+    $project_template = $twingle_api_templates['project'];
+
+    if (!$project_template) {
+      \Civi::log()->error("Could not read json file");
+      throw new \Exception('Could not read json file');
+    }
+
+    foreach ($values as $key => $value) {
+      if (!in_array($key, $project_template)) {
+        unset($values[$key]);
+      }
+    }
+
     return $values;
   }
 
@@ -214,8 +225,7 @@ class TwingleProject {
     while (!$single) {
       $result = civicrm_api3('Campaign', 'get', [
         'sequential'   => 1,
-        'return'       => ['id', 'last_modified_date'],
-        'is_active'    => '1',
+        'is_active'    => 1,
         $cf_project_id => $this->values['id'],
       ]);
 
@@ -231,12 +241,8 @@ class TwingleProject {
     // project's attributes must be updated from the campaign
     if ($result['count'] == 1) {
 
-      // set campaign id attribute
-      $this->id = $result['values'][0]['id'];
-
-      // set last_modified_date
-      $this->values['last_modified_date'] =
-        $result['values'][0]['last_modified_date'];
+      // Set attributes to the values of the existing TwingleProject campaign
+      $this->update($result['values'][0], self::CIVICRM);
 
       return TRUE;
     }
@@ -283,10 +289,9 @@ class TwingleProject {
     // Delete the newest project from array to keep it active
     array_shift($result['values']);
 
-    // Instantiate the left projects to deactivate them
+    // deactivate the projects
     foreach ($result['values'] as $p) {
-      $project = TwingleProject::fetch($p['id']);
-      $project->deactivate();
+      self::deactivateById($p['id']);
     }
 
   }
@@ -384,6 +389,9 @@ class TwingleProject {
         ? ''
         : $values['type'];
 
+      // Cast project_target to integer
+      $values['project_target'] = (int) $values['project_target'];
+
     }
     else {
 
@@ -426,7 +434,11 @@ class TwingleProject {
             '',
             $field
           )];
-          unset($values[$field]);
+          unset($values[str_replace(
+              'twingle_project_',
+              '',
+              $field
+            )]);
         }
       }
     }
@@ -451,7 +463,7 @@ class TwingleProject {
 
 
   /**
-   * Deactivate a TwingleProject campaign
+   * Deactivate this TwingleProject campaign
    *
    * @return bool
    * TRUE if deactivation was successful
@@ -459,9 +471,32 @@ class TwingleProject {
    * @throws \CiviCRM_API3_Exception
    */
   public function deactivate() {
+
+    return self::deactivateByid($this->id);
+
+  }
+
+  /**
+   * Deactivate a TwingleProject campaign by ID
+   *
+   * @param $id
+   * ID of the TwingleProject campaign that should get deactivated
+   *
+   * @return bool
+   * TRUE if deactivation was successful
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function deactivateById($id) {
+
+    $result = civicrm_api3('Campaign', 'getsingle', [
+      'id'         => $id,
+      'sequential' => 1,
+    ]);
+
     $result = civicrm_api3('Campaign', 'create', [
-      'title'     => $this->values['title'],
-      'id'        => $this->id,
+      'title'     => $result['title'],
+      'id'        => $id,
       'is_active' => '0',
     ]);
 

@@ -123,10 +123,10 @@
       "help_post": "Choose the project type. Allow users to create own events or to pay a membership fee.",
       "default_value": "default"
     },
-    "twingle_project_target": {
+    "twingle_project_project_target": {
       "custom_group_id": "Twingle_Project_Information",
       "label": "Twingle Project target",
-      "name": "twingle_project_target",
+      "name": "twingle_project_project_target",
       "is_required": 0,
       "is_searchable": 1,
       "data_type": "Money",
