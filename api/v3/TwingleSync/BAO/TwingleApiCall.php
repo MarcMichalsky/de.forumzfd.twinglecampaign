@@ -233,12 +233,6 @@ class TwingleApiCall {
   public function updateEvent() {
   }
 
-  /**
-   * @return array
-   */
-  public function getOrganisationId() {
-    return $this->organisationId;
-  }
 
   /**
    *
