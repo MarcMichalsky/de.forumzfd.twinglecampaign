@@ -6,14 +6,14 @@ use CRM\TwingleCampaign\BAO\TwingleApiCall as TwingleApiCall;
 include_once E::path() . '/api/v3/TwingleSync/BAO/TwingleApiCall.php';
 
 /**
- * TwingleSync.Get API specification (optional)
+ * TwingleSync.Post API specification (optional)
  * This is used for documentation and validation.
  *
  * @param array $spec description of fields supported by this API call
  *
  * @see https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
  */
-function _civicrm_api3_twingle_sync_Get_spec(&$spec) {
+function _civicrm_api3_twingle_sync_Post_spec(&$spec) {
   $spec['twingle_api_key'] = [
     'name'         => 'twingle_api_key',
     'title'        => E::ts('Twingle API key'),
@@ -31,7 +31,7 @@ function _civicrm_api3_twingle_sync_Get_spec(&$spec) {
 }
 
 /**
- * TwingleSync.Get API
+ * TwingleSync.Post API
  *
  * @param array $params
  *
@@ -42,7 +42,7 @@ function _civicrm_api3_twingle_sync_Get_spec(&$spec) {
  * @see civicrm_api3_create_success
  *
  */
-function civicrm_api3_twingle_sync_Get($params) {
+function civicrm_api3_twingle_sync_Post($params) {
   $result_values = [];
 
   // Is this call a test?
