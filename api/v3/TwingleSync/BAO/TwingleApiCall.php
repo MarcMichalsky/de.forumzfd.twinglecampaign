@@ -127,7 +127,6 @@ class TwingleApiCall {
    * NULL if $values is not an array
    *
    * @throws \CiviCRM_API3_Exception
-   * @throws \Exception
    */
   public function syncProject(array $values, bool $is_test = FALSE) {
 
@@ -135,19 +134,67 @@ class TwingleApiCall {
     if (is_array($values)) {
 
       // Get project options
+      try {
         $project_options = $this->getProjectOptions($values['id']);
+      } catch (\Exception $e) {
+
+        // Log Exception
+        \Civi::log()->error(
+          "Failed to instantiate TwingleProject: $e->getMessage()"
+        );
+
+        // Return result array with error description
+        return [
+          "title"      => $values['name'],
+          "project_id" => $values['id'],
+          "status"     =>
+            "Failed to get project options from Twingle: $e->getMessage()",
+        ];
+      }
 
       // Instantiate TwingleProject
+      try {
         $project = new TwingleProject(
           $values,
           $project_options,
           TwingleProject::TWINGLE
         );
+      } catch (\Exception $e) {
+
+        // Log Exception
+        \Civi::log()->error(
+          "Failed to instantiate TwingleProject: $e->getMessage()"
+        );
+
+        // Return result array with error description
+        return [
+          "title"      => $values['name'],
+          "project_id" => $values['id'],
+          "status"     =>
+            "Failed to instantiate TwingleProject: $e->getMessage()",
+        ];
+      }
 
       // Check if the TwingleProject campaign already exists
       if (!$project->exists()) {
         // ... if not, create it
-        $result = $project->create($is_test);
+        try {
+          $result = $project->create($is_test);
+        } catch (\Exception $e) {
+
+          // Log Exception
+          \Civi::log()->error(
+            "Could not create campaign from TwingleProject: $e->getMessage()"
+          );
+
+          // Return result array with error description
+          return [
+            "title"      => $values['name'],
+            "project_id" => $values['id'],
+            "status"     =>
+              "Could not create campaign from TwingleProject: $e->getMessage()",
+          ];
+        }
       }
       else {
         $result = $project->getResponse('TwingleProject exists');
@@ -159,8 +206,19 @@ class TwingleApiCall {
         $result['status'] == 'TwingleProject exists' &&
         $values['last_update'] > $project->lastUpdate()
       ) {
-        $project->update($values, TwingleProject::TWINGLE);
-        $result = $project->create();
+        try {
+          $project->update($values, TwingleProject::TWINGLE);
+          $result = $project->create();
+        } catch (\Exception $e){
+          // Log Exception
+          \Civi::log()->error(
+            "Could not update TwingleProject campaign: $e->getMessage()"
+          );
+          // Return result array with error description
+          $result = $project->getResponse(
+            "Could not update TwingleProject campaign: $e->getMessage()"
+          );
+        }
       }
       // If the CiviCRM TwingleProject campaign was changed, update the project
       // on Twingle's side
@@ -204,7 +262,18 @@ class TwingleApiCall {
    */
   public function updateProject(TwingleProject &$project) {
 
-    $values = $project->export();
+    try {
+      $values = $project->export();
+    } catch (\Exception $e) {
+      // Log Exception
+      \Civi::log()->error(
+        "Could not export TwingleProject values: $e->getMessage()"
+      );
+      // Return result array with error description
+      return $project->getResponse(
+        "Could not export TwingleProject values: $e->getMessage()"
+      );
+    }
 
     // Prepare url for curl
     $url = $this->protocol . 'project' . $this->baseUrl . $values['id'];
@@ -214,9 +283,22 @@ class TwingleApiCall {
 
     // Update TwingleProject in Civi with results from api call
     if (is_array($result) && !array_key_exists('message', $result)) {
-      $project->update($result, TwingleProject::TWINGLE);
-      $project->create();
-      return $project->getResponse('TwingleProject pushed to Twingle');
+      // Try to update the local TwingleProject campaign
+      try {
+        $project->update($result, TwingleProject::TWINGLE);
+        $project->create();
+        return $project->getResponse('TwingleProject pushed to Twingle');
+      } catch (\Exception $e) {
+        // Log Exception
+        \Civi::log()->error(
+          "Could not update TwingleProject campaign: $e->getMessage()"
+        );
+        // Return result array with error description
+        return $project->getResponse(
+          "TwingleProject was likely pushed to Twingle but the 
+          local update of the campaign failed: $e->getMessage()"
+        );
+      }
     }
     else {
       $message = $result['message'];
