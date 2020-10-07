@@ -1,13 +1,16 @@
-{ "project": [
-  "id",
-  "allow_more",
-  "name",
-  "organisation_id",
-  "project_target",
-  "transaction_type",
-  "type"
-],
-  "project_settings": {
+{
+  "project": [
+    "id",
+    "allow_more",
+    "name",
+    "organisation_id",
+    "project_target",
+    "transaction_type",
+    "type"
+  ],
+  "event": [
+  ],
+  "project_options": {
     "id": 2237,
     "has_confirmation_mail": false,
     "has_confirmation_mail_api": false,
@@ -43,7 +46,6 @@
     "has_force_donation_target_buttons": false,
     "has_show_single_target": false,
     "betterpayment_credit_card_theme": null,
-    "last_update": 1600433614,
     "app_js": null,
     "slidericon": "heart",
     "extra_field": [],

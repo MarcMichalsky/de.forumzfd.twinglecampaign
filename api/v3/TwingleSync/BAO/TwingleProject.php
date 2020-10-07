@@ -63,7 +63,15 @@ class TwingleProject {
     // If values come from Twingle API
     elseif ($origin == self::TWINGLE) {
 
-      // Translate keys for import
+      // Set latest_update
+      $project['last_update'] = $project['last_update'] > $options['last_update']
+        ? $project['last_update']
+        : $options['last_update'];
+
+      // Delete $options['last_update']
+      unset($options['last_update']);
+
+        // Translate keys for import
       self::translateKeys($project, self::IN);
       self::translateKeys($options, self::IN);
 
@@ -114,12 +122,11 @@ class TwingleProject {
    */
   public function create(bool $is_test = FALSE) {
 
-
     // Create campaign only if it does not already exist
     if (!$is_test) {
 
       // Translate Twingle field names into custom field names
-      $translatedFields = $this->values;
+      $translatedFields = array_merge($this->options, $this->values);
       self::translateCustomFields($translatedFields, self::IN);
 
       // Set id
@@ -186,33 +193,82 @@ class TwingleProject {
 
 
   /**
-   * Export values
+   * Export values. Ensures that only those values will be exported which the
+   * Twingle API expects.
    *
    * @return array
+   * Array with all values to send to the Twingle API
+   *
    * @throws \Exception
    */
   public function export() {
+
     $values = $this->values;
     self::formatValues($values, self::OUT);
     self::translateKeys($values, self::OUT);
 
+    // Get json file with template for project
     $json_file = file_get_contents(E::path() .
       '/api/v3/TwingleSync/resources/twingle_api_templates.json');
-    $twingle_api_templates = json_decode($json_file, TRUE);
-    $project_template = $twingle_api_templates['project'];
+    $template = json_decode($json_file, TRUE)['project'];
 
-    if (!$project_template) {
+    // Throw an error if json file can't be read
+    if (!$template) {
       \Civi::log()->error("Could not read json file");
       throw new \Exception('Could not read json file');
     }
 
+    // Replace array items which the Twingle API does not expect
     foreach ($values as $key => $value) {
-      if (!in_array($key, $project_template)) {
+      if (!in_array($key, $template)) {
         unset($values[$key]);
       }
     }
 
     return $values;
+  }
+
+  /**
+   * Export options. Ensures that only those values will be exported which the
+   * Twingle API expects. Missing values will get complemented with default
+   * values.
+   *
+   * @return array
+   * Array with all options to send to the Twingle API
+   *
+   * @throws \Exception
+   *
+   */
+  public function exportOptions() {
+
+    $options = $this->options;
+    self::formatValues($options, self::OUT);
+    self::translateKeys($options, self::OUT);
+
+    // Get json file with template for project options
+    $file_path = E::path() .
+      '/api/v3/TwingleSync/resources/twingle_api_templates.json';
+    $json_file = file_get_contents($file_path);
+    $json_file_name = pathinfo($file_path)['filename'];
+    $template = json_decode($json_file, TRUE)['project_options'];
+
+    // Throw an error if json file can't be read
+    if (!$template) {
+      $message = ($json_file_name)
+        ? "Could not read json file $json_file_name"
+        : "Could not locate json file in path: $file_path";
+      throw new \Exception($message);
+    }
+
+    // Replace array items which the Twingle API does not expect
+    foreach ($options as $key => $value) {
+      if (!key_exists($key, $template)) {
+        unset($options[$key]);
+      }
+    }
+
+    // Complement missing options with default values
+    return array_merge($template, $options);
   }
 
 
