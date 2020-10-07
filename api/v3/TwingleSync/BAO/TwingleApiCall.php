@@ -123,7 +123,7 @@ class TwingleApiCall {
    * If TRUE, don't do any changes
    *
    * @return array|null
-   * Returns a response array that contains title, id, project_id and state or
+   * Returns a response array that contains title, id, project_id and status or
    * NULL if $values is not an array
    *
    * @throws \CiviCRM_API3_Exception
@@ -156,7 +156,7 @@ class TwingleApiCall {
       // If Twingle's version of the project is newer than the CiviCRM
       // TwingleProject campaign update the campaign
       if (
-        $result['state'] == 'TwingleProject exists' &&
+        $result['status'] == 'TwingleProject exists' &&
         $values['last_update'] > $project->lastUpdate()
       ) {
         $project->update($values, TwingleProject::TWINGLE);
@@ -199,7 +199,7 @@ class TwingleApiCall {
    * The TwingleProject object that should get pushed to Twingle
    *
    * @return array
-   * Returns a response array that contains title, id, project_id and state
+   * Returns a response array that contains title, id, project_id and status
    *
    */
   public function updateProject(TwingleProject $project) {
