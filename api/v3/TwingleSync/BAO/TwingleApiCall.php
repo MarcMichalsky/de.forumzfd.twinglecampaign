@@ -145,7 +145,7 @@ class TwingleApiCall {
       // If the CiviCRM TwingleProject campaign was changed, update the project
       // on Twingle's side
       elseif (
-        $result['state'] == 'TwingleProject exists' &&
+        $result['status'] == 'TwingleProject exists' &&
         $values['last_update'] < $project->lastUpdate()
       ) {
         // If this is a test do not make database changes
@@ -158,7 +158,7 @@ class TwingleApiCall {
           $result = $this->updateProject($project);
         }
       }
-      elseif ($result['state'] == 'TwingleProject exists') {
+      elseif ($result['status'] == 'TwingleProject exists') {
         $result = $project->getResponse('TwingleProject up to date');
       }
 

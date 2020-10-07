@@ -100,7 +100,7 @@ class TwingleProject {
    * If true: don't do any changes
    *
    * @return array
-   * Returns a response array that contains title, id, project_id and state
+   * Returns a response array that contains title, id, project_id and status
    *
    * @throws \CiviCRM_API3_Exception
    */
@@ -518,20 +518,20 @@ class TwingleProject {
 
 
   /**
-   * Get a response that describes the state of a TwingleProject
+   * Get a response that describes the status of a TwingleProject
    *
-   * @param string $state
-   * State of the TwingleProject you want the response for
+   * @param string $status
+   * status of the TwingleProject you want the response for
    *
    * @return array
-   * Returns a response array that contains title, id, project_id and state
+   * Returns a response array that contains title, id, project_id and status
    */
-  public function getResponse(string $state) {
+  public function getResponse(string $status) {
     return [
       'title'      => $this->values['title'],
       'id'         => $this->id,
       'project_id' => $this->values['id'],
-      'state'      => $state,
+      'status'      => $status,
     ];
   }
 
