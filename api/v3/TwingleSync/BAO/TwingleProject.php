@@ -28,49 +28,57 @@ class TwingleProject {
 
   private $values;
 
-  private $settings;
+  private $options;
 
 
   /**
    * TwingleProject constructor.
    *
-   * @param array $values
-   * Array of values from which to create a TwingleProject
+   * @param array $project
+   * Result array of Twingle API call to
+   * https://project.twingle.de/api/by-organisation/$organisation_id
+   *
+   * @param array $options
+   * Result array of Twingle Api call to
+   * https://project.twingle.de/api/$project_id/options
    *
    * @param string $origin
-   * Origin of the array. It can be one of two constants:
-   *   TwingleProject::TWINGLE|CIVICRM
+   * Origin of the arrays. It can be one of two constants:
+   * TwingleProject::TWINGLE|CIVICRM
    *
    * @throws \Exception
    */
-  public function __construct(array $values, string $origin) {
+  public function __construct(array $project, array $options, string $origin) {
 
     // If values come from CiviCRM Campaign API
     if ($origin == self::CIVICRM) {
 
       // Set id (campaign id) attribute
-      $this->id = $values['id'];
+      $this->id = $project['id'];
 
       // Translate custom field names into Twingle field names
-      self::translateCustomFields($values, self::$OUT);
+      self::translateCustomFields($project, self::$OUT);
 
     }
     // If values come from Twingle API
     elseif ($origin == self::TWINGLE) {
 
       // Translate keys for import
-      self::translateKeys($values, self::IN);
+      self::translateKeys($project, self::IN);
+      self::translateKeys($options, self::IN);
 
       // Format values for import
-      self::formatValues($values, self::IN);
+      self::formatValues($project, self::IN);
+      self::formatValues($options, self::IN);
 
     }
 
     // Add value for campaign type
-    $values['campaign_type_id'] = 'twingle_project';
+    $project['campaign_type_id'] = 'twingle_project';
 
-    // Import values
-    $this->values = $values;
+    // Import project values and options
+    $this->values = $project;
+    $this->options = $options;
 
     // Fetch custom field mapping once
     self::init();
@@ -151,6 +159,7 @@ class TwingleProject {
    * Origin of the array. It can be one of two constants:
    *   TwingleProject::TWINGLE|CIVICRM
    *
+   * @throws \Exception
    */
   public function update(array $values, string $origin) {
 
@@ -597,6 +606,7 @@ class TwingleProject {
 
   }
 
+
   /**
    * Return a timestamp of the last update of the TwingleProject
    *
@@ -604,6 +614,15 @@ class TwingleProject {
    */
   public function lastUpdate() {
     return self::getTimestamp($this->values['last_modified_date']);
+  }
+
+  /**
+   * Returns the project_id of a TwingleProject
+   *
+   * @return int
+   */
+  public function getProjectId() {
+    return $this->values['id'];
   }
 
 
