@@ -202,7 +202,7 @@ class TwingleApiCall {
    * Returns a response array that contains title, id, project_id and status
    *
    */
-  public function updateProject(TwingleProject $project) {
+  public function updateProject(TwingleProject &$project) {
 
     $values = $project->export();
 
