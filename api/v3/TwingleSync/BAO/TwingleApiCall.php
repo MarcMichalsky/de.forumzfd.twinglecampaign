@@ -57,7 +57,7 @@ class TwingleApiCall {
    *
    * @return mixed
    */
-  public function getProject($projectId = NULL) {
+  public function getProject(int $projectId = NULL) {
     $response = [];
     foreach ($this->organisationId as $organisationId) {
       $url = empty($projectId)
