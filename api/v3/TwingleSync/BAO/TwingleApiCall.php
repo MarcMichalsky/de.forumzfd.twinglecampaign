@@ -69,6 +69,18 @@ class TwingleApiCall {
     return $response;
   }
 
+
+  public function getProjectOptions(int $projectId) {
+    $response = [];
+    foreach ($this->organisationId as $organisationId) {
+      $url = $this->protocol . 'project' . $this->baseUrl . $projectId .
+        '/options';
+
+      $response = array_merge($this->curlGet($url));
+    }
+    return $response;
+  }
+
   /**
    *
    * Returns all Events for the given $projectId
@@ -122,7 +134,15 @@ class TwingleApiCall {
     // If $values is an array
     if (is_array($values)) {
 
-      $project = new TwingleProject($values, TwingleProject::TWINGLE);
+      // Get project options
+        $project_options = $this->getProjectOptions($values['id']);
+
+      // Instantiate TwingleProject
+        $project = new TwingleProject(
+          $values,
+          $project_options,
+          TwingleProject::TWINGLE
+        );
 
       // Check if the TwingleProject campaign already exists
       if (!$project->exists()) {
