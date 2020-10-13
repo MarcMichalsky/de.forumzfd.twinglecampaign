@@ -191,13 +191,16 @@ class TwingleProject {
    * @param array $values
    * Array with values to update
    *
+   * @param array $options
+   * Array with options to update
+   *
    * @param string $origin
    * Origin of the array. It can be one of two constants:
    *   TwingleProject::TWINGLE|CIVICRM
    *
    * @throws \Exception
    */
-  public function update(array $values, array $options, string $origin) {
+  public function update(array $values, array $options, string $origin = NULL) {
 
     if ($origin == self::TWINGLE) {
       // Format values and translate keys
@@ -314,14 +317,27 @@ class TwingleProject {
     // project's attributes must be updated from the campaign
     if ($result['count'] == 1) {
 
+      // Set campaign id attribute
+      $this->id = $result['values'][0]['id'];
+
+      // Translate custom field names back
+      self::translateCustomFields($result['values'][0], self::OUT);
+
+      // Translate keys from CiviCRM format to Twingle format
+      self::translateKeys($result['values'][0], self::OUT);
+
       // Split result array into project values and options
       $values_and_options = self::splitValues($result['values'][0]);
 
+      // Translate keys from Twingle format to CiviCRM format
+      self::translateKeys($values_and_options['values'], self::IN);
+      self::translateKeys($values_and_options['options'], self::IN);
+
       // Set attributes to the values of the existing TwingleProject campaign
+      // to reflect the state of the actual campaign in the database
       $this->update(
         $values_and_options['values'],
-        $values_and_options['options'],
-        self::CIVICRM
+        $values_and_options['options']
       );
 
       return TRUE;

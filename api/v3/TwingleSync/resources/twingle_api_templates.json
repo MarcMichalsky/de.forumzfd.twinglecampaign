@@ -1,12 +1,14 @@
 {
   "project": [
     "id",
+    "identifier",
     "allow_more",
     "name",
     "organisation_id",
     "project_target",
     "transaction_type",
-    "type"
+    "type",
+    "last_update"
   ],
   "event": [
   ],
