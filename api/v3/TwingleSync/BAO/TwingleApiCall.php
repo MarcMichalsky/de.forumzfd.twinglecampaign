@@ -215,7 +215,7 @@ class TwingleApiCall {
         $values['last_update'] > $project->lastUpdate()
       ) {
         try {
-          $project->update($values, TwingleProject::TWINGLE);
+          $project->update($values, $project_options, TwingleProject::TWINGLE);
           $result = $project->create();
         } catch (\Exception $e){
           // Log Exception

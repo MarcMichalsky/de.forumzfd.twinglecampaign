@@ -197,20 +197,26 @@ class TwingleProject {
    *
    * @throws \Exception
    */
-  public function update(array $values, string $origin) {
+  public function update(array $values, array $options, string $origin) {
 
     if ($origin == self::TWINGLE) {
       // Format values and translate keys
       self::translateKeys($values, self::IN);
       self::formatValues($values, self::IN);
+
+      //Format options and translate keys
+      self::translateKeys($options, self::IN);
+      self::formatValues($options, self::IN);
     }
     elseif ($origin == self::CIVICRM) {
       $this->id = $values['id'];
       self::translateCustomFields($values, self::OUT);
     }
 
-    // Update attributes
+    // Update values and options
     $this->values = array_merge($this->values, $values);
+    $this->options = array_merge($this->options, $options);
+
   }
 
 
@@ -279,14 +285,14 @@ class TwingleProject {
    *
    * @return bool
    * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
    */
   public function exists() {
 
+    $result = [];
+
     // Get custom field name for project_id
     $cf_project_id = TwingleProject::$customFieldMapping['twingle_project_id'];
-
-    $single = FALSE;
-    $result = [];
 
     // If there is more than one campaign for a project, handle the duplicates
     while (!$single) {
@@ -308,8 +314,15 @@ class TwingleProject {
     // project's attributes must be updated from the campaign
     if ($result['count'] == 1) {
 
+      // Split result array into project values and options
+      $values_and_options = self::splitValues($result['values'][0]);
+
       // Set attributes to the values of the existing TwingleProject campaign
-      $this->update($result['values'][0], self::CIVICRM);
+      $this->update(
+        $values_and_options['values'],
+        $values_and_options['options'],
+        self::CIVICRM
+      );
 
       return TRUE;
     }
@@ -461,7 +474,6 @@ class TwingleProject {
           unset($possible_contact_fields[$exclude_contact_field]);
         }
 
-
         $values['exclude_contact_fields'] =
           \CRM_Utils_Array::implodePadded($possible_contact_fields);
       }
@@ -559,6 +571,44 @@ class TwingleProject {
         }
       }
     }
+  }
+
+  /**
+   * A function that will split one array coming from a TwingleProject campaign
+   * into a value array (containing basic project information) and another
+   * array containing the project options.
+   *
+   * @param array $input
+   * Array that comes from TwingleProject campaign
+   *
+   * @return array[]
+   * Associative array that contains two arrays: $values & $options
+   *
+   * @throws \Exception
+   */
+  private function splitValues(array $input) {
+
+    $values = [];
+    $options = [];
+
+    // Get array with template for project values and options
+    $values_template = self::$templates['project'];
+    $options_template = self::$templates['project_options'];
+
+    // Map array items into $values and $options array
+    foreach ($input as $key => $value) {
+      if (in_array($key, $values_template)) {
+        $values[$key] = $value;
+      }
+      if (key_exists($key, $options_template)) {
+        $options[$key] = $value;
+      }
+    }
+
+    return [
+      'values' => $values,
+      'options' => $options
+    ];
   }
 
 
