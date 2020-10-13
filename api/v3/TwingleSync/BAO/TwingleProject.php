@@ -63,14 +63,6 @@ class TwingleProject {
     // If values come from Twingle API
     elseif ($origin == self::TWINGLE) {
 
-      // Set latest_update
-      $project['last_update'] = $project['last_update'] > $options['last_update']
-        ? $project['last_update']
-        : $options['last_update'];
-
-      // Delete $options['last_update']
-      unset($options['last_update']);
-
         // Translate keys for import
       self::translateKeys($project, self::IN);
       self::translateKeys($options, self::IN);

@@ -152,6 +152,14 @@ class TwingleApiCall {
         ];
       }
 
+      // Set latest_update
+      $values['last_update'] = $values['last_update'] > $project_options['last_update']
+        ? $values['last_update']
+        : $project_options['last_update'];
+
+      // Delete $options['last_update']
+      unset($project_options['last_update']);
+
       // Instantiate TwingleProject
       try {
         $project = new TwingleProject(
