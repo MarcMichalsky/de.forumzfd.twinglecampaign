@@ -420,15 +420,64 @@ class TwingleProject {
     if ($direction == self::IN) {
 
       // Change timestamp into DateTime string
-      $values['last_modified_date'] =
-        self::getDateTime($values['last_modified_date']);
+      if ($values['last_modified_date']) {
+        $values['last_modified_date'] =
+          self::getDateTime($values['last_modified_date']);
+      }
 
       // empty project_type to 'default
-      $values['type'] = $values['type'] == ''
-        ? 'default'
-        : $values['type'];
+      if ($values['type']) {
+        $values['type'] = $values['type'] == ''
+          ? 'default'
+          : $values['type'];
+      }
 
+      // format donation rhythm
+      if (is_array($values['donation_rhythm'])) {
+        $tmp = [];
+        foreach ($values['donation_rhythm'] as $key => $value) {
+          if ($value) {
+            $tmp[$key] = $key;
+          }
+        }
+        $values['donation_rhythm'] = \CRM_Utils_Array::implodePadded($tmp);
+      }
+
+      // Format project target format
+      if (key_exists('has_projecttarget_as_money', $values)) {
+      $values['has_projecttarget_as_money'] =
+        $values['has_projecttarget_as_money'] ? 'in Euro' : 'percentage';
+      }
+
+      // Format contact fields
+      if ($values['exclude_contact_fields']) {
+        $possible_contact_fields =
+          self::$campaigns['custom_fields']
+          ['twingle_project_exclude_contact_fields']['option_values'];
+
+        $exclude_contact_fields = explode(',', $values['exclude_contact_fields']);
+
+        foreach ($exclude_contact_fields as $exclude_contact_field) {
+          unset($possible_contact_fields[$exclude_contact_field]);
+        }
+
+
+        $values['exclude_contact_fields'] =
+          \CRM_Utils_Array::implodePadded($possible_contact_fields);
+      }
+
+      // Format languages
+      if ($values['languages']) {
+        $values['languages'] =
+          \CRM_Utils_Array::implodePadded(
+            explode(
+              ',',
+              $values['languages']
+            )
+          );
+      }
     }
+
     elseif ($direction == self::OUT) {
 
       // Change DateTime string into timestamp
