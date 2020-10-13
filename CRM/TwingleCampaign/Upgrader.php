@@ -43,7 +43,8 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
     // Create campaign types, custom fields and custom groups by the contents
     // of the json file "campaigns.json"
 
-    $json_file = file_get_contents(E::path() . '/CRM/TwingleCampaign/Upgrader/resources/campaigns.json');
+    $json_file = file_get_contents(E::path() .
+      '/CRM/TwingleCampaign/Upgrader/resources/campaigns.json');
     $campaign_info = json_decode($json_file, TRUE);
 
     if (!$campaign_info) {

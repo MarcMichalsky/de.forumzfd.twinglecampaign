@@ -72,9 +72,8 @@ class TwingleProject {
     // If values come from Twingle API
     elseif ($origin == self::TWINGLE) {
 
-        // Translate keys for import
+      // Translate keys for import
       self::translateKeys($project, self::IN);
-      self::translateKeys($options, self::IN);
 
       // Format values for import
       self::formatValues($project, self::IN);
@@ -212,13 +211,6 @@ class TwingleProject {
 
     // Update attributes
     $this->values = array_merge($this->values, $values);
-
-    // Translate Twingle field names into custom field names
-    $translatedFields = $this->values;
-    self::translateCustomFields($translatedFields, self::IN);
-
-    // Set id
-    $translatedFields['id'] = $this->id;
   }
 
 
@@ -590,7 +582,7 @@ class TwingleProject {
       'title'      => $this->values['title'],
       'id'         => $this->id,
       'project_id' => $this->values['id'],
-      'status'      => $status,
+      'status'     => $status,
     ];
   }
 
