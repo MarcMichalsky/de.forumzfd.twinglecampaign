@@ -296,6 +296,7 @@ class TwingleApiCall {
     if (is_array($result) && !array_key_exists('message', $result)) {
       // Try to update the local TwingleProject campaign
       try {
+        // TODO: get options and add them as parameter to $project->update() call
         $project->update($result, TwingleProject::TWINGLE);
         $project->create();
         return $project->getResponse('TwingleProject pushed to Twingle');
