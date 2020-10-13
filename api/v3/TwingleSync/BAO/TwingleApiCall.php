@@ -6,7 +6,7 @@ use CRM_Core_BAO_Setting;
 use CRM_TwingleCampaign_ExtensionUtil as E;
 use CRM\TwingleCampaign\BAO\TwingleProject as TwingleProject;
 
-include_once E::path() . '/api/v3/TwingleSync/BAO/TwingleProject.php';
+include_once E::path() . '/CRM/TwingleCampaign/BAO/TwingleProject.php';
 
 class TwingleApiCall {
 

@@ -147,7 +147,7 @@ class CustomField {
       $customFields = [];
 
       $json_file = file_get_contents(E::path() .
-        '/CRM/TwingleCampaign/Upgrader/resources/campaigns.json');
+        '/CRM/TwingleCampaign/resources/campaigns.json');
       $campaign_info = json_decode($json_file, TRUE);
 
       if (!$campaign_info) {

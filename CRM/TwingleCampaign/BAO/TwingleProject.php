@@ -7,7 +7,7 @@ use CRM_TwingleCampaign_ExtensionUtil as E;
 use DateTime;
 use CRM\TwingleCampaign\BAO\CustomField as CustomField;
 
-include_once E::path() . '/CRM/TwingleCampaign/Upgrader/BAO/CustomField.php';
+include_once E::path() . '/CRM/TwingleCampaign/BAO/CustomField.php';
 
 
 class TwingleProject {
@@ -107,9 +107,9 @@ class TwingleProject {
 
     // Initialize json files as arrays
     $file_paths = [
-      'translations' => '/api/v3/TwingleSync/resources/dictionary.json',
-      'templates'    => '/api/v3/TwingleSync/resources/twingle_api_templates.json',
-      'campaigns'    => '/CRM/TwingleCampaign/Upgrader/resources/campaigns.json',
+      'translations' => '/CRM/TwingleCampaign/resources/dictionary.json',
+      'templates'    => '/CRM/TwingleCampaign/resources/twingle_api_templates.json',
+      'campaigns'    => '/CRM/TwingleCampaign/resources/campaigns.json',
     ];
 
     foreach ($file_paths as $key => $file_path) {

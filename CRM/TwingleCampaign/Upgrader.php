@@ -3,9 +3,9 @@
 use CRM_TwingleCampaign_ExtensionUtil as E;
 use CRM\TwingleCampaign\BAO as BAO;
 
-include E::path() . '/CRM/TwingleCampaign/Upgrader/BAO/CampaignType.php';
-include E::path() . '/CRM/TwingleCampaign/Upgrader/BAO/CustomField.php';
-include E::path() . '/CRM/TwingleCampaign/Upgrader/BAO/CustomGroup.php';
+include E::path() . '/CRM/TwingleCampaign/BAO/CampaignType.php';
+include E::path() . '/CRM/TwingleCampaign/BAO/CustomField.php';
+include E::path() . '/CRM/TwingleCampaign/BAO/CustomGroup.php';
 
 /**
  * Collection of upgrade steps.
@@ -44,7 +44,7 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
     // of the json file "campaigns.json"
 
     $json_file = file_get_contents(E::path() .
-      '/CRM/TwingleCampaign/Upgrader/resources/campaigns.json');
+      '/CRM/TwingleCampaign/resources/campaigns.json');
     $campaign_info = json_decode($json_file, TRUE);
 
     if (!$campaign_info) {
@@ -86,7 +86,7 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
    */
  public function disable() {
 
-   $json_file = file_get_contents(E::path() . '/CRM/TwingleCampaign/Upgrader/resources/campaigns.json');
+   $json_file = file_get_contents(E::path() . '/CRM/TwingleCampaign/resources/campaigns.json');
    $campaign_info = json_decode($json_file, TRUE);
 
    if (!$campaign_info) {
