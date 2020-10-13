@@ -28,9 +28,9 @@
       "campaign_type": "twingle_project",
       "weight": "2"
     },
-    "twingle_project_settings": {
+    "twingle_project_options": {
       "title": "Twingle Project Settings",
-      "name": "Twingle_Project_Settings",
+      "name": "Twingle_Project_Options",
       "extends": "Campaign",
       "campaign_type": "twingle_project",
       "weight": "3"
@@ -270,7 +270,7 @@
       "weight": 7
     },
     "twingle_project_has_confirmation_mail": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Confirmation Mail",
       "name": "twingle_project_has_confirmation_mail",
       "is_required": 0,
@@ -284,7 +284,7 @@
       "help_post": "Send confirmation mail"
     },
     "twingle_project_has_confirmation_mail_api": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Confirmation Mail API",
       "name": "twingle_project_has_confirmation_mail_api",
       "is_required": 0,
@@ -297,7 +297,7 @@
       "weight": 2
     },
     "twingle_project_has_donation_receipt": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Donation Receipt",
       "name": "twingle_project_has_donation_receipt",
       "is_required": 0,
@@ -311,7 +311,7 @@
       "help_post": "Offer donation receipts"
     },
     "twingle_project_has_contact_data": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Contact Data",
       "name": "twingle_project_has_contact_data",
       "is_required": 0,
@@ -324,7 +324,7 @@
       "weight": 4
     },
     "twingle_project_donation_rhythm": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Donation Rhythm",
       "name": "twingle_project_donation_rhythm",
       "is_required": 0,
@@ -344,7 +344,7 @@
       "weight": 5
     },
     "twingle_project_has_newsletter_registration": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Newsletter Registration",
       "name": "twingle_project_has_newsletter_registration",
       "is_required": 0,
@@ -358,7 +358,7 @@
       "help_post": "Enable newsletter registration"
     },
     "twingle_project_has_postinfo_registration": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Postinfo Registration",
       "name": "twingle_project_has_postinfo_registration",
       "is_required": 0,
@@ -372,7 +372,7 @@
       "help_post": "Enable post info registration"
     },
     "twingle_project_design_background_color": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Background Color",
       "name": "twingle_project_design_background_color",
       "is_required": 0,
@@ -386,7 +386,7 @@
       "help_post": "Hex color code (e.g. ffffff for white)"
     },
     "twingle_project_design_primary_color": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Primary Color",
       "name": "twingle_project_design_primary_color",
       "is_required": 0,
@@ -400,7 +400,7 @@
       "help_post": "Hex color code (e.g. ffffff for white)"
     },
     "twingle_project_design_font": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Font",
       "name": "twingle_project_design_font",
       "is_required": 0,
@@ -414,7 +414,7 @@
       "help_post": "Font name"
     },
     "twingle_project_design_font_color": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Font Color",
       "name": "twingle_project_design_font_color",
       "is_required": 0,
@@ -428,7 +428,7 @@
       "help_post": "Hex color code (e.g. ffffff for white)"
     },
     "twingle_project_design_button_font_color": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Button Font Color",
       "name": "twingle_project_design_button_font_color",
       "is_required": 0,
@@ -442,7 +442,7 @@
       "help_post": "Hex color code (e.g. ffffff for white)"
     },
     "twingle_project_design_button_font_color_light": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Button Font Color Light",
       "name": "twingle_project_design_button_font_color_light",
       "is_required": 0,
@@ -456,7 +456,7 @@
       "help_post": "Hex color code (e.g. ffffff for white)"
     },
     "twingle_project_image": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Image",
       "name": "twingle_project_image",
       "is_required": 0,
@@ -468,7 +468,7 @@
       "weight": 14
     },
     "twingle_project_bcc_email_address": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project BCC Email",
       "name": "twingle_project_bcc_email_address",
       "is_required": 0,
@@ -482,7 +482,7 @@
       "help_post": "Email address used as bcc addresses for confirmation mail which is send to an user"
     },
     "twingle_project_donation_value_min": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Donation Min",
       "name": "twingle_project_donation_value_min",
       "is_required": 0,
@@ -497,7 +497,7 @@
       "default_value": "5"
     },
     "twingle_project_donation_value_max": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Donation Max",
       "name": "twingle_project_donation_value_max",
       "is_required": 0,
@@ -512,7 +512,7 @@
       "default_value": "500"
     },
     "twingle_project_donation_value_default": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Donation Default",
       "name": "twingle_project_donation_value_default",
       "is_required": 0,
@@ -527,7 +527,7 @@
       "default_value": "50"
     },
     "twingle_project_exclude_contact_fields": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Contact Fields",
       "name": "twingle_project_exclude_contact_fields",
       "is_required": 0,
@@ -552,7 +552,7 @@
       "help_post": "Fields to include in contact form"
     },
     "twingle_project_custom_js": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Custom JavaScript",
       "name": "twingle_project_custom_js",
       "is_required": 0,
@@ -566,7 +566,7 @@
       "help_post": "URL to a custom JavaScript file that will be included in the frontend"
     },
     "twingle_project_custom_css": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Custom CSS",
       "name": "twingle_project_custom_css",
       "is_required": 0,
@@ -580,7 +580,7 @@
       "help_post": "URL to a custom CSS file that will be included in the frontend"
     },
     "twingle_project_share_url": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Share URL",
       "name": "twingle_project_share_url",
       "is_required": 0,
@@ -594,7 +594,7 @@
       "help_post": "URL for the sharing component on the last page and doi page"
     },
     "twingle_project_has_contact_mandatory": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Contact Mandatory",
       "name": "twingle_project_has_contact_mandatory",
       "is_required": 0,
@@ -607,7 +607,7 @@
       "help_post": "If the contact data should be requested mandatory as second step"
     },
     "twingle_project_has_doi": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Double Opt-In",
       "name": "twingle_project_has_doi",
       "is_required": 0,
@@ -620,7 +620,7 @@
       "help_post": "Enable Twingle's double opt-in (Do not enable, if you use CiviCRM's double opt-in!)"
     },
     "twingle_project_doi_redirect": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Double Opt-In Redirect",
       "name": "twingle_project_doi_redirect",
       "is_required": 0,
@@ -634,7 +634,7 @@
       "help_post": "Redirect url or urls (each per language) after successful DOIs"
     },
     "twingle_project_has_force_donation_target_buttons": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Force Donation Taget as Button",
       "name": "twingle_project_has_force_donation_target_buttons",
       "is_required": 0,
@@ -647,7 +647,7 @@
       "help_post": "Force showing the donation targets as buttons"
     },
     "twingle_project_has_show_single_target": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Show Single Target",
       "name": "twingle_project_has_show_single_target",
       "is_required": 0,
@@ -659,10 +659,10 @@
       "weight": 27,
       "help_post": "Show the donation button if we have only one set"
     },
-    "twingle_project_settings_last_update": {
-      "custom_group_id": "Twingle_Project_Settings",
+    "twingle_project_options_last_update": {
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Last Update",
-      "name": "twingle_project_settings_last_update",
+      "name": "twingle_project_options_last_update",
       "is_required": 0,
       "is_searchable": 0,
       "data_type": "String",
@@ -672,7 +672,7 @@
       "weight": 28
     },
     "twingle_project_slidericon": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Slider Icon",
       "name": "twingle_project_slidericon",
       "is_required": 0,
@@ -704,11 +704,11 @@
         "empty": "No Icon"
       },
       "is_active": 1,
-      "is_view": 1,
+      "is_view": 0,
       "weight": 29
     },
     "twingle_project_use_extra_field": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Use Extra Field",
       "name": "twingle_project_use_extra_field",
       "is_required": 0,
@@ -721,7 +721,7 @@
       "help_post": "Create extra field"
     },
     "twingle_project_extra_field_headline": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Use Extra Field Headline",
       "name": "twingle_project_extra_field_headline",
       "is_required": 0,
@@ -734,7 +734,7 @@
       "weight": 31
     },
     "twingle_project_extra_field_type": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Use Extra Field Type",
       "name": "twingle_project_extra_field_type",
       "is_required": 0,
@@ -747,7 +747,7 @@
       "weight": 32
     },
     "twingle_project_extra_field_label": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Use Extra Field Label",
       "name": "twingle_project_extra_field_label",
       "is_required": 0,
@@ -760,7 +760,7 @@
       "weight": 33
     },
     "twingle_project_extra_field_mandatory": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Use Extra Field Mandatory",
       "name": "twingle_project_extra_field_mandatory",
       "is_required": 0,
@@ -772,7 +772,7 @@
       "weight": 34
     },
     "twingle_project_has_hidden_logo": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Hidden Logo",
       "name": "twingle_project_has_hidden_logo",
       "is_required": 0,
@@ -785,7 +785,7 @@
       "help_post": "Hide the Logo on the project page"
     },
     "twingle_project_has_projecttarget_as_money": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Target Format",
       "name": "twingle_project_has_projecttarget_as_money",
       "is_required": 0,
@@ -803,7 +803,7 @@
       "default_value": "0"
     },
     "twingle_project_has_donationtarget_textfield": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Donation Purpose as Textfield",
       "name": "twingle_project_has_donationtarget_textfield",
       "is_required": 0,
@@ -816,7 +816,7 @@
       "help_post": "Let donors enter their own donation purpose"
     },
     "twingle_project_has_civi_crm_activated": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Activate CiviCRM Support",
       "name": "twingle_project_has_civi_crm_activated",
       "is_required": 0,
@@ -829,7 +829,7 @@
       "help_post": "Activate support for Twingle Extension (de.systopia.twingle)"
     },
     "twingle_project_has_step_index": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Show Step Index",
       "name": "twingle_project_has_step_index",
       "is_required": 0,
@@ -842,7 +842,7 @@
       "help_post": "Show a step index during donation process"
     },
     "twingle_project_gift_donation": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Donation Certificate ",
       "name": "twingle_project_gift_donation",
       "is_required": 0,
@@ -860,7 +860,7 @@
       "help_post": "Should donors get a donation certificate?"
     },
     "twingle_project_gift_donation_icon": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Donation Certificate Icon",
       "name": "twingle_project_gift_donation_icon",
       "is_required": 0,
@@ -884,7 +884,7 @@
       "weight": 41
     },
     "twingle_project_gift_donation_image": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Donation Certificate Image",
       "name": "twingle_project_gift_donation_image",
       "is_required": 0,
@@ -896,7 +896,7 @@
       "weight": 42
     },
     "twingle_project_languages": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Languages",
       "name": "twingle_project_languages",
       "is_required": 0,
@@ -914,7 +914,7 @@
       "weight": 43
     },
     "twingle_project_has_buttons": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Buttons",
       "name": "twingle_project_has_buttons",
       "is_required": 0,
@@ -927,7 +927,7 @@
       "help_post": "Up to three buttons can be configured. If you leave the amount blank, the button will not be displayed."
     },
     "twingle_project_has_no_slider": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Slider",
       "name": "twingle_project_has_no_slider",
       "is_required": 0,
@@ -940,7 +940,7 @@
       "help_post": "Show a slider that allows the donor to choose the donation amount."
     },
     "twingle_project_button1": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Button 1",
       "name": "twingle_project_button1",
       "is_required": 0,
@@ -954,7 +954,7 @@
       "help_post": "Amount to be displayed on Button 1"
     },
     "twingle_project_button2": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Button 2",
       "name": "twingle_project_button2",
       "is_required": 0,
@@ -968,7 +968,7 @@
       "help_post": "Amount to be displayed on Button 2"
     },
     "twingle_project_button3": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Button 3",
       "name": "twingle_project_button3",
       "is_required": 0,
@@ -982,7 +982,7 @@
       "help_post": "Amount to be displayed on Button 3"
     },
     "twingle_project_has_newsletter_namerequest": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Newsletter Name Requested",
       "name": "twingle_project_has_newsletter_namerequest",
       "is_required": 0,
@@ -995,7 +995,7 @@
       "help_post": "Must a donor give his name for newsletter sign-up?"
     },
     "twingle_project_has_show_donator_data": {
-      "custom_group_id": "Twingle_Project_Settings",
+      "custom_group_id": "Twingle_Project_Options",
       "label": "Twingle Project Show List of Donations",
       "name": "twingle_project_has_show_donator_data",
       "is_required": 0,
