@@ -230,7 +230,9 @@ class CustomField {
     $customFieldMapping = [];
 
     foreach ($customFields as $customField) {
-      $customFieldMapping[$customField->getName()] = 'custom_' . $customField->getId();
+      if ($customField) {
+        $customFieldMapping[$customField->getName()] = 'custom_' . $customField->getId();
+      }
     }
 
     return $customFieldMapping;
