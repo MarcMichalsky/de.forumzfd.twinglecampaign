@@ -217,6 +217,9 @@ class TwingleApiCall {
         try {
           $project->update($values, $project_options, TwingleProject::TWINGLE);
           $result = $project->create();
+          $result['status'] = $result['status'] == 'TwingleProject created'
+            ? 'TwingleProject updated'
+            : 'TwingleProject Update failed';
         } catch (\Exception $e){
           // Log Exception
           \Civi::log()->error(
