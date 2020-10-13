@@ -678,11 +678,6 @@ class TwingleProject {
   }
 
 
-  public function syncSettings() {
-    // TODO: sync project settings
-  }
-
-
   /**
    * Get a response that describes the status of a TwingleProject
    *
