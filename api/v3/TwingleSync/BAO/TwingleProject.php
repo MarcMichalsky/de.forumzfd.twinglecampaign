@@ -24,6 +24,12 @@ class TwingleProject {
 
   private static $customFieldMapping;
 
+  private static $translations;
+
+  private static $campaigns;
+
+  private static $templates;
+
   private $id;
 
   private $values;
@@ -49,6 +55,9 @@ class TwingleProject {
    * @throws \Exception
    */
   public function __construct(array $project, array $options, string $origin) {
+
+    // Fetch custom field mapping once
+    self::init();
 
     // If values come from CiviCRM Campaign API
     if ($origin == self::CIVICRM) {
@@ -79,9 +88,6 @@ class TwingleProject {
     // Import project values and options
     $this->values = $project;
     $this->options = $options;
-
-    // Fetch custom field mapping once
-    self::init();
   }
 
 
@@ -93,11 +99,43 @@ class TwingleProject {
    * @throws \Exception
    */
   private static function init() {
+
+    // Initialize custom field mapping
     if (self::$bInitialized) {
       return;
     }
     self::$customFieldMapping = CustomField::getMapping();
+
+    // Initialize json files as arrays
+    $file_paths = [
+      'translations' => '/api/v3/TwingleSync/resources/dictionary.json',
+      'templates'    => '/api/v3/TwingleSync/resources/twingle_api_templates.json',
+      'campaigns'    => '/CRM/TwingleCampaign/Upgrader/resources/campaigns.json',
+    ];
+
+    foreach ($file_paths as $key => $file_path) {
+
+      // Get array from json file
+      $file_path = E::path() . $file_path;
+      $json_file = file_get_contents($file_path);
+      $json_file_name = pathinfo($file_path)['filename'];
+      $array = json_decode($json_file, TRUE);
+
+      // Throw and log an error if json file can't be read
+      if (!$array) {
+        $message = ($json_file_name)
+          ? "Could not read json file $json_file_name"
+          : "Could not locate json file in path: $file_path";
+        \Civi::log()->error($message);
+        throw new \Exception($message);
+      }
+
+      // Set attribute
+      self::$$key = $array;
+    }
+
     self::$bInitialized = TRUE;
+
   }
 
 
@@ -199,20 +237,12 @@ class TwingleProject {
     self::formatValues($values, self::OUT);
     self::translateKeys($values, self::OUT);
 
-    // Get json file with template for project
-    $json_file = file_get_contents(E::path() .
-      '/api/v3/TwingleSync/resources/twingle_api_templates.json');
-    $template = json_decode($json_file, TRUE)['project'];
-
-    // Throw an error if json file can't be read
-    if (!$template) {
-      \Civi::log()->error("Could not read json file");
-      throw new \Exception('Could not read json file');
-    }
+    // Get template for project
+    $project = self::$templates['project'];
 
     // Replace array items which the Twingle API does not expect
     foreach ($values as $key => $value) {
-      if (!in_array($key, $template)) {
+      if (!in_array($key, $project)) {
         unset($values[$key]);
       }
     }
@@ -237,30 +267,18 @@ class TwingleProject {
     self::formatValues($options, self::OUT);
     self::translateKeys($options, self::OUT);
 
-    // Get json file with template for project options
-    $file_path = E::path() .
-      '/api/v3/TwingleSync/resources/twingle_api_templates.json';
-    $json_file = file_get_contents($file_path);
-    $json_file_name = pathinfo($file_path)['filename'];
-    $template = json_decode($json_file, TRUE)['project_options'];
-
-    // Throw an error if json file can't be read
-    if (!$template) {
-      $message = ($json_file_name)
-        ? "Could not read json file $json_file_name"
-        : "Could not locate json file in path: $file_path";
-      throw new \Exception($message);
-    }
+    // Get Template for project options
+    $project_options_template = self::$templates['project_options'];
 
     // Replace array items which the Twingle API does not expect
     foreach ($options as $key => $value) {
-      if (!key_exists($key, $template)) {
+      if (!key_exists($key, $project_options_template)) {
         unset($options[$key]);
       }
     }
 
     // Complement missing options with default values
-    return array_merge($template, $options);
+    return array_merge($project_options_template, $options);
   }
 
 
@@ -370,28 +388,12 @@ class TwingleProject {
    */
   private static function translateKeys(array &$values, string $direction) {
 
-    // Get json file with translations
-    $file_path = E::path() .
-      '/api/v3/TwingleSync/resources/dictionary.json';
-    $json_file = file_get_contents($file_path);
-    $json_file_name = pathinfo($file_path)['filename'];
-    $translations = json_decode($json_file, TRUE);
-
-    // Throw an error if json file can't be read
-    if (!$translations) {
-      $message = ($json_file_name)
-        ? "Could not read json file $json_file_name"
-        : "Could not locate json file in path: $file_path";
-      throw new \Exception($message);
-      //TODO: use specific exception or create own
-    }
-
-    // Select only fields
-    $translations = $translations['fields'];
+    // Get translations for fields
+    $field_translations = self::$translations['fields'];
 
     // Set the direction of the translation
     if ($direction == self::OUT) {
-      $translations = array_flip($translations);
+      $field_translations = array_flip($field_translations);
     }
     // Throw error if $direction constant does not match IN or OUT
     elseif ($direction != self::IN) {
@@ -402,7 +404,7 @@ class TwingleProject {
     }
 
     // Translate keys
-    foreach ($translations as $origin => $translation) {
+    foreach ($field_translations as $origin => $translation) {
       $values[$translation] = $values[$origin];
       unset($values[$origin]);
     }
