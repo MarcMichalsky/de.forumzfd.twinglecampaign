@@ -46,20 +46,28 @@ class CustomField {
    */
   public function __construct(array $attributes) {
     foreach ($this as $var => $value) {
+
+      // put array items into attributes
       if (array_key_exists($var, $attributes)) {
         $this->$var = $attributes[$var];
       }
+
+      // translate help_post
       if ($this->help_post) {
         $this->help_post = E::ts($this->help_post);
       }
     }
   }
 
+
   /**
+   * Creates a CustomField by calling CiviCRM API v.3
+   *
    * @throws \CiviCRM_API3_Exception
    */
   public function create() {
 
+    // Check if the field already exists
     $field = civicrm_api3(
       'CustomField',
       'get',
@@ -69,14 +77,17 @@ class CustomField {
       ]
     );
 
+    // If the field does not exist, create it
     if ($field['count'] == 0) {
       $this->result = civicrm_api3(
         'CustomField',
         'create',
         $this->getSetAttributes());
 
+      // Set field id
       $this->id = $this->result['id'];
 
+      // Log field creation
       if ($this->result['is_error'] == 0) {
         \Civi::log()->info("Twingle Extension has created a new custom field.\n
       label: $this->label\n
@@ -85,6 +96,7 @@ class CustomField {
       group: $this->custom_group_id"
         );
       }
+      // If the field could not get created: log error
       else {
         if ($this->label && $this->custom_group_id) {
           \Civi::log()
@@ -92,6 +104,7 @@ class CustomField {
             \"$this->label\" for group \"$this->custom_group_id\": 
             $this->result['error_message']");
         }
+        // If there is not enough information: log simple error message
         else {
           \Civi::log()
             ->error("Twingle Extension could not create new custom field: 
@@ -102,7 +115,10 @@ class CustomField {
   }
 
   /**
+   * Gets all the set attributes of the object and returns them as an array.
+   *
    * @return array
+   * Array with all set attributes of this object.
    */
   private function getSetAttributes() {
     $setAttributes = [];
@@ -115,9 +131,10 @@ class CustomField {
   }
 
   /**
-   * Alter a custom field
+   * Alter a custom field.
    *
    * @param $values
+   * Values to alter.
    *
    * @return bool
    * @throws \CiviCRM_API3_Exception
@@ -136,31 +153,43 @@ class CustomField {
   }
 
   /**
-   * @param $name
+   * Get an instance of a CustomField by its name or get an array with all
+   * custom fields by leaving parameters empty.
+   *
+   * @param string|null $name
+   * The name of the field you wish to instantiate.
    *
    * @return array|\CRM\TwingleCampaign\BAO\CustomField
+   * The required CustomField or an array with all custom fields.
+   *
    * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
    */
-  public static function fetch($name = NULL) {
+  public static function fetch(string $name = NULL) {
 
+    // If no specific custom field is requested
     if (!$name) {
       $customFields = [];
 
+      // Get json file with all custom fields for this extension
       $json_file = file_get_contents(E::path() .
         '/CRM/TwingleCampaign/resources/campaigns.json');
       $campaign_info = json_decode($json_file, TRUE);
 
+      // Log an error and throw an exception if the file cannot get read
       if (!$campaign_info) {
         \Civi::log()->error("Could not read json file");
         throw new \Exception('Could not read json file');
       }
 
+      // Recursive method call with all custom field names from the json file
       foreach ($campaign_info['custom_fields'] as $custom_field) {
         $result = CustomField::fetch($custom_field['name']);
         array_push($customFields, $result);
       }
       return $customFields;
     }
+    // If a specific custom field is required
     else {
       $custom_field = civicrm_api3(
         'CustomField',
@@ -185,12 +214,15 @@ class CustomField {
    * @throws \CiviCRM_API3_Exception
    */
   public function delete() {
+
+    // Delete this custom field by API call
     $this->result = civicrm_api3(
       'CustomField',
       'delete',
       ['id' => $this->id]
     );
 
+    // Check if custom field was deleted successfully
     if ($this->result['is_error'] == 0) {
       \Civi::log()->info("Twingle Extension has deleted custom field.\n
       label: $this->label\n
@@ -219,16 +251,21 @@ class CustomField {
   }
 
   /**
-   * Get a custom field mapping
+   * Get a custom field mapping (e.g. ['project_id' => 'custom_42'])
    *
    * @return array
+   * Associative array with a mapping of all custom fields used by this extension
+   *
    * @throws \CiviCRM_API3_Exception
    */
   public static function getMapping() {
 
+    // Get an array with all custom fields
     $customFields = CustomField::fetch();
+
     $customFieldMapping = [];
 
+    // Create a mapping (e.g. ['project_id' => 'custom_42'])
     foreach ($customFields as $customField) {
       if ($customField) {
         $customFieldMapping[$customField->getName()] = 'custom_' . $customField->getId();
@@ -239,6 +276,7 @@ class CustomField {
   }
 
 
+  // TODO: Remove unnecessary getters and setters
   /**
    * @param string $custom_group_id
    *

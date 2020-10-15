@@ -361,6 +361,18 @@ class TwingleApiCall {
     return $response;
   }
 
+  /**
+   * Sends a curl post and gives back the result array.
+   *
+   * @param $url
+   * The url the curl should get sent to
+   *
+   * @param $data
+   * The data that should get posted
+   *
+   * @return false|mixed
+   * Returns the result array of the curl or FALSE, if the curl failed
+   */
   private function curlPost($url, $data) {
     $curl = curl_init($url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
