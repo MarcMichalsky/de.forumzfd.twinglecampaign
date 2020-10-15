@@ -12,6 +12,8 @@ include E::path() . '/CRM/TwingleCampaign/BAO/CustomGroup.php';
  */
 class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
 
+  // TODO: Add static arrays from json files
+
   // By convention, functions that look like "function upgrade_NNNN()" are
   // upgrade tasks. They are executed in order (like Drupal's hook_update_N).
 

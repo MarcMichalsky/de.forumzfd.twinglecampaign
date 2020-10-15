@@ -51,6 +51,8 @@ class TwingleApiCall {
    * If $id parameter is empty, this function returns all projects for all
    * organisations this API key is assigned to.
    *
+   * TODO: Keys can only get assigned to one organisation. Save multiple keys in settings instead.
+   *
    * If $id parameter is given, this function returns a single project.
    *
    * @param null $projectId
