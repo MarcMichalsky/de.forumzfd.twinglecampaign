@@ -230,11 +230,8 @@ class CustomField {
       id: $this->id\n
       group: $this->custom_group_id"
       );
-
-      foreach ($this->getSetAttributes() as $var => $attribute) {
-        $this->$var = NULL;
-      }
     }
+    // ... else: log error
     else {
       if ($this->label && $this->custom_group_id) {
         \Civi::log()
