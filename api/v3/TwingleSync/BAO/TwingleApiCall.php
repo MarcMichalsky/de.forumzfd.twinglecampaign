@@ -379,4 +379,24 @@ class TwingleApiCall {
     return $response;
   }
 
+  /**
+   * Returns a result array
+   *
+   * @param $values
+   * Project values to generate result array from
+   *
+   * @param $status
+   * Status of the array
+   *
+   * @return array
+   */
+  private function getResultArray($values, $status) {
+    return [
+      "title"      => $values['name'],
+      "project_id" => (int) $values['id'],
+      "project_type" => $values['project_type'],
+      "status"     => $status
+    ];
+  }
+
 }
