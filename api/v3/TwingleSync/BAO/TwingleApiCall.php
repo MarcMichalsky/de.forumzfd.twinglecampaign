@@ -55,7 +55,7 @@ class TwingleApiCall {
    *
    * If $id parameter is given, this function returns a single project.
    *
-   * @param null $projectId
+   * @param int|null $projectId
    *
    * @return mixed
    */
@@ -148,7 +148,7 @@ class TwingleApiCall {
         // Return result array with error description
         return [
           "title"      => $values['name'],
-          "project_id" => $values['id'],
+          "project_id" => (int) $values['id'],
           "status"     =>
             "Failed to get project options from Twingle: $e->getMessage()",
         ];
@@ -179,7 +179,7 @@ class TwingleApiCall {
         // Return result array with error description
         return [
           "title"      => $values['name'],
-          "project_id" => $values['id'],
+          "project_id" => (int) $values['id'],
           "status"     =>
             "Failed to instantiate TwingleProject: $e->getMessage()",
         ];
@@ -187,6 +187,7 @@ class TwingleApiCall {
 
       // Check if the TwingleProject campaign already exists
       if (!$project->exists()) {
+
         // ... if not, create it
         try {
           $result = $project->create($is_test);
@@ -200,7 +201,7 @@ class TwingleApiCall {
           // Return result array with error description
           return [
             "title"      => $values['name'],
-            "project_id" => $values['id'],
+            "project_id" => (int) $values['id'],
             "status"     =>
               "Could not create campaign from TwingleProject: $e->getMessage()",
           ];
@@ -331,12 +332,13 @@ class TwingleApiCall {
 
 
   /**
-   *
    * Does a cURL and gives back the result array.
    *
    * @param $url
+   * The url the curl should get sent to
    *
    * @param null $params
+   * The parameters you want to send (optional)
    *
    * @return array|bool
    * Returns the result array of the curl or FALSE, if the curl failed
