@@ -3,9 +3,13 @@
 
 namespace CRM\TwingleCampaign\BAO;
 
+use Civi;
 use CRM_TwingleCampaign_ExtensionUtil as E;
+use CRM_Utils_Array;
 use DateTime;
 use CRM\TwingleCampaign\BAO\CustomField as CustomField;
+use Exception;
+use CiviCRM_API3_Exception;
 
 include_once E::path() . '/CRM/TwingleCampaign/BAO/CustomField.php';
 
@@ -66,7 +70,7 @@ class TwingleProject {
       $this->id = $project['id'];
 
       // Translate custom field names into Twingle field names
-      self::translateCustomFields($project, self::$OUT);
+      self::translateCustomFields($project, self::OUT);
 
     }
     // If values come from Twingle API
@@ -125,8 +129,8 @@ class TwingleProject {
         $message = ($json_file_name)
           ? "Could not read json file $json_file_name"
           : "Could not locate json file in path: $file_path";
-        \Civi::log()->error($message);
-        throw new \Exception($message);
+        Civi::log()->error($message);
+        throw new Exception($message);
       }
 
       // Set attribute
@@ -147,7 +151,7 @@ class TwingleProject {
    * @return array
    * Returns a response array that contains title, id, project_id and status
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws CiviCRM_API3_Exception
    */
   public function create(bool $is_test = FALSE) {
 
@@ -194,7 +198,7 @@ class TwingleProject {
    * @param array $options
    * Array with options to update
    *
-   * @param string $origin
+   * @param string|null $origin
    * Origin of the array. It can be one of two constants:
    *   TwingleProject::TWINGLE|CIVICRM
    *
@@ -287,12 +291,13 @@ class TwingleProject {
    * Check if a project already exists
    *
    * @return bool
-   * @throws \CiviCRM_API3_Exception
-   * @throws \Exception
+   * @throws CiviCRM_API3_Exception
+   * @throws Exception
    */
   public function exists() {
 
     $result = [];
+    $single = FALSE;
 
     // Get custom field name for project_id
     $cf_project_id = TwingleProject::$customFieldMapping['twingle_project_id'];
@@ -353,9 +358,9 @@ class TwingleProject {
    *
    * @param $id
    *
-   * @return \CRM\TwingleCampaign\BAO\TwingleProject
-   * @throws \CiviCRM_API3_Exception
-   * @throws \Exception
+   * @return TwingleProject
+   * @throws CiviCRM_API3_Exception
+   * @throws Exception
    */
   public static function fetch($id) {
     $result = civicrm_api3('Campaign', 'getsingle', [
@@ -363,7 +368,13 @@ class TwingleProject {
       'id'         => $id,
     ]);
 
-    return new TwingleProject($result, TRUE);
+    $values_and_options = self::splitValues($result);
+
+    return new TwingleProject(
+      $values_and_options['values'],
+      $values_and_options['options'],
+      self::CIVICRM
+    );
   }
 
 
@@ -373,7 +384,7 @@ class TwingleProject {
    * @param array $result
    * The $result array of a civicrm_api3-get-project call
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws CiviCRM_API3_Exception
    */
   private function handleDuplicates(array $result) {
 
@@ -418,7 +429,7 @@ class TwingleProject {
     }
     // Throw error if $direction constant does not match IN or OUT
     elseif ($direction != self::IN) {
-      throw new \Exception(
+      throw new Exception(
         "Invalid Parameter $direction for translateKeys()"
       );
       // TODO: use specific exception or create own
@@ -469,13 +480,13 @@ class TwingleProject {
             $tmp[$key] = $key;
           }
         }
-        $values['donation_rhythm'] = \CRM_Utils_Array::implodePadded($tmp);
+        $values['donation_rhythm'] = CRM_Utils_Array::implodePadded($tmp);
       }
 
       // Format project target format
       if (key_exists('has_projecttarget_as_money', $values)) {
-      $values['has_projecttarget_as_money'] =
-        $values['has_projecttarget_as_money'] ? 'in Euro' : 'percentage';
+        $values['has_projecttarget_as_money'] =
+          $values['has_projecttarget_as_money'] ? 'in Euro' : 'percentage';
       }
 
       // Format contact fields
@@ -491,13 +502,13 @@ class TwingleProject {
         }
 
         $values['exclude_contact_fields'] =
-          \CRM_Utils_Array::implodePadded($possible_contact_fields);
+          CRM_Utils_Array::implodePadded($possible_contact_fields);
       }
 
       // Format languages
       if ($values['languages']) {
         $values['languages'] =
-          \CRM_Utils_Array::implodePadded(
+          CRM_Utils_Array::implodePadded(
             explode(
               ',',
               $values['languages']
@@ -523,10 +534,9 @@ class TwingleProject {
     }
     else {
 
-      throw new \Exception(
+      throw new Exception(
         "Invalid Parameter $direction for formatValues()"
       );
-      // TODO: use specific exception or create own
 
     }
   }
@@ -548,7 +558,9 @@ class TwingleProject {
 
     // Translate from Twingle field name to custom field name
     if ($direction == self::IN) {
+
       foreach (TwingleProject::$customFieldMapping as $field => $custom) {
+
         if (array_key_exists(
           str_replace(
             'twingle_project_',
@@ -557,22 +569,27 @@ class TwingleProject {
           ),
           $values)
         ) {
+
           $values[$custom] = $values[str_replace(
             'twingle_project_',
             '',
             $field
           )];
+
           unset($values[str_replace(
               'twingle_project_',
               '',
               $field
-            )]);
+            )]
+          );
         }
       }
     }
     // Translate from custom field name to Twingle field name
     elseif ($direction == self::OUT) {
+
       foreach (TwingleProject::$customFieldMapping as $field => $custom) {
+
         if (array_key_exists(
           $custom,
           $values
@@ -602,7 +619,7 @@ class TwingleProject {
    *
    * @throws \Exception
    */
-  private function splitValues(array $input) {
+  private static function splitValues(array $input) {
 
     $values = [];
     $options = [];
@@ -622,8 +639,8 @@ class TwingleProject {
     }
 
     return [
-      'values' => $values,
-      'options' => $options
+      'values'  => $values,
+      'options' => $options,
     ];
   }
 
@@ -634,7 +651,7 @@ class TwingleProject {
    * @return bool
    * TRUE if deactivation was successful
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws CiviCRM_API3_Exception
    */
   public function deactivate() {
 
@@ -651,7 +668,7 @@ class TwingleProject {
    * @return bool
    * TRUE if deactivation was successful
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws CiviCRM_API3_Exception
    */
   public static function deactivateById($id) {
 
@@ -767,6 +784,7 @@ class TwingleProject {
   public function lastUpdate() {
     return self::getTimestamp($this->values['last_modified_date']);
   }
+
 
   /**
    * Returns the project_id of a TwingleProject
