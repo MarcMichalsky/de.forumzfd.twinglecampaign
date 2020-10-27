@@ -50,20 +50,22 @@ class TwingleProject {
    * Result array of Twingle API call to
    * https://project.twingle.de/api/by-organisation/$organisation_id
    *
-   * @param array $options
-   * Result array of Twingle Api call to
-   * https://project.twingle.de/api/$project_id/options
-   *
    * @param string $origin
    * Origin of the arrays. It can be one of two constants:
    * TwingleProject::TWINGLE|CIVICRM
    *
    * @throws Exception
    */
-  public function __construct(array $project, array $options, string $origin) {
+  public function __construct(array $project, string $origin) {
 
     // Fetch custom field mapping once
     self::init();
+
+    // Create TwingleProjectOptions object
+    $this->options = new TwingleProjectOptions($project['options'], $origin);
+
+    // Unset project options in $project array
+    unset($project['options']);
 
     // If values come from CiviCRM Campaign API
     if ($origin == self::CIVICRM) {
@@ -74,25 +76,17 @@ class TwingleProject {
       // Translate custom field names into Twingle field names
       self::translateCustomFields($project, self::OUT);
 
-    }
-    // If values come from Twingle API
-    elseif ($origin == self::TWINGLE) {
-
-      // Translate keys for import
-      self::translateKeys($project, self::IN);
-
-      // Format values for import
-      self::formatValues($project, self::IN);
-      self::formatValues($options, self::IN);
+      // Translate keys and values
+      self::formatValues($project, self::OUT);
+      self::translateKeys($project, self::OUT);
 
     }
 
     // Add value for campaign type
     $project['campaign_type_id'] = 'twingle_project';
 
-    // Import project values and options
+    // Set project values attribute
     $this->values = $project;
-    $this->options = $options;
   }
 
 
@@ -161,15 +155,43 @@ class TwingleProject {
     // Create campaign only if it does not already exist
     if (!$is_test) {
 
-      // Translate Twingle field names into custom field names
-      $translatedFields = array_merge($this->options, $this->values);
-      self::translateCustomFields($translatedFields, self::IN);
+      // Prepare project values for import into database
+      $values_prepared_for_import = $this->values;
+      self::formatValues(
+        $values_prepared_for_import,
+        self::IN
+      );
+      self::translateKeys(
+        $values_prepared_for_import,
+        self::IN
+      );
+      self::translateCustomFields(
+        $values_prepared_for_import,
+        self::IN
+      );
+
+      // Prepare project option values for import into database
+      $options_prepared_for_import = $this->options->getValues();
+      TwingleProjectOptions::formatValues(
+        $options_prepared_for_import,
+        self::IN
+      );
+      self::translateCustomFields(
+        $options_prepared_for_import,
+        self::IN
+      );
+
+      // Merge project values and project options values
+      $merged = array_merge(
+        $values_prepared_for_import,
+        $options_prepared_for_import
+      );
 
       // Set id
-      $translatedFields['id'] = $this->id;
+      $merged['id'] = $this->id;
 
       // Create campaign
-      $result = civicrm_api3('Campaign', 'create', $translatedFields);
+      $result = civicrm_api3('Campaign', 'create', $merged);
 
       // Update id
       $this->id = $result['id'];
@@ -198,35 +220,37 @@ class TwingleProject {
    * @param array $values
    * Array with values to update
    *
-   * @param array $options
-   * Array with options to update
-   *
    * @param string|null $origin
    * Origin of the array. It can be one of two constants:
    *   TwingleProject::TWINGLE|CIVICRM
    *
    * @throws Exception
    */
-  public function update(array $values, array $options, string $origin = NULL) {
+  public function update(array $values, string $origin = NULL) {
 
-    if ($origin == self::TWINGLE) {
-      // Format values and translate keys
-      self::translateKeys($values, self::IN);
-      self::formatValues($values, self::IN);
+    if ($origin == self::CIVICRM) {
 
-      //Format options and translate keys
-      self::translateKeys($options, self::IN);
-      self::formatValues($options, self::IN);
-    }
-    elseif ($origin == self::CIVICRM) {
+      // Set project id
       $this->id = $values['id'];
+
+      // Translate custom field names
       self::translateCustomFields($values, self::OUT);
+
+      // Format project values
+      self::formatValues($values, self::OUT);
+
+      // Separate options from project values
+      self::separateOptions($values);
     }
 
-    // Update values and options
-    $this->values = array_merge($this->values, $values);
-    $this->options = array_merge($this->options, $options);
+    // Update project options
+    $this->options->update($values['options'], $origin);
 
+    // Unset options array in project values
+    unset($values['options']);
+
+    // Update project values
+    $this->values = array_merge($this->values, $values);
   }
 
 
@@ -271,7 +295,7 @@ class TwingleProject {
    */
   public function exportOptions() {
 
-    $options = $this->options;
+    $options = $this->values['options'];
     self::formatValues($options, self::OUT);
     self::translateKeys($options, self::OUT);
 
@@ -291,10 +315,14 @@ class TwingleProject {
 
 
   /**
-   * Check if a project already exists
+   * Check if a TwingleProject campaign already exists and if so set attributes
+   * to the values of the existing campaign.
    *
    * @return bool
+   * Returns TRUE id the TwingleProject campaign already exists
+   *
    * @throws CiviCRM_API3_Exception
+   *
    * @throws Exception
    */
   public function exists() {
@@ -325,28 +353,27 @@ class TwingleProject {
     // project's attributes must be updated from the campaign
     if ($result['count'] == 1) {
 
+      // Extract project values from result array
+      $values = $result['values'][0];
+
       // Set campaign id attribute
-      $this->id = $result['values'][0]['id'];
+      $this->id = $values['id'];
 
       // Translate custom field names back
-      self::translateCustomFields($result['values'][0], self::OUT);
+      self::translateCustomFields($values, self::OUT);
 
       // Translate keys from CiviCRM format to Twingle format
-      self::translateKeys($result['values'][0], self::OUT);
+      self::translateKeys($values, self::OUT);
 
-      // Split result array into project values and options
-      $values_and_options = self::splitValues($result['values'][0]);
+      // Separate options from project values
+      self::separateOptions($values);
 
       // Translate keys from Twingle format to CiviCRM format
-      self::translateKeys($values_and_options['values'], self::IN);
-      self::translateKeys($values_and_options['options'], self::IN);
+      self::translateKeys($values, self::IN);
 
       // Set attributes to the values of the existing TwingleProject campaign
       // to reflect the state of the actual campaign in the database
-      $this->update(
-        $values_and_options['values'],
-        $values_and_options['options']
-      );
+      $this->update($values, self::TWINGLE);
 
       return TRUE;
     }
@@ -371,11 +398,11 @@ class TwingleProject {
       'id'         => $id,
     ]);
 
-    $values_and_options = self::splitValues($result);
+    // Separate options from project values
+    self::separateOptions($result['values']);
 
     return new TwingleProject(
-      $values_and_options['values'],
-      $values_and_options['options'],
+      $result['values'],
       self::CIVICRM
     );
   }
@@ -421,7 +448,7 @@ class TwingleProject {
    *
    * @throws Exception
    */
-  private static function translateKeys(array &$values, string $direction) {
+  public static function translateKeys(array &$values, string $direction) {
 
     // Get translations for fields
     $field_translations = self::$translations['fields'];
@@ -463,63 +490,16 @@ class TwingleProject {
     if ($direction == self::IN) {
 
       // Change timestamp into DateTime string
-      if ($values['last_modified_date']) {
-        $values['last_modified_date'] =
-          self::getDateTime($values['last_modified_date']);
+      if ($values['last_update']) {
+        $values['last_update'] =
+          self::getDateTime($values['last_update']);
       }
 
-      // empty project_type to 'default
-      if ($values['type']) {
-        $values['type'] = $values['type'] == ''
-          ? 'default'
-          : $values['type'];
-      }
-
-      // format donation rhythm
-      if (is_array($values['donation_rhythm'])) {
-        $tmp = [];
-        foreach ($values['donation_rhythm'] as $key => $value) {
-          if ($value) {
-            $tmp[$key] = $key;
-          }
-        }
-        $values['donation_rhythm'] = CRM_Utils_Array::implodePadded($tmp);
-      }
-
-      // Format project target format
-      if (key_exists('has_projecttarget_as_money', $values)) {
-        $values['has_projecttarget_as_money'] =
-          $values['has_projecttarget_as_money'] ? 'in Euro' : 'percentage';
-      }
-
-      // Format contact fields
-      if ($values['exclude_contact_fields']) {
-        $possible_contact_fields =
-          self::$campaigns['custom_fields']
-          ['twingle_project_exclude_contact_fields']['option_values'];
-
-        $exclude_contact_fields = explode(',', $values['exclude_contact_fields']);
-
-        foreach ($exclude_contact_fields as $exclude_contact_field) {
-          unset($possible_contact_fields[$exclude_contact_field]);
-        }
-
-        $values['exclude_contact_fields'] =
-          CRM_Utils_Array::implodePadded($possible_contact_fields);
-      }
-
-      // Format languages
-      if ($values['languages']) {
-        $values['languages'] =
-          CRM_Utils_Array::implodePadded(
-            explode(
-              ',',
-              $values['languages']
-            )
-          );
+      // empty project_type to 'default'
+      if (!$values['type']) {
+        $values['type'] = 'default';
       }
     }
-
     elseif ($direction == self::OUT) {
 
       // Change DateTime string into timestamp
@@ -530,9 +510,6 @@ class TwingleProject {
       $values['type'] = $values['type'] == 'default'
         ? ''
         : $values['type'];
-
-      // Cast project_target to integer
-      $values['project_target'] = (int) $values['project_target'];
 
     }
     else {
@@ -610,41 +587,27 @@ class TwingleProject {
   }
 
   /**
-   * A function that will split one array coming from a TwingleProject campaign
-   * into a value array (containing basic project information) and another
-   * array containing the project options.
+   * A function that picks all option values from the values array and puts them
+   * into an own array.
    *
-   * @param array $input
-   * Array that comes from TwingleProject campaign
-   *
-   * @return array[]
-   * Associative array that contains two arrays: $values & $options
-   *
-   * @throws \Exception
+   * @param array $values
    */
-  private static function splitValues(array $input) {
+  private static function separateOptions(array &$values) {
 
-    $values = [];
     $options = [];
 
     // Get array with template for project values and options
-    $values_template = self::$templates['project'];
     $options_template = self::$templates['project_options'];
 
     // Map array items into $values and $options array
-    foreach ($input as $key => $value) {
-      if (in_array($key, $values_template)) {
-        $values[$key] = $value;
-      }
+    foreach ($values as $key => $value) {
       if (key_exists($key, $options_template)) {
         $options[$key] = $value;
       }
     }
 
-    return [
-      'values'  => $values,
-      'options' => $options,
-    ];
+    // Insert options array into values array
+    $values['options'] = $options;
   }
 
 
@@ -709,9 +672,9 @@ class TwingleProject {
    */
   public function getResponse(string $status) {
     return [
-      'title'      => $this->values['title'],
-      'id'         => $this->id,
-      'project_id' => $this->values['id'],
+      'title'      => $this->values['name'],
+      'id'         => (int) $this->id,
+      'project_id' => (int) $this->values['id'],
       'status'     => $status,
     ];
   }
@@ -785,7 +748,12 @@ class TwingleProject {
    * @return int|null
    */
   public function lastUpdate() {
-    return self::getTimestamp($this->values['last_modified_date']);
+    $lastProjectUpdate = self::getTimestamp($this->values['last_modified_date']);
+    $lastOptionsUpdate = self::getTimestamp($this->options->lastUpdate());
+    $lastUpdate = $lastProjectUpdate > $lastOptionsUpdate
+      ? $lastProjectUpdate
+      : $lastOptionsUpdate;
+    return self::getTimestamp($lastUpdate);
   }
 
 

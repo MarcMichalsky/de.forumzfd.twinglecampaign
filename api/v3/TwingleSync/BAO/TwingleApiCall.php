@@ -140,8 +140,8 @@ class TwingleApiCall {
 
       // Get project options
       try {
-        $project_options = $this->getProjectOptions($values['id']);
-      } catch (\Exception $e) {
+        $values['options'] = $this->getProjectOptions($values['id']);
+      } catch (Exception $e) {
 
         // Log Exception
         Civi::log()->error(
@@ -157,19 +157,10 @@ class TwingleApiCall {
         ];
       }
 
-      // Set latest_update
-      $values['last_update'] = $values['last_update'] > $project_options['last_update']
-        ? $values['last_update']
-        : $project_options['last_update'];
-
-      // Delete $options['last_update']
-      unset($project_options['last_update']);
-
       // Instantiate TwingleProject
       try {
         $project = new TwingleProject(
           $values,
-          $project_options,
           TwingleProject::TWINGLE
         );
       } catch (Exception $e) {
@@ -212,50 +203,46 @@ class TwingleApiCall {
       }
       else {
         $result = $project->getResponse('TwingleProject exists');
+
+        // If Twingle's version of the project is newer than the CiviCRM
+        // TwingleProject campaign update the campaign
+        if ($values['last_update'] > $project->lastUpdate()) {
+          try {
+            $project->update($values, TwingleProject::TWINGLE);
+            $result = $project->create();
+            $result['status'] = $result['status'] == 'TwingleProject created'
+              ? 'TwingleProject updated'
+              : 'TwingleProject Update failed';
+          } catch (Exception $e){
+            // Log Exception
+            Civi::log()->error(
+              "Could not update TwingleProject campaign: $e->getMessage()"
+            );
+            // Return result array with error description
+            $result = $project->getResponse(
+              "Could not update TwingleProject campaign: $e->getMessage()"
+            );
+          }
+        }
+        // If the CiviCRM TwingleProject campaign was changed, update the project
+        // on Twingle's side
+        elseif ($values['last_update'] < $project->lastUpdate()) {
+          // If this is a test do not make database changes
+          if ($is_test) {
+            $result = $project->getResponse(
+              'TwingleProject ready to push'
+            );
+          }
+          else {
+            $result = $this->updateProject($project);
+          }
+        }
+        elseif ($result['status'] == 'TwingleProject exists') {
+          $result = $project->getResponse('TwingleProject up to date');
+        }
+
       }
 
-      // If Twingle's version of the project is newer than the CiviCRM
-      // TwingleProject campaign update the campaign
-      if (
-        $result['status'] == 'TwingleProject exists' &&
-        $values['last_update'] > $project->lastUpdate()
-      ) {
-        try {
-          $project->update($values, $project_options, TwingleProject::TWINGLE);
-          $result = $project->create();
-          $result['status'] = $result['status'] == 'TwingleProject created'
-            ? 'TwingleProject updated'
-            : 'TwingleProject Update failed';
-        } catch (\Exception $e){
-          // Log Exception
-          \Civi::log()->error(
-            "Could not update TwingleProject campaign: $e->getMessage()"
-          );
-          // Return result array with error description
-          $result = $project->getResponse(
-            "Could not update TwingleProject campaign: $e->getMessage()"
-          );
-        }
-      }
-      // If the CiviCRM TwingleProject campaign was changed, update the project
-      // on Twingle's side
-      elseif (
-        $result['status'] == 'TwingleProject exists' &&
-        $values['last_update'] < $project->lastUpdate()
-      ) {
-        // If this is a test do not make database changes
-        if ($is_test) {
-          $result = $project->getResponse(
-            'TwingleProject ready to push'
-          );
-        }
-        else {
-          $result = $this->updateProject($project);
-        }
-      }
-      elseif ($result['status'] == 'TwingleProject exists') {
-        $result = $project->getResponse('TwingleProject up to date');
-      }
 
       // Return a response of the synchronization
       return $result;
@@ -302,7 +289,6 @@ class TwingleApiCall {
     if (is_array($result) && !array_key_exists('message', $result)) {
       // Try to update the local TwingleProject campaign
       try {
-        // TODO: get options and add them as parameter to $project->update() call
         $project->update($result, TwingleProject::TWINGLE);
         $project->create();
         return $project->getResponse('TwingleProject pushed to Twingle');
