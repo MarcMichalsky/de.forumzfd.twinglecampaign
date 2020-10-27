@@ -8,10 +8,12 @@ use CRM_TwingleCampaign_ExtensionUtil as E;
 use CRM_Utils_Array;
 use DateTime;
 use CRM\TwingleCampaign\BAO\CustomField as CustomField;
+use CRM\TwingleCampaign\BAO\TwingleProjectOptions as TwingleProjectOptions;
 use Exception;
 use CiviCRM_API3_Exception;
 
 include_once E::path() . '/CRM/TwingleCampaign/BAO/CustomField.php';
+include_once E::path() . '/CRM/TwingleCampaign/BAO/TwingleProjectOptions.php';
 
 
 class TwingleProject {
@@ -56,7 +58,7 @@ class TwingleProject {
    * Origin of the arrays. It can be one of two constants:
    * TwingleProject::TWINGLE|CIVICRM
    *
-   * @throws \Exception
+   * @throws Exception
    */
   public function __construct(array $project, array $options, string $origin) {
 
@@ -99,7 +101,7 @@ class TwingleProject {
    * This function will be fully executed only once, when the TwingleProject
    * class gets instantiated for the first time.
    *
-   * @throws \Exception
+   * @throws Exception
    */
   private static function init() {
 
@@ -152,6 +154,7 @@ class TwingleProject {
    * Returns a response array that contains title, id, project_id and status
    *
    * @throws CiviCRM_API3_Exception
+   * @throws Exception
    */
   public function create(bool $is_test = FALSE) {
 
@@ -202,7 +205,7 @@ class TwingleProject {
    * Origin of the array. It can be one of two constants:
    *   TwingleProject::TWINGLE|CIVICRM
    *
-   * @throws \Exception
+   * @throws Exception
    */
   public function update(array $values, array $options, string $origin = NULL) {
 
@@ -234,7 +237,7 @@ class TwingleProject {
    * @return array
    * Array with all values to send to the Twingle API
    *
-   * @throws \Exception
+   * @throws Exception
    */
   public function export() {
 
@@ -263,7 +266,7 @@ class TwingleProject {
    * @return array
    * Array with all options to send to the Twingle API
    *
-   * @throws \Exception
+   * @throws Exception
    *
    */
   public function exportOptions() {
@@ -416,7 +419,7 @@ class TwingleProject {
    * TwingleProject::OUT -> translate array keys from CiviCRM format into
    * Twingle format
    *
-   * @throws \Exception
+   * @throws Exception
    */
   private static function translateKeys(array &$values, string $direction) {
 
@@ -453,7 +456,7 @@ class TwingleProject {
    * TwingleProject::IN -> translate array values from Twingle to CiviCRM <br>
    * TwingleProject::OUT -> translate array values from CiviCRM to Twingle
    *
-   * @throws \Exception
+   * @throws Exception
    */
   private function formatValues(array &$values, string $direction) {
 

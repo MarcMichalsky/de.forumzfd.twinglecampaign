@@ -2,9 +2,12 @@
 
 namespace CRM\TwingleCampaign\BAO;
 
+use API_Exception;
+use Civi;
 use CRM_Core_BAO_Setting;
 use CRM_TwingleCampaign_ExtensionUtil as E;
 use CRM\TwingleCampaign\BAO\TwingleProject as TwingleProject;
+use Exception;
 
 include_once E::path() . '/CRM/TwingleCampaign/BAO/TwingleProject.php';
 
@@ -23,7 +26,7 @@ class TwingleApiCall {
    *
    * @param $apiKey
    *
-   * @throws \API_Exception
+   * @throws API_Exception
    */
   public function __construct($apiKey) {
     $this->apiKey = $apiKey;
@@ -40,7 +43,7 @@ class TwingleApiCall {
     curl_close($curl);
 
     if (empty($response)) {
-      throw new \API_Exception(
+      throw new API_Exception(
         "Twingle API call failed. Please check your api key.");
     }
 
@@ -141,7 +144,7 @@ class TwingleApiCall {
       } catch (\Exception $e) {
 
         // Log Exception
-        \Civi::log()->error(
+        Civi::log()->error(
           "Failed to instantiate TwingleProject: $e->getMessage()"
         );
 
@@ -169,10 +172,10 @@ class TwingleApiCall {
           $project_options,
           TwingleProject::TWINGLE
         );
-      } catch (\Exception $e) {
+      } catch (Exception $e) {
 
         // Log Exception
-        \Civi::log()->error(
+        Civi::log()->error(
           "Failed to instantiate TwingleProject: $e->getMessage()"
         );
 
@@ -191,10 +194,10 @@ class TwingleApiCall {
         // ... if not, create it
         try {
           $result = $project->create($is_test);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
           // Log Exception
-          \Civi::log()->error(
+          Civi::log()->error(
             "Could not create campaign from TwingleProject: $e->getMessage()"
           );
 
@@ -278,9 +281,9 @@ class TwingleApiCall {
 
     try {
       $values = $project->export();
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
       // Log Exception
-      \Civi::log()->error(
+      Civi::log()->error(
         "Could not export TwingleProject values: $e->getMessage()"
       );
       // Return result array with error description
@@ -303,9 +306,9 @@ class TwingleApiCall {
         $project->update($result, TwingleProject::TWINGLE);
         $project->create();
         return $project->getResponse('TwingleProject pushed to Twingle');
-      } catch (\Exception $e) {
+      } catch (Exception $e) {
         // Log Exception
-        \Civi::log()->error(
+        Civi::log()->error(
           "Could not update TwingleProject campaign: $e->getMessage()"
         );
         // Return result array with error description
