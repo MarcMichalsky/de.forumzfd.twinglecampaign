@@ -18,8 +18,10 @@ include_once E::path() . '/CRM/TwingleCampaign/BAO/TwingleProjectOptions.php';
 
 class TwingleProject {
 
+  // IN means: heading into CiviCRM database
   public const IN = 'IN';
 
+  // OUT means: coming from the CiviCRM database
   public const OUT = 'OUT';
 
   public const CIVICRM = 'CIVICRM';
@@ -28,13 +30,13 @@ class TwingleProject {
 
   private static $bInitialized = FALSE;
 
-  private static $customFieldMapping;
+  public static $customFieldMapping;
 
-  private static $translations;
+  public static $translations;
 
-  private static $campaigns;
+  public static $campaigns;
 
-  private static $templates;
+  public static $templates;
 
   private $id;
 
@@ -534,7 +536,7 @@ class TwingleProject {
    * names
    *
    */
-  private static function translateCustomFields(array &$values, string $direction) {
+  public static function translateCustomFields(array &$values, string $direction) {
 
     // Translate from Twingle field name to custom field name
     if ($direction == self::IN) {
