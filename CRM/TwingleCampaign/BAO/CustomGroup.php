@@ -13,6 +13,7 @@ class CustomGroup {
   private $extends;
   private $weight;
   private $extends_entity_column_value;
+  private $collapse_display;
   private $results;
 
   /**
@@ -243,10 +244,10 @@ class CustomGroup {
   }
 
   /**
-   * @return string
+   * @return mixed
    */
-  public function getColumnValue(): string {
-    return $this->column_value;
+  public function getCollapseDisplay() {
+    return $this->collapse_display;
   }
 
   /**
