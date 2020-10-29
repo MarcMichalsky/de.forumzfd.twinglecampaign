@@ -3,15 +3,11 @@
 
 namespace CRM\TwingleCampaign\BAO;
 
-use Civi;
 use CRM_TwingleCampaign_ExtensionUtil as E;
-use CRM_Utils_Array;
+use CRM\TwingleCampaign\Utils\ExtensionCache as Cache;
 use DateTime;
-use CRM\TwingleCampaign\BAO\CustomField as CustomField;
 use Exception;
 use CiviCRM_API3_Exception;
-
-include_once E::path() . '/CRM/TwingleCampaign/BAO/CustomField.php';
 
 
 class TwingleProject {
@@ -27,14 +23,6 @@ class TwingleProject {
   public const TWINGLE = 'TWINGLE';
 
   private static $bInitialized = FALSE;
-
-  public static $customFieldMapping;
-
-  public static $translations;
-
-  public static $campaigns;
-
-  public static $templates;
 
   private $id;
 
@@ -56,9 +44,6 @@ class TwingleProject {
    */
   public function __construct(array $project, string $origin) {
 
-    // Fetch custom field mapping once
-    self::init();
-
     // If values come from CiviCRM Campaign API
     if ($origin == self::CIVICRM) {
 
@@ -79,54 +64,6 @@ class TwingleProject {
 
     // Set project values attribute
     $this->values = $project;
-  }
-
-
-  /**
-   * Get custom field mapping.
-   * This function will be fully executed only once, when the TwingleProject
-   * class gets instantiated for the first time.
-   *
-   * @throws Exception
-   */
-  private static function init() {
-
-    // Initialize custom field mapping
-    if (self::$bInitialized) {
-      return;
-    }
-    self::$customFieldMapping = CustomField::getMapping();
-
-    // Initialize json files as arrays
-    $file_paths = [
-      'translations' => '/CRM/TwingleCampaign/resources/dictionary.json',
-      'templates'    => '/CRM/TwingleCampaign/resources/twingle_api_templates.json',
-      'campaigns'    => '/CRM/TwingleCampaign/resources/campaigns.json',
-    ];
-
-    foreach ($file_paths as $key => $file_path) {
-
-      // Get array from json file
-      $file_path = E::path() . $file_path;
-      $json_file = file_get_contents($file_path);
-      $json_file_name = pathinfo($file_path)['filename'];
-      $array = json_decode($json_file, TRUE);
-
-      // Throw and log an error if json file can't be read
-      if (!$array) {
-        $message = ($json_file_name)
-          ? "Could not read json file $json_file_name"
-          : "Could not locate json file in path: $file_path";
-        Civi::log()->error($message);
-        throw new Exception($message);
-      }
-
-      // Set attribute
-      self::$$key = $array;
-    }
-
-    self::$bInitialized = TRUE;
-
   }
 
 
@@ -249,7 +186,8 @@ class TwingleProject {
     $single = FALSE;
 
     // Get custom field name for project_id
-    $cf_project_id = TwingleProject::$customFieldMapping['twingle_project_id'];
+    $cf_project_id = Cache::getInstance()
+      ->getCustomFieldMapping()['twingle_project_id'];
 
     // If there is more than one campaign for a project, handle the duplicates
     while (!$single) {
@@ -361,7 +299,7 @@ class TwingleProject {
   public static function translateKeys(array &$values, string $direction) {
 
     // Get translations for fields
-    $field_translations = self::$translations['fields'];
+    $field_translations = Cache::getInstance()->getTranslations()['fields'];
 
     // Set the direction of the translation
     if ($direction == self::OUT) {
@@ -452,7 +390,8 @@ class TwingleProject {
     // Translate from Twingle field name to custom field name
     if ($direction == self::IN) {
 
-      foreach (TwingleProject::$customFieldMapping as $field => $custom) {
+      foreach (Cache::getInstance()
+                 ->getCustomFieldMapping() as $field => $custom) {
 
         if (array_key_exists(
           str_replace(
@@ -481,7 +420,8 @@ class TwingleProject {
     // Translate from custom field name to Twingle field name
     elseif ($direction == self::OUT) {
 
-      foreach (TwingleProject::$customFieldMapping as $field => $custom) {
+      foreach (Cache::getInstance()
+                 ->getCustomFieldMapping() as $field => $custom) {
 
         if (array_key_exists(
           $custom,
@@ -508,7 +448,8 @@ class TwingleProject {
   public function setEmbedData(array $embedData) {
 
     // Get all embed_data keys from template
-    $embed_data_keys = self::$templates['project_embed_data'];
+    $embed_data_keys = Cache::getInstance()
+      ->getTemplates()['project_embed_data'];
 
     // Transfer all embed_data values
     foreach ($embed_data_keys as $key) {
