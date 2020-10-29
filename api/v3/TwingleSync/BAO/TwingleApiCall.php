@@ -74,18 +74,6 @@ class TwingleApiCall {
     return $response;
   }
 
-
-  public function getProjectOptions(int $projectId) {
-    $response = [];
-    foreach ($this->organisationId as $organisationId) {
-      $url = $this->protocol . 'project' . $this->baseUrl . $projectId .
-        '/options';
-
-      $response = array_merge($this->curlGet($url));
-    }
-    return $response;
-  }
-
   /**
    *
    * Returns all Events for the given $projectId
@@ -138,25 +126,6 @@ class TwingleApiCall {
     // If $values is an array
     if (is_array($values)) {
 
-      // Get project options
-      try {
-        $values['options'] = $this->getProjectOptions($values['id']);
-      } catch (Exception $e) {
-
-        // Log Exception
-        Civi::log()->error(
-          "Failed to instantiate TwingleProject: $e->getMessage()"
-        );
-
-        // Return result array with error description
-        return [
-          "title"      => $values['name'],
-          "project_id" => (int) $values['id'],
-          "status"     =>
-            "Failed to get project options from Twingle: $e->getMessage()",
-        ];
-      }
-
       // Instantiate TwingleProject
       try {
         $project = new TwingleProject(
@@ -182,8 +151,9 @@ class TwingleApiCall {
       // Check if the TwingleProject campaign already exists
       if (!$project->exists()) {
 
-        // ... if not, create it
+        // ... if not, get embed data and create project
         try {
+          $this->getEmbedData($project);
           $result = $project->create($is_test);
         } catch (Exception $e) {
 
@@ -206,12 +176,10 @@ class TwingleApiCall {
 
         // If Twingle's version of the project is newer than the CiviCRM
         // TwingleProject campaign update the campaign
-        $lastUpdate = $values['last_update'] > $values['options']['last_update']
-          ? $values['last_update']
-          : $values['options']['last_update'];
-        if ($lastUpdate > $project->lastUpdate()) {
+        if ($values['last_update'] > $project->lastUpdate()) {
           try {
             $project->update($values);
+            $this->getEmbedData($project);
             $result = $project->create();
             $result['status'] = $result['status'] == 'TwingleProject created'
               ? 'TwingleProject updated'
@@ -229,7 +197,7 @@ class TwingleApiCall {
         }
         // If the CiviCRM TwingleProject campaign was changed, update the project
         // on Twingle's side
-        elseif ($lastUpdate < $project->lastUpdate()) {
+        elseif ($values['last_update'] < $project->lastUpdate()) {
           // If this is a test do not make database changes
           if ($is_test) {
             $result = $project->getResponse(
@@ -243,9 +211,7 @@ class TwingleApiCall {
         elseif ($result['status'] == 'TwingleProject exists') {
           $result = $project->getResponse('TwingleProject up to date');
         }
-
       }
-
 
       // Return a response of the synchronization
       return $result;
@@ -253,6 +219,25 @@ class TwingleApiCall {
     else {
       return NULL;
     }
+
+  }
+
+  /**
+   * @param \CRM\TwingleCampaign\BAO\TwingleProject $project
+   */
+  private function getEmbedData(TwingleProject &$project) {
+
+    // Prepare url for curl
+    $url = $this->protocol . 'project' . $this->baseUrl . $project->getProjectId();
+
+    // Send curl
+    $result = $this->curlGet($url);
+
+    // Set embed data
+    $project->setEmbedData($result['embed']);
+
+    // Set counter-url
+    $project->setCounterUrl($result['counter-url']['url']);
 
   }
 
@@ -267,7 +252,7 @@ class TwingleApiCall {
    * Returns a response array that contains title, id, project_id and status
    *
    */
-  public function updateProject(TwingleProject &$project) {
+  private function updateProject(TwingleProject &$project) {
 
     try {
       $values = $project->export();
@@ -292,7 +277,8 @@ class TwingleApiCall {
     if (is_array($result) && !array_key_exists('message', $result)) {
       // Try to update the local TwingleProject campaign
       try {
-        $project->update($result, TwingleProject::TWINGLE);
+        $project->update($result);
+        $this->getEmbedData($project);
         $project->create();
         return $project->getResponse('TwingleProject pushed to Twingle');
       } catch (Exception $e) {

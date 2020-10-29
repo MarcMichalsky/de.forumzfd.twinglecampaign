@@ -42,8 +42,6 @@ class TwingleProject {
 
   private $values;
 
-  private $options;
-
 
   /**
    * TwingleProject constructor.
@@ -62,12 +60,6 @@ class TwingleProject {
 
     // Fetch custom field mapping once
     self::init();
-
-    // Create TwingleProjectOptions object
-    $this->options = new TwingleProjectOptions($project['options'], $origin);
-
-    // Unset project options in $project array
-    unset($project['options']);
 
     // If values come from CiviCRM Campaign API
     if ($origin == self::CIVICRM) {
@@ -172,28 +164,11 @@ class TwingleProject {
         self::IN
       );
 
-      // Prepare project option values for import into database
-      $options_prepared_for_import = $this->options->getValues();
-      TwingleProjectOptions::formatValues(
-        $options_prepared_for_import,
-        self::IN
-      );
-      self::translateCustomFields(
-        $options_prepared_for_import,
-        self::IN
-      );
-
-      // Merge project values and project options values
-      $merged = array_merge(
-        $values_prepared_for_import,
-        $options_prepared_for_import
-      );
-
       // Set id
-      $merged['id'] = $this->id;
+      $values_prepared_for_import['id'] = $this->id;
 
       // Create campaign
-      $result = civicrm_api3('Campaign', 'create', $merged);
+      $result = civicrm_api3('Campaign', 'create', $values_prepared_for_import);
 
       // Update id
       $this->id = $result['id'];
@@ -226,12 +201,6 @@ class TwingleProject {
    */
   public function update(array $values) {
 
-    // Update project options
-    $this->options->update($values['options']);
-
-    // Unset options array in project values
-    unset($values['options']);
-
     // Update project values
     $this->values = array_merge($this->values, $values);
   }
@@ -250,7 +219,6 @@ class TwingleProject {
 
     $values = $this->values;
     self::formatValues($values, self::OUT);
-    self::translateKeys($values, self::OUT);
 
     // Get template for project
     $project = self::$templates['project'];
@@ -263,37 +231,6 @@ class TwingleProject {
     }
 
     return $values;
-  }
-
-  /**
-   * Export options. Ensures that only those values will be exported which the
-   * Twingle API expects. Missing values will get complemented with default
-   * values.
-   *
-   * @return array
-   * Array with all options to send to the Twingle API
-   *
-   * @throws Exception
-   *
-   */
-  public function exportOptions() {
-
-    $options = $this->values['options'];
-    self::formatValues($options, self::OUT);
-    self::translateKeys($options, self::OUT);
-
-    // Get Template for project options
-    $project_options_template = self::$templates['project_options'];
-
-    // Replace array items which the Twingle API does not expect
-    foreach ($options as $key => $value) {
-      if (!key_exists($key, $project_options_template)) {
-        unset($options[$key]);
-      }
-    }
-
-    // Complement missing options with default values
-    return array_merge($project_options_template, $options);
   }
 
 
@@ -349,9 +286,6 @@ class TwingleProject {
       // Translate keys from CiviCRM format to Twingle format
       self::translateKeys($values, self::OUT);
 
-      // Separate options from project values
-      self::separateOptions($values);
-
       // Set attributes to the values of the existing TwingleProject campaign
       // to reflect the state of the actual campaign in the database
       $this->update($values);
@@ -378,9 +312,6 @@ class TwingleProject {
       'sequential' => 1,
       'id'         => $id,
     ]);
-
-    // Separate options from project values
-    self::separateOptions($result['values']);
 
     return new TwingleProject(
       $result['values'],
@@ -484,13 +415,16 @@ class TwingleProject {
     elseif ($direction == self::OUT) {
 
       // Change DateTime string into timestamp
-      $values['last_modified_date'] =
-        self::getTimestamp($values['last_modified_date']);
+      $values['last_update'] =
+        self::getTimestamp($values['last_update']);
 
-      // default project_type to ''
+      // Default project_type to ''
       $values['type'] = $values['type'] == 'default'
         ? ''
         : $values['type'];
+
+      // Cast project target to integer
+      $values['project_target'] = (int) $values['project_target'];
 
     }
     else {
@@ -568,30 +502,31 @@ class TwingleProject {
   }
 
   /**
-   * A function that picks all option values from the values array and puts them
-   * into an own array.
+   * Set embed data fields
    *
-   * @param array $values
+   * @param array $embedData
+   * Array with embed data from Twingle API
    */
-  private static function separateOptions(array &$values) {
+  public function setEmbedData(array $embedData) {
 
-    $options = [];
+    // Get all embed_data keys from template
+    $embed_data_keys = self::$templates['project_embed_data'];
 
-    // Get array with template for project values and options
-    $options_template = self::$templates['project_options'];
-
-    // Map array items into $values and $options array
-    foreach ($values as $key => $value) {
-      if (key_exists($key, $options_template)) {
-        $options[$key] = $value;
-        unset($values[$key]);
-      }
+    // Transfer all embed_data values
+    foreach ($embed_data_keys as $key) {
+      $this->values[$key] = htmlspecialchars($embedData[$key]);
     }
-
-    // Insert options array into values array
-    $values['options'] = $options;
   }
 
+  /**
+   * Set counter url
+   *
+   * @param String $counterUrl
+   * URL of the counter
+   */
+  public function setCounterUrl(string $counterUrl) {
+    $this->values['counter'] = $counterUrl;
+  }
 
   /**
    * Deactivate this TwingleProject campaign
@@ -654,10 +589,11 @@ class TwingleProject {
    */
   public function getResponse(string $status) {
     return [
-      'title'      => $this->values['name'],
-      'id'         => (int) $this->id,
-      'project_id' => (int) $this->values['id'],
-      'status'     => $status,
+      'title'        => $this->values['name'],
+      'id'           => (int) $this->id,
+      'project_id'   => (int) $this->values['id'],
+      'project_type' => $this->values['type'],
+      'status'       => $status,
     ];
   }
 
@@ -730,12 +666,8 @@ class TwingleProject {
    * @return int|null
    */
   public function lastUpdate() {
-    $lastProjectUpdate = self::getTimestamp($this->values['last_update']);
-    $lastOptionsUpdate = self::getTimestamp($this->options->lastUpdate());
-    $lastUpdate = $lastProjectUpdate > $lastOptionsUpdate
-      ? $lastProjectUpdate
-      : $lastOptionsUpdate;
-    return self::getTimestamp($lastUpdate);
+
+    return self::getTimestamp($this->values['last_update']);
   }
 
 
