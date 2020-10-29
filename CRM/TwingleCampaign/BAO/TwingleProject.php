@@ -8,12 +8,10 @@ use CRM_TwingleCampaign_ExtensionUtil as E;
 use CRM_Utils_Array;
 use DateTime;
 use CRM\TwingleCampaign\BAO\CustomField as CustomField;
-use CRM\TwingleCampaign\BAO\TwingleProjectOptions as TwingleProjectOptions;
 use Exception;
 use CiviCRM_API3_Exception;
 
 include_once E::path() . '/CRM/TwingleCampaign/BAO/CustomField.php';
-include_once E::path() . '/CRM/TwingleCampaign/BAO/TwingleProjectOptions.php';
 
 
 class TwingleProject {
