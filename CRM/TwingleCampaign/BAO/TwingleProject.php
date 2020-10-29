@@ -222,31 +222,12 @@ class TwingleProject {
    * @param array $values
    * Array with values to update
    *
-   * @param string|null $origin
-   * Origin of the array. It can be one of two constants:
-   *   TwingleProject::TWINGLE|CIVICRM
-   *
    * @throws Exception
    */
-  public function update(array $values, string $origin = NULL) {
-
-    if ($origin == self::CIVICRM) {
-
-      // Set project id
-      $this->id = $values['id'];
-
-      // Translate custom field names
-      self::translateCustomFields($values, self::OUT);
-
-      // Format project values
-      self::formatValues($values, self::OUT);
-
-      // Separate options from project values
-      self::separateOptions($values);
-    }
+  public function update(array $values) {
 
     // Update project options
-    $this->options->update($values['options'], $origin);
+    $this->options->update($values['options']);
 
     // Unset options array in project values
     unset($values['options']);
@@ -344,6 +325,7 @@ class TwingleProject {
       ]);
 
       if ($result['count'] > 1) {
+        // TODO: abort loop if function fails
         TwingleProject::handleDuplicates($result);
       }
       else {
@@ -370,12 +352,9 @@ class TwingleProject {
       // Separate options from project values
       self::separateOptions($values);
 
-      // Translate keys from Twingle format to CiviCRM format
-      self::translateKeys($values, self::IN);
-
       // Set attributes to the values of the existing TwingleProject campaign
       // to reflect the state of the actual campaign in the database
-      $this->update($values, self::TWINGLE);
+      $this->update($values);
 
       return TRUE;
     }
@@ -605,6 +584,7 @@ class TwingleProject {
     foreach ($values as $key => $value) {
       if (key_exists($key, $options_template)) {
         $options[$key] = $value;
+        unset($values[$key]);
       }
     }
 
@@ -750,7 +730,7 @@ class TwingleProject {
    * @return int|null
    */
   public function lastUpdate() {
-    $lastProjectUpdate = self::getTimestamp($this->values['last_modified_date']);
+    $lastProjectUpdate = self::getTimestamp($this->values['last_update']);
     $lastOptionsUpdate = self::getTimestamp($this->options->lastUpdate());
     $lastUpdate = $lastProjectUpdate > $lastOptionsUpdate
       ? $lastProjectUpdate

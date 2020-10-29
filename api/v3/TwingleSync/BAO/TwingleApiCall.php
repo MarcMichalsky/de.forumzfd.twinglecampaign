@@ -206,9 +206,12 @@ class TwingleApiCall {
 
         // If Twingle's version of the project is newer than the CiviCRM
         // TwingleProject campaign update the campaign
-        if ($values['last_update'] > $project->lastUpdate()) {
+        $lastUpdate = $values['last_update'] > $values['options']['last_update']
+          ? $values['last_update']
+          : $values['options']['last_update'];
+        if ($lastUpdate > $project->lastUpdate()) {
           try {
-            $project->update($values, TwingleProject::TWINGLE);
+            $project->update($values);
             $result = $project->create();
             $result['status'] = $result['status'] == 'TwingleProject created'
               ? 'TwingleProject updated'
@@ -226,7 +229,7 @@ class TwingleApiCall {
         }
         // If the CiviCRM TwingleProject campaign was changed, update the project
         // on Twingle's side
-        elseif ($values['last_update'] < $project->lastUpdate()) {
+        elseif ($lastUpdate < $project->lastUpdate()) {
           // If this is a test do not make database changes
           if ($is_test) {
             $result = $project->getResponse(

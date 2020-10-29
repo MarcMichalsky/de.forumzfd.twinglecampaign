@@ -55,20 +55,9 @@ class TwingleProjectOptions {
    * @param array $options
    * Array with values to update
    *
-   * @param string|null $origin
-   * Origin of the array. It can be one of two constants:
-   *   TwingleProject::TWINGLE|CIVICRM
-   *
    * @throws Exception
    */
-  public function update(array $options, string $origin = NULL) {
-
-    if ($origin == TwingleProject::CIVICRM) {
-      self::formatValues($options, TwingleProject::OUT);
-    }
-
-    // Unset project options id
-    unset($options['id']);
+  public function update(array $options) {
 
     // Update values
     $this->values = array_merge($this->values, $options);
@@ -248,7 +237,7 @@ class TwingleProjectOptions {
   }
 
   public function lastUpdate() {
-    return $this->values['last_modified_date'];
+    return $this->values['last_update'];
   }
 
 }

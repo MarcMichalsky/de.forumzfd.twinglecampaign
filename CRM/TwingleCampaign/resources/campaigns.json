@@ -165,19 +165,6 @@
       "is_view": 0,
       "weight": 5
     },
-    "twingle_project_last_update": {
-      "custom_group_id": "Twingle_Project_Information",
-      "label": "Twingle Project Last update",
-      "name": "twingle_project_last_update",
-      "is_required": 0,
-      "is_searchable": 1,
-      "data_type": "String",
-      "html_type": "Text",
-      "text_length": 32,
-      "is_active": 1,
-      "is_view": 1,
-      "weight": 5
-    },
     "twingle_project_widget": {
       "custom_group_id": "Twingle_Project_Embed_Codes",
       "label": "Twingle Project Widget",

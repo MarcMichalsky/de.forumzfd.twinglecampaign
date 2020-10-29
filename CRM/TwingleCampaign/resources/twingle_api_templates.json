@@ -13,7 +13,6 @@
   "event": [
   ],
   "project_options": {
-    "id": 2237,
     "has_confirmation_mail": false,
     "has_confirmation_mail_api": false,
     "has_donation_receipt": true,
@@ -34,7 +33,7 @@
     "design_button_font_color": "",
     "design_button_font_color_light": "",
     "image": "",
-    "bcc_email_address": "demo-zfd@twingle.de",
+    "bcc_email_address": "",
     "donation_value_min": 5,
     "donation_value_max": 500,
     "donation_value_default": 50,
