@@ -19,5 +19,16 @@
     "eventlist"
   ],
   "event": [
+  ],
+  "event_embed_data": [
+    "page",
+    "eventpage",
+    "widget",
+    "form",
+    "widget-single",
+    "form-single",
+    "eventall",
+    "eventlist",
+    "eventeditcreate"
   ]
 }

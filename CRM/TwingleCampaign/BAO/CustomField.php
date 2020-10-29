@@ -89,10 +89,10 @@ class CustomField {
 
       // Log field creation
       if ($this->result['is_error'] == 0) {
-        \Civi::log()->info("Twingle Extension has created a new custom field.\n
-      label: $this->label\n
-      name: $this->name\n
-      id: $this->id\n
+        \Civi::log()->info("Twingle Extension has created a new custom field.
+      label: $this->label
+      name: $this->name
+      id: $this->id
       group: $this->custom_group_id"
         );
       }
@@ -224,10 +224,10 @@ class CustomField {
 
     // Check if custom field was deleted successfully
     if ($this->result['is_error'] == 0) {
-      \Civi::log()->info("Twingle Extension has deleted custom field.\n
-      label: $this->label\n
-      name: $this->name\n
-      id: $this->id\n
+      \Civi::log()->info("Twingle Extension has deleted custom field.
+      label: $this->label
+      name: $this->name
+      id: $this->id
       group: $this->custom_group_id"
       );
     }

@@ -51,8 +51,8 @@ class CampaignType {
       $this->value = array_column($this->results['values'], 'value')[0];
 
       if ($this->results['is_error'] == 0) {
-        \Civi::log()->info("Twingle Extension has created a new campaign type.\n
-      label: $this->label\n
+        \Civi::log()->info("Twingle Extension has created a new campaign type.
+      label: $this->label
       name: $this->name"
         );
       }
@@ -104,12 +104,12 @@ class CampaignType {
   }
 
   /**
-   * @param $name
+   * @param string $name
    *
    * @return \CRM\TwingleCampaign\BAO\CampaignType|null
    * @throws \CiviCRM_API3_Exception
    */
-  public static function fetch($name) {
+  public static function fetch(string $name) {
     $campaign_type = civicrm_api3(
       'OptionValue',
       'get',

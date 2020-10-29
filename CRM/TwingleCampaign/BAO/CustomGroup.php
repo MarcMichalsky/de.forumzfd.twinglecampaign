@@ -49,11 +49,11 @@ class CustomGroup {
       $this->id = $this->results['id'];
 
       if ($this->results['is_error'] == 0) {
-        \Civi::log()->info("Twingle Extension has created a new custom group.\n 
-      title: $this->title\n
-      name: $this->name\n
-      extends: $this->extends\n
-      id: $this->id\n
+        \Civi::log()->info("Twingle Extension has created a new custom group.
+      title: $this->title
+      name: $this->name
+      extends: $this->extends
+      id: $this->id
       column_value: $this->extends_entity_column_value"
         );
       }
@@ -134,10 +134,10 @@ class CustomGroup {
     );
 
     if ($this->results['is_error'] == 0) {
-      \Civi::log()->info("Twingle Extension has deleted custom group.\n
-      title: $this->title\n
-      name: $this->name\n
-      extends: $this->extends\n
+      \Civi::log()->info("Twingle Extension has deleted custom group.
+      title: $this->title
+      name: $this->name
+      extends: $this->extends
       id : $this->id"
       );
 

@@ -4,6 +4,6 @@
 namespace CRM\TwingleCampaign\BAO;
 
 
-class TwingleCampaign {
+class TwingleCampaign extends Campaign {
 
 }

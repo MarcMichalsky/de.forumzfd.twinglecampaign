@@ -55,7 +55,7 @@ function civicrm_api3_twingle_sync_Post($params) {
     : $params['twingle_api_key'];
   $twingleApi = new TwingleApiCall($apiKey);
 
-  // Get all projects from Twingle and store them in $projects
+  // Get all projects from Twingle
   $projects = $twingleApi->getProject();
 
   // Create projects as campaigns if they do not exist and store results in
@@ -65,6 +65,23 @@ function civicrm_api3_twingle_sync_Post($params) {
     if (is_array($project)) {
       $result_values['sync']['projects'][$i++] = $twingleApi
         ->syncProject($project, $is_test);
+    }
+  }
+
+  // Get all events from projects of event type
+  foreach ($result_values['sync']['projects'] as $project) {
+    if ($project['project_type'] == 'event') {
+      $events = $twingleApi->getEvent($project['project_id']);
+    }
+  }
+
+  // Create events them as campaigns if they do not exist and store results in
+  // $result_values
+  $j = 0;
+  if ($events) {
+    foreach ($events as $event) {
+      $result_values['sync']['events'][$j++] = $twingleApi
+        ->syncEvent($event, $is_test);
     }
   }
 

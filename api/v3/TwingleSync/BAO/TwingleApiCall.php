@@ -54,7 +54,8 @@ class TwingleApiCall {
    * If $id parameter is empty, this function returns all projects for all
    * organisations this API key is assigned to.
    *
-   * TODO: Keys can only get assigned to one organisation. Save multiple keys in settings instead.
+   * TODO: Keys can only get assigned to one organisation. Save multiple keys
+   * in settings instead.
    *
    * If $id parameter is given, this function returns a single project.
    *
@@ -184,7 +185,7 @@ class TwingleApiCall {
             $result['status'] = $result['status'] == 'TwingleProject created'
               ? 'TwingleProject updated'
               : 'TwingleProject Update failed';
-          } catch (Exception $e){
+          } catch (Exception $e) {
             // Log Exception
             Civi::log()->error(
               "Could not update TwingleProject campaign: $e->getMessage()"
@@ -304,8 +305,98 @@ class TwingleApiCall {
 
   }
 
+  /**
+   * @param array $values
+   * @param bool $isTest
+   *
+   * @return array | NULL
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function syncEvent(array $values, bool $isTest) {
+    // If $event is an array
+    if (is_array($values)) {
 
-  public function updateEvent() {
+      // Instantiate TwingleEvent
+      try {
+        $event = new TwingleEvent(
+          $values,
+          TwingleEvent::TWINGLE
+        );
+      } catch (Exception $e) {
+
+        // Log Exception
+        Civi::log()->error(
+          "Failed to instantiate TwingleEvent: $e->getMessage()"
+        );
+
+        // Return result array with error description
+        return [
+          "title"      => $values['description'],
+          "event_id"   => (int) $values['id'],
+          "project_id" => (int) $values['id'],
+          "status"     =>
+            "Failed to instantiate TwingleEvent: $e->getMessage()",
+        ];
+      }
+
+      // Check if the TwingleProject campaign already exists
+      if (!$event->exists()) {
+
+        // ... if not, get embed data and create project
+        try {
+          $this->getEmbedData($event); // TODO: !
+          $result = $event->create($is_test);
+        } catch (Exception $e) {
+
+          // Log Exception
+          Civi::log()->error(
+            "Could not create campaign from TwingleEvent: $e->getMessage()"
+          );
+
+          // Return result array with error description
+          return [
+            "title"      => $values['description'],
+            "event_id"   => (int) $values['id'],
+            "project_id" => (int) $values['id'],
+            "Could not create campaign from TwingleEvent: $e->getMessage()",
+          ];
+        }
+      }
+      else {
+        $result = $event->getResponse('TwingleEvent exists');
+
+        // If Twingle's version of the event is newer than the CiviCRM
+        // TwingleEvent campaign update the campaign
+        if ($values['last_update'] > $event->lastUpdate()) {
+          try {
+            $event->update($values);
+            $this->getEmbedData($event); // TODO: !
+            $result = $event->create();
+            $result['status'] = $result['status'] == 'TwingleEvent created'
+              ? 'TwingleEvent updated'
+              : 'TwingleEvent Update failed';
+          } catch (Exception $e) {
+            // Log Exception
+            Civi::log()->error(
+              "Could not update TwingleEvent campaign: $e->getMessage()"
+            );
+            // Return result array with error description
+            $result = $event->getResponse(
+              "Could not update TwingleProject campaign: $e->getMessage()"
+            );
+          }
+        }
+        elseif ($result['status'] == 'TwingleEvent exists') {
+          $result = $event->getResponse('TwingleEvent up to date');
+        }
+      }
+
+      // Return a response of the synchronization
+      return $result;
+    }
+    else {
+      return NULL;
+    }
   }
 
 
@@ -382,10 +473,10 @@ class TwingleApiCall {
    */
   private function getResultArray($values, $status) {
     return [
-      "title"      => $values['name'],
-      "project_id" => (int) $values['id'],
+      "title"        => $values['name'],
+      "project_id"   => (int) $values['id'],
       "project_type" => $values['project_type'],
-      "status"     => $status
+      "status"       => $status,
     ];
   }
 
