@@ -30,6 +30,8 @@ abstract class Campaign {
 
   protected $id_custom_field = NULL;
 
+  protected $prefix = NULL;
+
 
   /**
    * Campaign constructor.
@@ -54,7 +56,7 @@ abstract class Campaign {
       $this->id = $campaign['id'];
 
       // Translate custom field names into Twingle field names
-      self::translateCustomFields($campaign, self::OUT);
+      $this->translateCustomFields($campaign, self::OUT);
 
       // Translate keys and values
       self::formatValues($campaign, self::OUT);
@@ -66,7 +68,6 @@ abstract class Campaign {
     $this->values = $campaign;
 
   }
-
 
   /**
    * Check if a campaign already exists and if so set attributes
@@ -111,12 +112,12 @@ abstract class Campaign {
       $this->id = $values['id'];
 
       // Translate custom field names back
-      self::translateCustomFields($values, self::OUT);
+      $this->translateCustomFields($values, self::OUT);
 
       // Translate keys from CiviCRM format to Twingle format
       self::translateKeys($values, self::OUT);
 
-      // Set attributes to the values of the existing TwingleEvent campaign
+      // Set attributes to the values of the existing campaign
       // to reflect the state of the actual campaign in the database
       $this->update($values);
 
@@ -154,7 +155,7 @@ abstract class Campaign {
         $values_prepared_for_import,
         self::IN
       );
-      self::translateCustomFields(
+      $this->translateCustomFields(
         $values_prepared_for_import,
         self::IN
       );
@@ -290,10 +291,10 @@ abstract class Campaign {
    *
    * @throws Exception
    */
-  public static function translateKeys(array &$values, string $direction) {
+  public function translateKeys(array &$values, string $direction) {
 
     // Get translations for fields
-    $field_translations = Cache::getInstance()->getTranslations()['fields'];
+    $field_translations = Cache::getInstance()->getTranslations()[$this->className];
 
     // Set the direction of the translation
     if ($direction == self::OUT) {
@@ -379,7 +380,7 @@ abstract class Campaign {
    * names
    *
    */
-  public static function translateCustomFields(array &$values, string $direction) {
+  public function translateCustomFields(array &$values, string $direction) {
 
     // Translate from Twingle field name to custom field name
     if ($direction == self::IN) {
@@ -389,7 +390,7 @@ abstract class Campaign {
 
         if (array_key_exists(
           str_replace(
-            'twingle_project_',
+            $this->prefix,
             '',
             $field
           ),
@@ -397,13 +398,13 @@ abstract class Campaign {
         ) {
 
           $values[$custom] = $values[str_replace(
-            'twingle_project_',
+            $this->prefix,
             '',
             $field
           )];
 
           unset($values[str_replace(
-              'twingle_project_',
+              $this->prefix,
               '',
               $field
             )]
@@ -423,7 +424,7 @@ abstract class Campaign {
         )
         ) {
           $values[str_replace(
-            'twingle_project_',
+            $this->prefix,
             '',
             $field
           )] = $values[$custom];
@@ -590,17 +591,6 @@ abstract class Campaign {
       return NULL;
     }
 
-  }
-
-
-  /**
-   * Return a timestamp of the last update of the Campaign
-   *
-   * @return int|null
-   */
-  public function lastUpdate() {
-
-    return self::getTimestamp($this->values['last_update']);
   }
 
 

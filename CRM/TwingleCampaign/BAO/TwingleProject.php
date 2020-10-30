@@ -3,12 +3,15 @@
 
 namespace CRM\TwingleCampaign\BAO;
 
+use Civi;
 use CRM_TwingleCampaign_ExtensionUtil as E;
 use CRM\TwingleCampaign\Utils\ExtensionCache as Cache;
-use DateTime;
+use CRM\TwingleCampaign\BAO\Campaign;
 use Exception;
 use CiviCRM_API3_Exception;
 
+include_once E::path() . '/CRM/TwingleCampaign/BAO/Campaign.php';
+include_once E::path() . '/CRM/TwingleCampaign/Utils/ExtensionCache.php';
 
 class TwingleProject extends Campaign {
 
@@ -28,7 +31,8 @@ class TwingleProject extends Campaign {
   public function __construct(array $project, string $origin) {
     parent::__construct($project, $origin);
 
-    $this->className = get_class($this);
+    $this->className = (new \ReflectionClass($this))->getShortName();
+    $this->prefix = 'twingle_project_';
 
     // Add value for campaign type
     $this->values['campaign_type_id'] = 'twingle_project';
@@ -37,6 +41,130 @@ class TwingleProject extends Campaign {
     $this->id_custom_field = Cache::getInstance()
       ->getCustomFieldMapping()['twingle_project_id'];
 
+  }
+
+
+  /**
+   * Synchronizes projects between Twingle and CiviCRM (both directions)
+   * based on the timestamp.
+   *
+   * @param array $values
+   * @param TwingleApiCall $twingleApi
+   * @param bool $is_test
+   * If TRUE, don't do any changes
+   *
+   * @return array|null
+   * Returns a response array that contains title, id, project_id and status or
+   * NULL if $values is not an array
+   *
+   * @throws CiviCRM_API3_Exception
+   */
+  public static function sync(
+    array $values,
+    TwingleApiCall &$twingleApi,
+    bool $is_test = FALSE
+  ) {
+
+    // If $values is an array
+    if (is_array($values)) {
+
+      // Instantiate TwingleProject
+      try {
+        $project = new TwingleProject(
+          $values,
+          self::TWINGLE
+        );
+      } catch (Exception $e) {
+
+        // Log Exception
+        Civi::log()->error(
+          "Failed to instantiate TwingleProject: $e->getMessage()"
+        );
+
+        // Return result array with error description
+        return [
+          "title"      => $values['name'],
+          "project_id" => (int) $values['id'],
+          "status"     =>
+            "Failed to instantiate TwingleProject: $e->getMessage()",
+        ];
+      }
+
+      // Check if the TwingleProject campaign already exists
+      if (!$project->exists()) {
+
+        // ... if not, get embed data and create project
+        try {
+          $project->setEmbedData(
+            $twingleApi->getProjectEmbedData($project->getProjectId())
+          );
+          $result = $project->create($is_test);
+        } catch (Exception $e) {
+
+          // Log Exception
+          Civi::log()->error(
+            "Could not create campaign from TwingleProject: $e->getMessage()"
+          );
+
+          // Return result array with error description
+          return [
+            "title"      => $values['name'],
+            "project_id" => (int) $values['id'],
+            "status"     =>
+              "Could not create campaign from TwingleProject: $e->getMessage()",
+          ];
+        }
+      }
+      else {
+        $result = $project->getResponse('TwingleProject exists');
+
+        // If Twingle's version of the project is newer than the CiviCRM
+        // TwingleProject campaign update the campaign
+        if ($values['last_update'] > $project->lastUpdate()) {
+          try {
+            $project->update($values);
+            $project->setEmbedData(
+              $twingleApi->getProjectEmbedData($project->getProjectId())
+            );
+            $result = $project->create();
+            $result['status'] = $result['status'] == 'TwingleProject created'
+              ? 'TwingleProject updated'
+              : 'TwingleProject Update failed';
+          } catch (Exception $e) {
+            // Log Exception
+            Civi::log()->error(
+              "Could not update TwingleProject campaign: $e->getMessage()"
+            );
+            // Return result array with error description
+            $result = $project->getResponse(
+              "Could not update TwingleProject campaign: $e->getMessage()"
+            );
+          }
+        }
+        // If the CiviCRM TwingleProject campaign was changed, update the project
+        // on Twingle's side
+        elseif ($values['last_update'] < $project->lastUpdate()) {
+          // If this is a test do not make database changes
+          if ($is_test) {
+            $result = $project->getResponse(
+              'TwingleProject ready to push'
+            );
+          }
+          else {
+            $result = $twingleApi->pushProject($project);
+          }
+        }
+        elseif ($result['status'] == 'TwingleProject exists') {
+          $result = $project->getResponse('TwingleProject up to date');
+        }
+      }
+
+      // Return a response of the synchronization
+      return $result;
+    }
+    else {
+      return NULL;
+    }
   }
 
 
@@ -137,16 +265,7 @@ class TwingleProject extends Campaign {
       $this->values[$key] = htmlspecialchars($embedData[$key]);
     }
   }
-
-  /**
-   * Set counter url
-   *
-   * @param String $counterUrl
-   * URL of the counter
-   */
-  public function setCounterUrl(string $counterUrl) {
-    $this->values['counter'] = $counterUrl;
-  }
+  
 
   /**
    * Deactivate this TwingleProject campaign
@@ -180,6 +299,16 @@ class TwingleProject extends Campaign {
       'project_type' => $this->values['type'],
       'status'       => $status,
     ];
+  }
+
+  /**
+   * Return a timestamp of the last update of the Campaign
+   *
+   * @return int|null
+   */
+  public function lastUpdate() {
+
+    return self::getTimestamp($this->values['last_update']);
   }
 
 

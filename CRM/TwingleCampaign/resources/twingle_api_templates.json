@@ -16,7 +16,8 @@
     "form-single",
     "widget-single",
     "eventall",
-    "eventlist"
+    "eventlist",
+    "counter"
   ],
   "event": [
   ],

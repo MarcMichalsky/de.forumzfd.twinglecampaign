@@ -7,6 +7,8 @@ use CRM\TwingleCampaign\BAO\CustomField as CustomField;
 use CRM_TwingleCampaign_ExtensionUtil as E;
 use Exception;
 
+include_once E::path() . '/CRM/TwingleCampaign/BAO/CustomField.php';
+
 /**
  * A singleton that caches mappings and settings
  *
@@ -24,6 +26,10 @@ class ExtensionCache {
 
   private $templates;
 
+  /**
+   * Get an instance (singleton)
+   * @return ExtensionCache|null
+   */
   public static function getInstance() {
     if (null === self::$_instance) {
       self::$_instance = new self;
@@ -31,6 +37,11 @@ class ExtensionCache {
     return self::$_instance;
   }
 
+  /**
+   * Protected ExtensionCache constructor.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   protected function __construct() {
 
     // Get a mapping of custom fields

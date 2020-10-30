@@ -1,6 +1,10 @@
 {
-  "fields": {
+  "TwingleProject": {
     "name": "title",
     "last_update": "last_modified_date"
+  },
+  "TwingleEvent": {
+    "description": "title",
+    "updated_at": "last_modified_date"
   }
 }

@@ -1,9 +1,15 @@
 <?php
 
-use CRM_TwingleCampaign_ExtensionUtil as E;
 use CRM\TwingleCampaign\BAO\TwingleApiCall as TwingleApiCall;
+use CRM\TwingleCampaign\BAO\TwingleProject;
+use CRM\TwingleCampaign\BAO\TwingleEvent;
+use CRM\TwingleCampaign\BAO\TwingleCampaign;
+use CRM_TwingleCampaign_ExtensionUtil as E;
 
-include_once E::path() . '/api/v3/TwingleSync/BAO/TwingleApiCall.php';
+include_once E::path() . '/CRM/TwingleCampaign/BAO/TwingleApiCall.php';
+include_once E::path() . '/CRM/TwingleCampaign/BAO/TwingleProject.php';
+include_once E::path() . '/CRM/TwingleCampaign/BAO/TwingleEvent.php';
+include_once E::path() . '/CRM/TwingleCampaign/BAO/TwingeCampaign.php';
 
 /**
  * TwingleSync.Post API specification (optional)
@@ -13,7 +19,7 @@ include_once E::path() . '/api/v3/TwingleSync/BAO/TwingleApiCall.php';
  *
  * @see https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
  */
-function _civicrm_api3_twingle_sync_Post_spec(&$spec) {
+function _civicrm_api3_twingle_sync_Post_spec(array &$spec) {
   $spec['twingle_api_key'] = [
     'name'         => 'twingle_api_key',
     'title'        => E::ts('Twingle API key'),
@@ -38,11 +44,11 @@ function _civicrm_api3_twingle_sync_Post_spec(&$spec) {
  * @return array
  *   API result descriptor
  *
- * @throws \CiviCRM_API3_Exception|\API_Exception
+ * @throws \CiviCRM_API3_Exception
+ * @throws \API_Exception
  * @see civicrm_api3_create_success
- *
  */
-function civicrm_api3_twingle_sync_Post($params) {
+function civicrm_api3_twingle_sync_Post(array $params) {
   $result_values = [];
 
   // Is this call a test?
@@ -63,8 +69,8 @@ function civicrm_api3_twingle_sync_Post($params) {
   $i = 0;
   foreach ($projects as $project) {
     if (is_array($project)) {
-      $result_values['sync']['projects'][$i++] = $twingleApi
-        ->syncProject($project, $is_test);
+      $result_values['sync']['projects'][$i++] =
+        TwingleProject::sync($project, $twingleApi, $is_test);
     }
   }
 
@@ -80,10 +86,12 @@ function civicrm_api3_twingle_sync_Post($params) {
   $j = 0;
   if ($events) {
     foreach ($events as $event) {
-      $result_values['sync']['events'][$j++] = $twingleApi
-        ->syncEvent($event, $is_test);
+      $result_values['sync']['events'][$j++] =
+        TwingleEvent::sync($event, $twingleApi, $is_test);
     }
   }
 
   return civicrm_api3_create_success($result_values);
 }
+
+
