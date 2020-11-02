@@ -40,6 +40,7 @@ class TwingleEvent extends Campaign {
     // Get custom field name for event_id
     $this->id_custom_field = Cache::getInstance()
       ->getCustomFieldMapping()['twingle_event_id'];
+    $this->values['parent_id'] = $this->getParentCampaignId();
 
   }
 
@@ -333,6 +334,23 @@ class TwingleEvent extends Campaign {
       $names $lastname $email./nError Message: $message");
       return NULL;
     }
+  }
+
+  /**
+   * Gets the campaign id of the parent TwingleProject campaign.
+   * @return int|null
+   * @throws CiviCRM_API3_Exception
+   */
+  private function getParentCampaignId() {
+    $cf_project_id = Cache::getInstance()->getCustomFieldMapping()['twingle_project_id'];
+    $parentCampaign = civicrm_api3('Campaign', 'get', [
+      'sequential' => 1,
+      $cf_project_id => $this->values['project_id']
+    ]);
+    if ($parentCampaign['is_error'] == 0) {
+      return (int) $parentCampaign['id'];
+    }
+    else return NULL;
   }
 
   /**
