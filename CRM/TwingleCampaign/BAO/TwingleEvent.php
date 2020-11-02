@@ -291,6 +291,51 @@ class TwingleEvent extends Campaign {
   }
 
   /**
+   * Matches a single string that should contain first and lastname to match a
+   * contact or create a new one if it does not exist yet.
+   *
+   * TODO: The logic of this method should instead be handled in the XCM
+   * extension. This ist only a temporary solution.
+   *
+   * @param string $names
+   * @param string $email
+   *
+   * @return int|null
+   * Returns a contact id
+   */
+  private function matchContact(string $names, string $email) {
+    $names = explode(' ', $names);
+    $lastname = '';
+
+    if (is_array($names) && count($names) > 1) {
+      $lastname = array_pop($names);
+      $test = $names[count($names) - 1];
+      $nameSuffixes = ['de', 'da', 'von', 'van'];
+
+      if (in_array($test, $nameSuffixes)) {
+        array_pop($names);
+        $lastname = $test . ' ' . $lastname;
+      }
+
+      $names = implode(" ", $names);
+    }
+    try {
+      $contact = civicrm_api3('Contact', 'getorcreate', [
+        'xcm_profile' => 'default',
+        'first_name'  => $names,
+        'last_name'   => $lastname,
+        'email'       => $email,
+      ]);
+      return (int) $contact['id'];
+    } catch (CiviCRM_API3_Exception $e) {
+      $message = $e->getMessage();
+      \Civi::log()->error("TwingleCampaign extension could not match or create a contact for:
+      $names $lastname $email./nError Message: $message");
+      return NULL;
+    }
+  }
+
+  /**
    * Return a timestamp of the last update of the Campaign
    *
    * @return int|null

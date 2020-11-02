@@ -21,6 +21,9 @@
     <ver>5.0</ver>
   </compatibility>
   <comments>This is a new, undeveloped module</comments>
+  <requires>
+    <ext>de.systopia.xcm</ext>
+  </requires>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
