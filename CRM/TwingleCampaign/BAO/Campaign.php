@@ -317,58 +317,6 @@ abstract class Campaign {
 
 
   /**
-   * Translate values between CiviCRM Campaigns and Twingle
-   *
-   * @param array $values
-   * array of which values shall be translated
-   *
-   * @param string $direction
-   * Campaign::IN -> translate array values from Twingle to CiviCRM <br>
-   * Campaign::OUT -> translate array values from CiviCRM to Twingle
-   *
-   * @throws Exception
-   */
-  private function formatValues(array &$values, string $direction) {
-
-    if ($direction == self::IN) {
-
-      // Change timestamp into DateTime string
-      if ($values['last_update']) {
-        $values['last_update'] =
-          self::getDateTime($values['last_update']);
-      }
-
-      // empty project_type to 'default'
-      if (!$values['type']) {
-        $values['type'] = 'default';
-      }
-    }
-    elseif ($direction == self::OUT) {
-
-      // Change DateTime string into timestamp
-      $values['last_update'] =
-        self::getTimestamp($values['last_update']);
-
-      // Default project_type to ''
-      $values['type'] = $values['type'] == 'default'
-        ? ''
-        : $values['type'];
-
-      // Cast project target to integer
-      $values['project_target'] = (int) $values['project_target'];
-
-    }
-    else {
-
-      throw new Exception(
-        "Invalid Parameter $direction for formatValues()"
-      );
-
-    }
-  }
-
-
-  /**
    * Translate between Twingle field names and custom field names
    *
    * @param array $values
