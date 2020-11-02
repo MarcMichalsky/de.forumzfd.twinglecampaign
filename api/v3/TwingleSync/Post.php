@@ -74,20 +74,20 @@ function civicrm_api3_twingle_sync_Post(array $params) {
     }
   }
 
-  // Get all events from projects of event type
+  // Get all events from projects of type "event" and create them as campaigns
+  // if they do not exist yet
+  $j = 0;
   foreach ($result_values['sync']['projects'] as $project) {
     if ($project['project_type'] == 'event') {
       $events = $twingleApi->getEvent($project['project_id']);
-    }
-  }
-
-  // Create events them as campaigns if they do not exist and store results in
-  // $result_values
-  $j = 0;
-  if ($events) {
-    foreach ($events as $event) {
-      $result_values['sync']['events'][$j++] =
-        TwingleEvent::sync($event, $twingleApi, $is_test);
+      if (is_array($events)) {
+        foreach ($events as $event) {
+          if ($event) {
+            $result_values['sync']['events'][$j++] =
+              TwingleEvent::sync($event, $twingleApi, $is_test);
+          }
+        }
+      }
     }
   }
 
