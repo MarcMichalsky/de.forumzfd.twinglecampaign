@@ -49,7 +49,7 @@ class CustomGroup {
       $this->id = $this->results['id'];
 
       if ($this->results['is_error'] == 0) {
-        \Civi::log()->info("Twingle Extension has created a new custom group.
+        \Civi::log()->info("TwingleCampaign Extension has created a new custom group.
       title: $this->title
       name: $this->name
       extends: $this->extends
@@ -59,12 +59,12 @@ class CustomGroup {
       }
       else {
         if ($this->title) {
-          \Civi::log()->error("Twingle Extension could not create new custom group
+          \Civi::log()->error("TwingleCampaign Extension could not create new custom group
         for \"$this->title\": $this->results['error_message']"
           );
         }
         else {
-          \Civi::log()->error("Twingle Extension could not create new 
+          \Civi::log()->error("TwingleCampaign Extension could not create new 
         custom group: $this->results['error_message']");
         }
       }
@@ -134,7 +134,7 @@ class CustomGroup {
     );
 
     if ($this->results['is_error'] == 0) {
-      \Civi::log()->info("Twingle Extension has deleted custom group.
+      \Civi::log()->info("TwingleCampaign Extension has deleted custom group.
       title: $this->title
       name: $this->name
       extends: $this->extends
@@ -147,12 +147,12 @@ class CustomGroup {
     }
     else {
       if ($this->title) {
-        \Civi::log()->error("Twingle Extension could not delete custom group
+        \Civi::log()->error("TwingleCampaign Extension could not delete custom group
         \"$this->title\": $this->results['error_message']"
         );
       }
       else {
-        \Civi::log()->error("Twingle Extension could not delete custom group: 
+        \Civi::log()->error("TwingleCampaign Extension could not delete custom group: 
         $this->results['error_message']");
       }
     }

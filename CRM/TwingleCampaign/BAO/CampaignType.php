@@ -137,7 +137,7 @@ class CampaignType {
     );
 
     if ($this->results['is_error'] == 0) {
-      \Civi::log()->info("Twingle Extension has deleted campaign type.\n
+      \Civi::log()->info("TwingleCampaign Extension has deleted campaign type.\n
       label: $this->label\n
       name: $this->name"
       );
@@ -148,12 +148,12 @@ class CampaignType {
     }
     else {
       if ($this->label) {
-        \Civi::log()->error("Twingle Extension could not delete campaign type
+        \Civi::log()->error("TwingleCampaign Extension could not delete campaign type
         \"$this->label\": $this->results['error_message']"
         );
       }
       else {
-        \Civi::log()->error("Twingle Extension could not delete campaign type: 
+        \Civi::log()->error("TwingleCampaign Extension could not delete campaign type: 
         $this->results['error_message']");
       }
     }

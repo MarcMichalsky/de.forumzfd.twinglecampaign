@@ -33,7 +33,7 @@ class TwingleEvent extends Campaign {
 
     $this->className = (new \ReflectionClass($this))->getShortName();
     $this->prefix = 'twingle_event_';
-
+    $this->values['campaign_type_id'] = 'twingle_event';
     // Add value for campaign type
     $event['campaign_type_id'] = 'twingle_event';
 
@@ -53,7 +53,7 @@ class TwingleEvent extends Campaign {
    * If TRUE, don't do any changes
    *
    * @return array|null
-   * Returns a response array that contains title, id, event_id, project_
+   * Returns a response array that contains title, id, event_id, project_id
    * and status or NULL if $values is not an array
    *
    * @throws CiviCRM_API3_Exception

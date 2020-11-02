@@ -235,13 +235,13 @@ class CustomField {
     else {
       if ($this->label && $this->custom_group_id) {
         \Civi::log()
-          ->error("Twingle Extension could not delete custom field
+          ->error("TwingleCampaign Extension could not delete custom field
             \"$this->label\" for group \"$this->custom_group_id\": 
             $this->result['error_message']");
       }
       else {
         \Civi::log()
-          ->error("Twingle Extension could not delete custom field: 
+          ->error("TwingleCampaign Extension could not delete custom field: 
             $this->result['error_message']");
       }
     }

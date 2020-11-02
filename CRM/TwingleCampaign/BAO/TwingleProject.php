@@ -33,11 +33,7 @@ class TwingleProject extends Campaign {
 
     $this->className = (new \ReflectionClass($this))->getShortName();
     $this->prefix = 'twingle_project_';
-
-    // Add value for campaign type
     $this->values['campaign_type_id'] = 'twingle_project';
-
-    // Get custom field name for project_id
     $this->id_custom_field = Cache::getInstance()
       ->getCustomFieldMapping()['twingle_project_id'];
 
