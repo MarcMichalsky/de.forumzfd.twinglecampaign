@@ -28,7 +28,7 @@ class TwingleEvent extends Campaign {
    *
    * @throws Exception
    */
-  public function __construct(array $event, string $origin) {
+  protected function __construct(array $event, string $origin) {
     parent::__construct($event, $origin);
 
     $this->className = (new \ReflectionClass($this))->getShortName();

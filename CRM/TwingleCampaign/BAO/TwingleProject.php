@@ -28,7 +28,7 @@ class TwingleProject extends Campaign {
    *
    * @throws Exception
    */
-  public function __construct(array $project, string $origin) {
+  protected function __construct(array $project, string $origin) {
     parent::__construct($project, $origin);
 
     $this->className = (new \ReflectionClass($this))->getShortName();
