@@ -45,7 +45,7 @@ abstract class Campaign {
    *
    * @throws Exception
    */
-  public function __construct(array $campaign, string $origin) {
+  protected function __construct(array $campaign, string $origin) {
 
     $this->className = get_class($this);
 
