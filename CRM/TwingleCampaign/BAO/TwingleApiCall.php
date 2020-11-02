@@ -171,7 +171,9 @@ class TwingleApiCall {
       $response = $this->curlGet($url, $params);
       $finished = is_null($eventId) || count($response['data']) < $this->limit;
       $offset = $offset + $this->limit;
-      $result = array_merge($result, $response['data']);
+      if ($response['data']) {
+        $result = array_merge($result, $response['data']);
+      }
     }
     return $result;
   }
