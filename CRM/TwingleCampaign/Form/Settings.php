@@ -1,6 +1,6 @@
 <?php
 
-use CRM_Twingle_ExtensionUtil as E;
+use CRM_TwingleCampaign_ExtensionUtil as E;
 
 /**
  * Form controller class

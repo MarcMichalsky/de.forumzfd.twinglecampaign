@@ -34,10 +34,6 @@ class TwingleEvent extends Campaign {
     $this->className = (new \ReflectionClass($this))->getShortName();
     $this->prefix = 'twingle_event_';
     $this->values['campaign_type_id'] = 'twingle_event';
-    // Add value for campaign type
-    $event['campaign_type_id'] = 'twingle_event';
-
-    // Get custom field name for event_id
     $this->id_custom_field = Cache::getInstance()
       ->getCustomFieldMapping()['twingle_event_id'];
     $this->values['parent_id'] = $this->getParentCampaignId();
