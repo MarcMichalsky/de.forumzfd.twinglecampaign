@@ -67,7 +67,7 @@ function civicrm_api3_twingle_sync_Post(array $params) {
     ? trim(Civi::settings()->get('twingle_api_key'))
     : trim($params['twingle_api_key']);
   // If function call does not provide a limit, set a default value
-  $limit = empty($params['limit']) ?? 20;
+  $limit = ($params['limit']) ?? NULL;
   $twingleApi = new TwingleApiCall($apiKey, $limit);
 
   // Get all projects from Twingle
