@@ -23,6 +23,7 @@
   <comments>This is a new, undeveloped module</comments>
   <requires>
     <ext>de.systopia.xcm</ext>
+    <ext>de.systopia.campaign</ext>
   </requires>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
