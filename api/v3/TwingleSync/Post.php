@@ -27,6 +27,13 @@ function _civicrm_api3_twingle_sync_Post_spec(array &$spec) {
     'api.required' => 0,
     'description'  => E::ts('The key to access the Twingle API'),
   ];
+  $spec['limit'] = [
+    'name'         => 'limit',
+    'title'        => E::ts('Limit'),
+    'type'         => CRM_Utils_Type::T_INT,
+    'api.required' => 0,
+    'description'  => E::ts('Limit for the number of events that should get requested per call to the Twingle API'),
+  ];
   $spec['is_test'] = [
     'name'         => 'is_test',
     'title'        => E::ts('Test'),
@@ -59,7 +66,9 @@ function civicrm_api3_twingle_sync_Post(array $params) {
   $apiKey = empty($params['twingle_api_key'])
     ? CRM_Core_BAO_Setting::getItem('', 'twingle_api_key')
     : $params['twingle_api_key'];
-  $twingleApi = new TwingleApiCall($apiKey);
+  // If function call does not provide a limit, set a default value
+  $limit = empty($params['limit']) ?? 20;
+  $twingleApi = new TwingleApiCall($apiKey, $limit);
 
   // Get all projects from Twingle
   $projects = $twingleApi->getProject();

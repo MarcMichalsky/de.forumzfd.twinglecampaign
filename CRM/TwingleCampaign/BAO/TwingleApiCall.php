@@ -26,11 +26,15 @@ class TwingleApiCall {
    *
    * @param $apiKey
    *
+   * @param int $limit
+   * Limit for the number of events that should get requested per call to the
+   * Twingle API
+   *
    * @throws API_Exception
    */
-  public function __construct($apiKey) {
+  public function __construct($apiKey, int $limit = 20) {
     $this->apiKey = $apiKey;
-    $this->limit = CRM_Core_BAO_Setting::getItem('', 'twingle_request_size');
+    $this->limit = $limit;
 
     // Get organisation id
     $curl = curl_init($this->protocol . 'organisation' . $this->baseUrl);
