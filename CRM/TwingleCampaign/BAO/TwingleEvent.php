@@ -307,11 +307,20 @@ class TwingleEvent extends Campaign {
     if (is_array($names) && count($names) > 1) {
       $lastname = array_pop($names);
       $test = $names[count($names) - 1];
-      $nameSuffixes = ['de', 'da', 'von', 'van'];
+      $lastnamePrefixes = ['da', 'de', 'der', 'van', 'von'];
 
-      if (in_array($test, $nameSuffixes)) {
-        array_pop($names);
-        $lastname = $test . ' ' . $lastname;
+      if (in_array($test, $lastnamePrefixes)) {
+        if ($test == 'der' &&
+          $names[count($names) - 2] == 'van' ||
+          $names[count($names) - 2] == 'von'
+        ) {
+          $lastname = implode(' ', array_splice($names, -2))
+            . ' ' . $lastname;
+        }
+        else {
+          array_pop($names);
+          $lastname = $test . ' ' . $lastname;
+        }
       }
 
       $names = implode(" ", $names);
@@ -334,19 +343,23 @@ class TwingleEvent extends Campaign {
 
   /**
    * Gets the campaign id of the parent TwingleProject campaign.
+   *
    * @return int|null
    * @throws CiviCRM_API3_Exception
    */
   private function getParentCampaignId() {
-    $cf_project_id = Cache::getInstance()->getCustomFieldMapping()['twingle_project_id'];
+    $cf_project_id = Cache::getInstance()
+      ->getCustomFieldMapping()['twingle_project_id'];
     $parentCampaign = civicrm_api3('Campaign', 'get', [
-      'sequential' => 1,
-      $cf_project_id => $this->values['project_id']
+      'sequential'   => 1,
+      $cf_project_id => $this->values['project_id'],
     ]);
     if ($parentCampaign['is_error'] == 0) {
       return (int) $parentCampaign['id'];
     }
-    else return NULL;
+    else {
+      return NULL;
+    }
   }
 
   /**
