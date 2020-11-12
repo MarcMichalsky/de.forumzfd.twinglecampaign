@@ -71,10 +71,11 @@ class TwingleEvent extends Campaign {
           self::TWINGLE
         );
       } catch (Exception $e) {
+        $message = $e->getMessage();
 
         // Log Exception
         Civi::log()->error(
-          "Failed to instantiate TwingleEvent: $e->getMessage()"
+          "Failed to instantiate TwingleEvent: $message"
         );
 
         // Return result array with error description
@@ -83,7 +84,7 @@ class TwingleEvent extends Campaign {
           "event_id"   => (int) $values['id'],
           "project_id" => (int) $values['project_id'],
           "status"     =>
-            "Failed to instantiate TwingleEvent: $e->getMessage()",
+            "Failed to instantiate TwingleEvent: $message",
         ];
       }
 
@@ -94,10 +95,11 @@ class TwingleEvent extends Campaign {
         try {
           $result = $event->create($is_test);
         } catch (Exception $e) {
+          $message = $e->getMessage();
 
           // Log Exception
           Civi::log()->error(
-            "Could not create campaign from TwingleEvent: $e->getMessage()"
+            "Could not create campaign from TwingleEvent: $message"
           );
 
           // Return result array with error description
@@ -106,7 +108,7 @@ class TwingleEvent extends Campaign {
             "event_id"   => (int) $values['id'],
             "project_id" => (int) $values['project_id'],
             "status"     =>
-              "Could not create campaign from TwingleEvent: $e->getMessage()",
+              "Could not create campaign from TwingleEvent: $message",
           ];
         }
       }
@@ -123,13 +125,15 @@ class TwingleEvent extends Campaign {
               ? 'TwingleEvent updated'
               : 'TwingleEvent Update failed';
           } catch (Exception $e) {
+            $message = $e->getMessage();
+
             // Log Exception
             Civi::log()->error(
-              "Could not update TwingleEvent campaign: $e->getMessage()"
+              "Could not update TwingleEvent campaign: $message"
             );
             // Return result array with error description
             $result = $event->getResponse(
-              "Could not update TwingleEvent campaign: $e->getMessage()"
+              "Could not update TwingleEvent campaign: $message"
             );
           }
         }
