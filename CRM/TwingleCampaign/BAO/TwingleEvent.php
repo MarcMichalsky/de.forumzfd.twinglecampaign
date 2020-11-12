@@ -318,7 +318,7 @@ class TwingleEvent extends Campaign {
     }
     try {
       $contact = civicrm_api3('Contact', 'getorcreate', [
-        'xcm_profile' => 'default',
+        'xcm_profile' => Civi::settings()->get('twinglecampaign_xcm_profile'),
         'first_name'  => $names,
         'last_name'   => $lastname,
         'email'       => $email,
