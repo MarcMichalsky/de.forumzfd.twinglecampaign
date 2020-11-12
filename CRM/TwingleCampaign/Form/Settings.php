@@ -20,8 +20,16 @@ class CRM_TwingleCampaign_Form_Settings extends CRM_Core_Form {
 
     $this->addElement('select',
       'twinglecampaign_xcm_profile',
-      E::ts('XCM Profile'),
-      $this->getXCMProfiles()
+      E::ts('XCM Profile to match event initiator'),
+      $this->getXCMProfiles(),
+      ['class' => 'crm-select2 huge']
+    );
+
+    $this->addElement('select',
+      'twinglecampaign_start_case',
+      E::ts('Start a case for event initiator'),
+      $this->getCaseTypes(),
+      ['class' => 'crm-select2 huge']
     );
 
     $this->addButtons([
@@ -29,7 +37,7 @@ class CRM_TwingleCampaign_Form_Settings extends CRM_Core_Form {
         'type'      => 'submit',
         'name'      => E::ts('Save'),
         'isDefault' => TRUE,
-      ]
+      ],
     ]);
 
     parent::buildQuickForm();
@@ -40,6 +48,8 @@ class CRM_TwingleCampaign_Form_Settings extends CRM_Core_Form {
       Civi::settings()->get('twingle_api_key');
     $defaultValues['twinglecampaign_xcm_profile'] =
       Civi::settings()->get('twinglecampaign_xcm_profile');
+    $defaultValues['twinglecampaign_start_case'] =
+      Civi::settings()->get('twinglecampaign_start_case');
     return $defaultValues;
   }
 
@@ -48,7 +58,10 @@ class CRM_TwingleCampaign_Form_Settings extends CRM_Core_Form {
   public function postProcess() {
     $values = $this->exportValues();
     Civi::settings()->set('twingle_api_key', $values['twingle_api_key']);
-    Civi::settings()->set('twinglecampaign_xcm_profile', $values['twinglecampaign_xcm_profile']);
+    Civi::settings()
+      ->set('twinglecampaign_xcm_profile', $values['twinglecampaign_xcm_profile']);
+    Civi::settings()
+      ->set('twinglecampaign_start_case', $values['twinglecampaign_start_case']);
     parent::postProcess();
   }
 
@@ -58,16 +71,40 @@ class CRM_TwingleCampaign_Form_Settings extends CRM_Core_Form {
    *
    * @return array
    */
-  public function getXCMProfiles() {
+  private function getXCMProfiles() {
     $xcmProfiles = [];
-    if (!isset($this->_settings['twinglecampaign_xcm_profile'])) {
-      if (method_exists('CRM_Xcm_Configuration', 'getProfileList')) {
-        $profiles = CRM_Xcm_Configuration::getProfileList();
-        foreach ($profiles as $profile_key => $profile_name) {
-          $xcmProfiles[$profile_key] = $profile_name;
-        }
+    if (method_exists('CRM_Xcm_Configuration', 'getProfileList')) {
+      $profiles = CRM_Xcm_Configuration::getProfileList();
+      foreach ($profiles as $profile_key => $profile_name) {
+        $xcmProfiles[$profile_key] = $profile_name;
       }
     }
     return $xcmProfiles;
   }
+
+  /**
+   * Retrieves all case types
+   *
+   * @return array
+   */
+  private function getCaseTypes() {
+    $caseTypes = [NULL => E::ts('none')];
+    try {
+      $result = civicrm_api3('CaseType', 'get', [
+        'sequential' => 1,
+      ]);
+      if (is_array($result['values'])) {
+        foreach ($result['values'] as $case) {
+          $caseTypes[$case['name']] = $case['title'];
+        }
+      }
+    } catch (CiviCRM_API3_Exception $e) {
+      Civi::log()->error(
+        'TwingleCampaign could not retrieve case types: ' .
+        $e->getMessage());
+    }
+    return $caseTypes;
+  }
+
 }
+
