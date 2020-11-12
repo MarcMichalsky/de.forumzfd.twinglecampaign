@@ -226,24 +226,44 @@ class TwingleEvent extends Campaign {
 
     if ($direction == self::IN) {
 
-      // Change timestamp into DateTime string
+      // Change timestamps into DateTime strings
       if ($values['updated_at']) {
         $values['updated_at'] =
           self::getDateTime($values['updated_at']);
       }
+
       if ($values['confirmed_at']) {
         $values['confirmed_at'] =
           self::getDateTime($values['confirmed_at']);
+        $values['status_id'] = 'In Progress';
       }
+      else {
+        $values['status_id'] = 'Planned';
+      }
+
       if ($values['created_at']) {
         $values['created_at'] =
           self::getDateTime($values['created_at']);
       }
+
       if ($values['user_name']) {
         $values['user_name'] = $this->matchContact(
           $values['user_name'],
           $values['user_email']
         );
+      }
+
+      // Set campaign status
+      if ($values['deleted']) {
+        $values['status_id'] = 'Cancelled';
+      }
+
+      // Set URLs
+      if (is_array($values['urls'])) {
+        $values['url_internal'] = $values['urls']['show_internal'];
+        $values['url_external'] = $values['urls']['show_external'];
+        $values['url_edit_internal'] = $values['urls']['edit_internal'];
+        $values['url_edit_external'] = $values['urls']['edit_internal'];
       }
 
 

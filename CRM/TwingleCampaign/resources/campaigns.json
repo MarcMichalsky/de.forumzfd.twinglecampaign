@@ -117,21 +117,6 @@
       "help_post": "Choose the project type. Allow users to create own events or to pay a membership fee.",
       "default_value": "default"
     },
-    "twingle_project_project_target": {
-      "custom_group_id": "Twingle_Project_Information",
-      "label": "Twingle Project target",
-      "name": "twingle_project_project_target",
-      "is_required": 0,
-      "is_searchable": 1,
-      "data_type": "Money",
-      "html_type": "Text",
-      "text_length": 32,
-      "is_active": 1,
-      "is_view": 0,
-      "weight": 7,
-      "help_post": "Donation target of the Project",
-      "default_value": "0"
-    },
     "twingle_project_allow_more": {
       "custom_group_id": "Twingle_Project_Information",
       "label": "Twingle Project allow more",
@@ -327,19 +312,6 @@
       "is_view": 1,
       "weight": 6
     },
-    "twingle_event_target": {
-      "custom_group_id": "Twingle_Event_Information",
-      "label": "Twingle Event Target",
-      "name": "twingle_event_target",
-      "is_required": 0,
-      "is_searchable": 0,
-      "data_type": "String",
-      "html_type": "Text",
-      "text_length": 10,
-      "is_active": 1,
-      "is_view": 1,
-      "weight": 6
-    },
     "twingle_event_is_public": {
       "custom_group_id": "Twingle_Event_Information",
       "label": "Twingle Event is public",
@@ -402,6 +374,58 @@
       "is_active": 1,
       "is_view": 1,
       "weight": 11
+    },
+    "twingle_event_url_internal": {
+      "custom_group_id": "Twingle_Event_Information",
+      "label": "Twingle Event Internal URL",
+      "name": "twingle_event_url_internal",
+      "is_required": 0,
+      "is_searchable": 0,
+      "data_type": "String",
+      "html_type": "Text",
+      "text_length": 256,
+      "is_active": 1,
+      "is_view": 1,
+      "weight": 12
+    },
+    "twingle_event_url_external": {
+      "custom_group_id": "Twingle_Event_Information",
+      "label": "Twingle Event External URL",
+      "name": "twingle_event_url_external",
+      "is_required": 0,
+      "is_searchable": 0,
+      "data_type": "String",
+      "html_type": "Text",
+      "text_length": 256,
+      "is_active": 1,
+      "is_view": 1,
+      "weight": 13
+    },
+    "twingle_event_url_edit_internal": {
+      "custom_group_id": "Twingle_Event_Information",
+      "label": "Twingle Event Edit Internal URL",
+      "name": "twingle_event_url_edit_internal",
+      "is_required": 0,
+      "is_searchable": 0,
+      "data_type": "String",
+      "html_type": "Text",
+      "text_length": 256,
+      "is_active": 1,
+      "is_view": 1,
+      "weight": 14
+    },
+    "twingle_event_url_edit_external": {
+      "custom_group_id": "Twingle_Event_Information",
+      "label": "Twingle Event Edit External URL",
+      "name": "twingle_event_url_edit_external",
+      "is_required": 0,
+      "is_searchable": 0,
+      "data_type": "String",
+      "html_type": "Text",
+      "text_length": 256,
+      "is_active": 1,
+      "is_view": 1,
+      "weight": 15
     }
   }
 }
