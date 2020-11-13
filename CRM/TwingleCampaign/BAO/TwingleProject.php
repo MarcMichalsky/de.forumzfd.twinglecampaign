@@ -152,6 +152,35 @@ class TwingleProject extends Campaign {
           }
           else {
             $result = $twingleApi->pushProject($project);
+            // Update TwingleProject in Civi with results from api call
+            if (is_array($result) && !array_key_exists('message', $result)) {
+              // Try to update the local TwingleProject campaign
+              try {
+                $project->update($result);
+                $project->create();
+                return $project->getResponse('TwingleProject pushed to Twingle');
+              } catch (Exception $e) {
+                // Log Exception
+                $errorMessage = $e->getMessage();
+                Civi::log()->error(
+                  "Could not push TwingleProject campaign: $errorMessage"
+                );
+                // Return result array with error description
+                return $project->getResponse(
+                  "TwingleProject was likely pushed to Twingle but the local " .
+                  "update of the campaign failed: $errorMessage"
+                );
+              }
+            }
+            else {
+              $message = $result['message'];
+              return $project->getResponse(
+                $message
+                  ? "TwingleProject could not get pushed to Twingle: $message"
+                  : 'TwingleProject could not get pushed to Twingle'
+              );
+            }
+
           }
         }
         elseif ($result['status'] == 'TwingleProject exists') {

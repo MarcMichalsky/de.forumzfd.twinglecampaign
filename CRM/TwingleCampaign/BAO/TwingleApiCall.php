@@ -108,37 +108,8 @@ class TwingleApiCall {
     // Prepare url for curl
     $url = $this->protocol . 'project' . $this->baseUrl . $values['id'];
 
-    // Send curl
-    $result = $this->curlPost($url, $values);
-
-    // Update TwingleProject in Civi with results from api call
-    if (is_array($result) && !array_key_exists('message', $result)) {
-      // Try to update the local TwingleProject campaign
-      try {
-        $project->update($result);
-        $project->create();
-        return $project->getResponse('TwingleProject pushed to Twingle');
-      } catch (Exception $e) {
-        // Log Exception
-        Civi::log()->error(
-          "Could not push TwingleProject campaign: $e->getMessage()"
-        );
-        // Return result array with error description
-        return $project->getResponse(
-          "TwingleProject was likely pushed to Twingle but the 
-          local update of the campaign failed: $e->getMessage()"
-        );
-      }
-    }
-    else {
-      $message = $result['message'];
-      return $project->getResponse(
-        $message
-          ? "TwingleProject could not get pushed to Twingle: $message"
-          : 'TwingleProject could not get pushed to Twingle'
-      );
-    }
-
+    // Send curl and return result
+    return $this->curlPost($url, $values);
   }
 
   /**
