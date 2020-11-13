@@ -58,6 +58,15 @@ function _civicrm_api3_twingle_sync_Post_spec(array &$spec) {
 function civicrm_api3_twingle_sync_Post(array $params) {
   $result_values = [];
 
+  // Who is calling?
+  $api_key = $_REQUEST['api_key'];
+  $user = CRM_Core_DAO::getFieldValue(
+    'CRM_Contact_DAO_Contact',
+    $api_key,
+    'id',
+    'api_key'
+  );
+
   // Is this call a test?
   $is_test = (boolean) $params['is_test'];
 
@@ -93,7 +102,7 @@ function civicrm_api3_twingle_sync_Post(array $params) {
         foreach ($events as $event) {
           if ($event) {
             $result_values['sync']['events'][$j++] =
-              TwingleEvent::sync($event, $twingleApi, $is_test);
+              TwingleEvent::sync($event, $twingleApi, $user, $is_test);
           }
         }
       }

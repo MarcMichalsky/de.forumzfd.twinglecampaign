@@ -6,11 +6,11 @@ namespace CRM\TwingleCampaign\BAO;
 use Civi;
 use CRM_TwingleCampaign_ExtensionUtil as E;
 use CRM\TwingleCampaign\Utils\ExtensionCache as Cache;
-use CRM\TwingleCampaign\BAO\Campaign;
 use Exception;
 use CiviCRM_API3_Exception;
 
 include_once E::path() . '/CRM/TwingleCampaign/BAO/Campaign.php';
+include_once E::path() . '/CRM/TwingleCampaign/BAO/Configuration.php';
 include_once E::path() . '/CRM/TwingleCampaign/Utils/ExtensionCache.php';
 
 class TwingleEvent extends Campaign {
@@ -46,6 +46,7 @@ class TwingleEvent extends Campaign {
    *
    * @param array $values
    * @param TwingleApiCall $twingleApi
+   * @param int $user
    * @param bool $is_test
    * If TRUE, don't do any changes
    *
@@ -53,11 +54,12 @@ class TwingleEvent extends Campaign {
    * Returns a response array that contains title, id, event_id, project_id
    * and status or NULL if $values is not an array
    *
-   * @throws CiviCRM_API3_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function sync(
     array $values,
     TwingleApiCall &$twingleApi,
+    int $user,
     bool $is_test = FALSE
   ) {
 
@@ -93,7 +95,7 @@ class TwingleEvent extends Campaign {
 
         // ... if not, get embed data and create event
         try {
-          $result = $event->create($is_test);
+          $result = $event->create($user, $is_test);
         } catch (Exception $e) {
           $errorMessage = $e->getMessage();
 
@@ -154,16 +156,16 @@ class TwingleEvent extends Campaign {
   /**
    * Create the Event as a campaign in CiviCRM if it does not exist
    *
+   * @param int $user
    * @param bool $is_test
    * If true: don't do any changes
    *
    * @return array
    * Returns a response array that contains title, id, project_id and status
    *
-   * @throws CiviCRM_API3_Exception
-   * @throws Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function create(bool $is_test = FALSE) {
+  public function create(int $user, bool $is_test = FALSE) {
 
     // Create campaign only if it does not already exist
     if (!$is_test) {
@@ -178,6 +180,7 @@ class TwingleEvent extends Campaign {
         $values_prepared_for_import,
         self::IN
       );
+      $formattedValues = $values_prepared_for_import;
       $this->translateCustomFields(
         $values_prepared_for_import,
         self::IN
@@ -198,6 +201,21 @@ class TwingleEvent extends Campaign {
       }
       else {
         $response = $this->getResponse("$this->className creation failed");
+      }
+
+      // Start a case for event initiator
+      if (
+        $result['is_error'] == 0 &&
+        Configuration::get('twinglecampaign_start_case')
+      ) {
+        $result = civicrm_api3('Case', 'create', [
+          'contact_id' => $formattedValues['contact_id'],
+          'creator_id' => $user,
+          'case_type_id' => Configuration::get('twinglecampaign_start_case'),
+          'subject' => $formattedValues['title'],
+          'start_date' => $formattedValues['created_at'],
+          'status_id' => "Open",
+        ]);
       }
 
     }
@@ -247,7 +265,7 @@ class TwingleEvent extends Campaign {
       }
 
       if ($values['user_name']) {
-        $values['user_name'] = $this->matchContact(
+        $values['contact_id'] = $this->matchContact(
           $values['user_name'],
           $values['user_email']
         );
