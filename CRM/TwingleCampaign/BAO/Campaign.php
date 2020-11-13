@@ -131,64 +131,6 @@ abstract class Campaign {
     }
   }
 
-  /**
-   * Create the Campaign as a campaign in CiviCRM if it does not exist
-   *
-   * @param bool $is_test
-   * If true: don't do any changes
-   *
-   * @return array
-   * Returns a response array that contains title, id, project_id and status
-   *
-   * @throws CiviCRM_API3_Exception
-   * @throws Exception
-   */
-  public function create(bool $is_test = FALSE) {
-
-    // Create campaign only if it does not already exist
-    if (!$is_test) {
-
-      // Prepare project values for import into database
-      $values_prepared_for_import = $this->values;
-      self::formatValues(
-        $values_prepared_for_import,
-        self::IN
-      );
-      self::translateKeys(
-        $values_prepared_for_import,
-        self::IN
-      );
-      $this->translateCustomFields(
-        $values_prepared_for_import,
-        self::IN
-      );
-
-      // Set id
-      $values_prepared_for_import['id'] = $this->id;
-
-      // Create campaign
-      $result = civicrm_api3('Campaign', 'create', $values_prepared_for_import);
-
-      // Update id
-      $this->id = $result['id'];
-
-      // Check if campaign was created successfully
-      if ($result['is_error'] == 0) {
-        $response = $this->getResponse("$this->className created");
-      }
-      else {
-        $response = $this->getResponse("$this->className creation failed");
-      }
-
-    }
-    // If this is a test, do not create campaign
-    else {
-      $response = $this->getResponse("$this->className not yet created");
-    }
-
-    return $response;
-  }
-
 
   /**
    * Update an existing campaign
