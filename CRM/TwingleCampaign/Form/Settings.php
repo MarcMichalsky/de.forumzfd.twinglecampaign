@@ -1,6 +1,9 @@
 <?php
 
+use CRM\TwingleCampaign\BAO\Configuration;
 use CRM_TwingleCampaign_ExtensionUtil as E;
+
+include_once E::path() . '/CRM/TwingleCampaign/BAO/Configuration.php';
 
 /**
  * Form controller class
@@ -44,24 +47,13 @@ class CRM_TwingleCampaign_Form_Settings extends CRM_Core_Form {
   }
 
   public function setDefaultValues() {
-    $defaultValues['twingle_api_key'] =
-      Civi::settings()->get('twingle_api_key');
-    $defaultValues['twinglecampaign_xcm_profile'] =
-      Civi::settings()->get('twinglecampaign_xcm_profile');
-    $defaultValues['twinglecampaign_start_case'] =
-      Civi::settings()->get('twinglecampaign_start_case');
-    return $defaultValues;
+    return Configuration::get();
   }
 
   //TODO: validate Twingle API key
 
   public function postProcess() {
-    $values = $this->exportValues();
-    Civi::settings()->set('twingle_api_key', $values['twingle_api_key']);
-    Civi::settings()
-      ->set('twinglecampaign_xcm_profile', $values['twinglecampaign_xcm_profile']);
-    Civi::settings()
-      ->set('twinglecampaign_start_case', $values['twinglecampaign_start_case']);
+    Configuration::set($this->exportValues());
     parent::postProcess();
   }
 
