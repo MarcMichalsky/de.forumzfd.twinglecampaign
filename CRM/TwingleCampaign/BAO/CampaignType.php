@@ -119,7 +119,7 @@ class CampaignType {
       ]
     );
     if ($campaign_type = array_shift($campaign_type['values'])) {
-      return new CampaignType($campaign_type);
+      return new self($campaign_type);
     }
     else {
       return NULL;

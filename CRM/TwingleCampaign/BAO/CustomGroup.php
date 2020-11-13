@@ -106,7 +106,7 @@ class CustomGroup {
   /**
    * @param $name
    *
-   * @return BAO\CustomGroup
+   * @return CustomGroup
    * @throws \CiviCRM_API3_Exception
    */
   public static function fetch($name) {
@@ -120,7 +120,7 @@ class CustomGroup {
       ]
     );
     if ($custom_group = array_shift($custom_group['values'])) {
-      return new CustomGroup($custom_group);
+      return new self($custom_group);
     }
     else {
       return NULL;

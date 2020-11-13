@@ -200,7 +200,7 @@ class CustomField {
         ]
       );
       if ($custom_field = array_shift($custom_field['values'])) {
-        return new CustomField($custom_field);
+        return new self($custom_field);
       }
       else {
         return NULL;
