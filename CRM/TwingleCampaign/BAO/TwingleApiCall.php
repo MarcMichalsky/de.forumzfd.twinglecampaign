@@ -96,12 +96,13 @@ class TwingleApiCall {
       $values = $project->export();
     } catch (Exception $e) {
       // Log Exception
+      $errorMessage = $e->getMessage();
       Civi::log()->error(
-        "Could not export TwingleProject values: $e->getMessage()"
+        "Could not export TwingleProject values: $errorMessage"
       );
       // Return result array with error description
       return $project->getResponse(
-        "Could not export TwingleProject values: $e->getMessage()"
+        "Could not export TwingleProject values: $errorMessage"
       );
     }
 
