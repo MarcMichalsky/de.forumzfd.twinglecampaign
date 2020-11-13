@@ -114,6 +114,9 @@ abstract class Campaign {
       // Translate custom field names back
       $this->translateCustomFields($values, self::OUT);
 
+      // Escape html in embed code fields
+      $this->escapeHtml($values);
+
       // Translate keys from CiviCRM format to Twingle format
       self::translateKeys($values, self::OUT);
 
@@ -196,7 +199,6 @@ abstract class Campaign {
    * @throws Exception
    */
   public function update(array $values) {
-
     // Update campaign values
     $this->values = array_merge($this->values, $values);
   }
@@ -477,6 +479,22 @@ abstract class Campaign {
       'project_type' => $this->values['type'],
       'status'       => $status,
     ];
+  }
+
+
+  /**
+   * Escape html in all embed code fields
+   * @param array $values
+   */
+  protected function escapeHtml(array &$values) {
+    $embed_data_keys = Cache::getInstance()
+      ->getTemplates()['project_embed_data'];
+
+    foreach ($embed_data_keys as $key) {
+      if (key_exists($key, $values)) {
+        $values[$key] = htmlspecialchars($values[$key]);
+      }
+    }
   }
 
 
