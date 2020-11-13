@@ -71,11 +71,11 @@ class TwingleEvent extends Campaign {
           self::TWINGLE
         );
       } catch (Exception $e) {
-        $message = $e->getMessage();
+        $errorMessage = $e->getMessage();
 
         // Log Exception
         Civi::log()->error(
-          "Failed to instantiate TwingleEvent: $message"
+          "Failed to instantiate TwingleEvent: $errorMessage"
         );
 
         // Return result array with error description
@@ -84,7 +84,7 @@ class TwingleEvent extends Campaign {
           "event_id"   => (int) $values['id'],
           "project_id" => (int) $values['project_id'],
           "status"     =>
-            "Failed to instantiate TwingleEvent: $message",
+            "Failed to instantiate TwingleEvent: $errorMessage",
         ];
       }
 
@@ -95,11 +95,11 @@ class TwingleEvent extends Campaign {
         try {
           $result = $event->create($is_test);
         } catch (Exception $e) {
-          $message = $e->getMessage();
+          $errorMessage = $e->getMessage();
 
           // Log Exception
           Civi::log()->error(
-            "Could not create campaign from TwingleEvent: $message"
+            "Could not create campaign from TwingleEvent: $errorMessage"
           );
 
           // Return result array with error description
@@ -108,7 +108,7 @@ class TwingleEvent extends Campaign {
             "event_id"   => (int) $values['id'],
             "project_id" => (int) $values['project_id'],
             "status"     =>
-              "Could not create campaign from TwingleEvent: $message",
+              "Could not create campaign from TwingleEvent: $errorMessage",
           ];
         }
       }
@@ -125,15 +125,15 @@ class TwingleEvent extends Campaign {
               ? 'TwingleEvent updated'
               : 'TwingleEvent Update failed';
           } catch (Exception $e) {
-            $message = $e->getMessage();
+            $errorMessage = $e->getMessage();
 
             // Log Exception
             Civi::log()->error(
-              "Could not update TwingleEvent campaign: $message"
+              "Could not update TwingleEvent campaign: $errorMessage"
             );
             // Return result array with error description
             $result = $event->getResponse(
-              "Could not update TwingleEvent campaign: $message"
+              "Could not update TwingleEvent campaign: $errorMessage"
             );
           }
         }
@@ -358,9 +358,9 @@ class TwingleEvent extends Campaign {
       ]);
       return (int) $contact['id'];
     } catch (CiviCRM_API3_Exception $e) {
-      $message = $e->getMessage();
+      $errorMessage = $e->getMessage();
       \Civi::log()->error("TwingleCampaign extension could not match or create a contact for:
-      $names $lastname $email./nError Message: $message");
+      $names $lastname $email./nError Message: $errorMessage");
       return NULL;
     }
   }

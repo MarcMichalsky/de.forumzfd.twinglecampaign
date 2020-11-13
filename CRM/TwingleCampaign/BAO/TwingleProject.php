@@ -71,11 +71,11 @@ class TwingleProject extends Campaign {
           self::TWINGLE
         );
       } catch (Exception $e) {
-        $message = $e->getMessage();
+        $errorMessage = $e->getMessage();
 
         // Log Exception
         Civi::log()->error(
-          "Failed to instantiate TwingleProject: $message"
+          "Failed to instantiate TwingleProject: $errorMessage"
         );
 
         // Return result array with error description
@@ -83,7 +83,7 @@ class TwingleProject extends Campaign {
           "title"      => $values['name'],
           "project_id" => (int) $values['id'],
           "status"     =>
-            "Failed to instantiate TwingleProject: $message",
+            "Failed to instantiate TwingleProject: $errorMessage",
         ];
       }
 
@@ -97,11 +97,11 @@ class TwingleProject extends Campaign {
           );
           $result = $project->create($is_test);
         } catch (Exception $e) {
-          $message = $e->getMessage();
+          $errorMessage = $e->getMessage();
 
           // Log Exception
           Civi::log()->error(
-            "Could not create campaign from TwingleProject: $message"
+            "Could not create campaign from TwingleProject: $errorMessage"
           );
 
           // Return result array with error description
@@ -109,7 +109,7 @@ class TwingleProject extends Campaign {
             "title"      => $values['name'],
             "project_id" => (int) $values['id'],
             "status"     =>
-              "Could not create campaign from TwingleProject: $message",
+              "Could not create campaign from TwingleProject: $errorMessage",
           ];
         }
       }
@@ -129,15 +129,15 @@ class TwingleProject extends Campaign {
               ? 'TwingleProject updated'
               : 'TwingleProject Update failed';
           } catch (Exception $e) {
-            $message = $e->getMessage();
+            $errorMessage = $e->getMessage();
 
             // Log Exception
             Civi::log()->error(
-              "Could not update TwingleProject campaign: $message"
+              "Could not update TwingleProject campaign: $errorMessage"
             );
             // Return result array with error description
             $result = $project->getResponse(
-              "Could not update TwingleProject campaign: $message"
+              "Could not update TwingleProject campaign: $errorMessage"
             );
           }
         }
