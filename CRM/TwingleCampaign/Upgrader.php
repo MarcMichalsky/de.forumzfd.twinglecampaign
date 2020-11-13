@@ -1,120 +1,102 @@
 <?php
 
+use CRM\TwingleCampaign\BAO\CampaignType;
+use CRM\TwingleCampaign\BAO\CustomField;
+use CRM\TwingleCampaign\BAO\CustomGroup;
+use CRM\TwingleCampaign\BAO\Configuration;
 use CRM\TwingleCampaign\Utils\ExtensionCache;
 use CRM_TwingleCampaign_ExtensionUtil as E;
-use CRM\TwingleCampaign\BAO as BAO;
 
-include E::path() . '/CRM/TwingleCampaign/BAO/CampaignType.php';
-include E::path() . '/CRM/TwingleCampaign/BAO/CustomField.php';
-include E::path() . '/CRM/TwingleCampaign/BAO/CustomGroup.php';
+include_once E::path() . '/CRM/TwingleCampaign/BAO/CampaignType.php';
+include_once E::path() . '/CRM/TwingleCampaign/BAO/CustomField.php';
+include_once E::path() . '/CRM/TwingleCampaign/BAO/CustomGroup.php';
 include_once E::path() . '/CRM/TwingleCampaign/BAO/Configuration.php';
+include_once E::path() . '/CRM/TwingleCampaign/Utils/ExtensionCache.php';
 
 /**
  * Collection of upgrade steps.
  */
 class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
 
-  // TODO: Add static arrays from json files
-
   // By convention, functions that look like "function upgrade_NNNN()" are
   // upgrade tasks. They are executed in order (like Drupal's hook_update_N).
 
   /**
-   * Example: Run an external SQL script when the module is installed.
-   *
    * @throws \Exception
    */
   public function install() {
-
-  }
-
-  /**
-   * Example: Run an external SQL script when the module is uninstalled.
-   *
-   * @throws \CiviCRM_API3_Exception
-   * @throws \Exception
-   */
-  public function uninstall() {
-
-  }
-
-  /**
-   * Example: Run a simple query when a module is enabled.
-   *
-   * @throws \Exception
-   */
-  public function enable() {
     // Create campaign types, custom fields and custom groups by the contents
     // of the json file "campaigns.json"
 
-    $json_file = file_get_contents(E::path() .
-      '/CRM/TwingleCampaign/resources/campaigns.json');
-    $campaign_info = json_decode($json_file, TRUE);
-
-    if (!$campaign_info) {
-      \Civi::log()->error("Could not read json file");
-      throw new Exception('Could not read json file');
-    }
+    $campaign_info = ExtensionCache::getInstance()->getCampaigns();
 
     // Create campaign types
     foreach ($campaign_info['campaign_types'] as $campaign_type) {
-      new BAO\CampaignType($campaign_type);
+      new CampaignType($campaign_type);
     }
-    foreach (BAO\CampaignType::getCampaignTypes() as $campaign_type) {
+    foreach (CampaignType::getCampaignTypes() as $campaign_type) {
       $campaign_type->create();
     }
 
     // Create custom groups
     foreach ($campaign_info['custom_groups'] as $custom_group) {
-      foreach (BAO\CampaignType::getCampaignTypes() as $campaign_type) {
+      foreach (CampaignType::getCampaignTypes() as $campaign_type) {
         if ($campaign_type->getName() == $custom_group['campaign_type']) {
           $custom_group['extends_entity_column_value'] = $campaign_type->getValue();
         }
       }
-      $cg = new BAO\CustomGroup($custom_group);
+      $cg = new CustomGroup($custom_group);
       $cg->create();
     }
 
     // Create custom fields
     foreach ($campaign_info['custom_fields'] as $custom_field) {
-      $cf = new BAO\CustomField($custom_field);
+      $cf = new CustomField($custom_field);
       $cf->create();
     }
   }
 
   /**
-   * Example: Run a simple query when a module is disabled.
-   *
    * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
+   */
+  public function uninstall() {
+
+    $campaign_info = ExtensionCache::getInstance()->getCampaigns();
+
+    // Delete campaign types
+    foreach ($campaign_info['campaign_types'] as $campaign_type) {
+      $result = CampaignType::fetch($campaign_type['name']);
+      if ($result) {
+        $result->delete();
+      }
+    }
+
+    // Delete custom groups
+    foreach ($campaign_info['custom_groups'] as $custom_group) {
+      $result = CustomGroup::fetch($custom_group['name']);
+      if ($result) {
+        $result->delete();
+      }
+    }
+
+    // Delete all settings for this extension
+    Configuration::deleteAll();
+
+  }
+
+  /**
+   * @throws \Exception
+   */
+  public function enable() {
+
+  }
+
+  /**
    * @throws \Exception
    */
  public function disable() {
 
-   $json_file = file_get_contents(E::path() . '/CRM/TwingleCampaign/resources/campaigns.json');
-   $campaign_info = json_decode($json_file, TRUE);
-
-   if (!$campaign_info) {
-     \Civi::log()->error("Could not read json file");
-     throw new Exception('Could not read json file');
-   }
-
-   // Delete campaign types
-   foreach ($campaign_info['campaign_types'] as $campaign_type) {
-     $result = BAO\CampaignType::fetch($campaign_type['name']);
-     if ($result) {
-       $result->delete();
-     }
-   }
-
-   // Delete custom groups
-   foreach ($campaign_info['custom_groups'] as $custom_group) {
-     $result = BAO\CustomGroup::fetch($custom_group['name']);
-     if ($result) {
-       $result->delete();
-     }
-   }
-    // Delete all settings for this extension
-    Configuration::deleteAll();
  }
 
  /**
