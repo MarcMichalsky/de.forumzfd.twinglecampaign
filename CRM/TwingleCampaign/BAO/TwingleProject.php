@@ -22,7 +22,7 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
   protected function __construct(array $project, string $origin) {
     parent::__construct($project, $origin);
 
-    $this->className = (new \ReflectionClass($this))->getShortName();
+    $this->className = (new ReflectionClass($this))->getShortName();
     $this->prefix = 'twingle_project_';
     $this->values['campaign_type_id'] = 'twingle_project';
     $this->id_custom_field = Cache::getInstance()
@@ -230,7 +230,7 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    */
   public function create(bool $is_test = FALSE) {
 
-    // Create campaign only if it does not already exist
+    // Create campaign only if this is not a test
     if (!$is_test) {
 
       // Prepare project values for import into database

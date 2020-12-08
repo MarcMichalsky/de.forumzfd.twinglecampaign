@@ -86,7 +86,7 @@ class CRM_TwingleCampaign_BAO_CustomField {
 
       // Log field creation
       if ($this->result['is_error'] == 0) {
-        \Civi::log()->info("Twingle Extension has created a new custom field.
+        Civi::log()->info("Twingle Extension has created a new custom field.
       label: $this->label
       name: $this->name
       id: $this->id
@@ -96,14 +96,14 @@ class CRM_TwingleCampaign_BAO_CustomField {
       // If the field could not get created: log error
       else {
         if ($this->label && $this->custom_group_id) {
-          \Civi::log()
+          Civi::log()
             ->error("Twingle Extension could not create new custom field
             \"$this->label\" for group \"$this->custom_group_id\": 
             $this->result['error_message']");
         }
         // If there is not enough information: log simple error message
         else {
-          \Civi::log()
+          Civi::log()
             ->error("Twingle Extension could not create new custom field: 
             $this->result['error_message']");
         }
@@ -175,8 +175,8 @@ class CRM_TwingleCampaign_BAO_CustomField {
 
       // Log an error and throw an exception if the file cannot get read
       if (!$campaign_info) {
-        \Civi::log()->error("Could not read json file");
-        throw new \Exception('Could not read json file');
+        Civi::log()->error("Could not read json file");
+        throw new Exception('Could not read json file');
       }
 
       // Recursive method call with all custom field names from the json file
@@ -221,7 +221,7 @@ class CRM_TwingleCampaign_BAO_CustomField {
 
     // Check if custom field was deleted successfully
     if ($this->result['is_error'] == 0) {
-      \Civi::log()->info("Twingle Extension has deleted custom field.
+      Civi::log()->info("Twingle Extension has deleted custom field.
       label: $this->label
       name: $this->name
       id: $this->id
@@ -231,13 +231,13 @@ class CRM_TwingleCampaign_BAO_CustomField {
     // ... else: log error
     else {
       if ($this->label && $this->custom_group_id) {
-        \Civi::log()
+        Civi::log()
           ->error("TwingleCampaign Extension could not delete custom field
             \"$this->label\" for group \"$this->custom_group_id\": 
             $this->result['error_message']");
       }
       else {
-        \Civi::log()
+        Civi::log()
           ->error("TwingleCampaign Extension could not delete custom field: 
             $this->result['error_message']");
       }

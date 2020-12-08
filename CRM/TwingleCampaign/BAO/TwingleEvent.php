@@ -23,7 +23,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
   protected function __construct(array $event, string $origin) {
     parent::__construct($event, $origin);
 
-    $this->className = (new \ReflectionClass($this))->getShortName();
+    $this->className = (new ReflectionClass($this))->getShortName();
     $this->prefix = 'twingle_event_';
     $this->values['campaign_type_id'] = 'twingle_event';
     $this->id_custom_field = Cache::getInstance()
@@ -369,7 +369,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
       return (int) $contact['id'];
     } catch (CiviCRM_API3_Exception $e) {
       $errorMessage = $e->getMessage();
-      \Civi::log()->error("TwingleCampaign extension could not match or create a contact for:
+      Civi::log()->error("TwingleCampaign extension could not match or create a contact for:
       $names $lastname $email./nError Message: $errorMessage");
       return NULL;
     }
