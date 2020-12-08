@@ -1,11 +1,6 @@
 <?php
 
-
-namespace CRM\TwingleCampaign\BAO;
-
-use CRM_Civirules_Utils_LoggerFactory as Civi;
-
-class CustomGroup {
+class CRM_TwingleCampaign_BAO_CustomGroup {
 
   private $id;
   private $title;
@@ -106,7 +101,7 @@ class CustomGroup {
   /**
    * @param $name
    *
-   * @return CustomGroup
+   * @return self
    * @throws \CiviCRM_API3_Exception
    */
   public static function fetch($name) {

@@ -1,11 +1,7 @@
 <?php
 
 
-namespace CRM\TwingleCampaign\BAO;
-
-use Civi;
-
-class Configuration {
+class CRM_TwingleCampaign_BAO_Configuration {
 
   private static $settingsKeys = [
     'twingle_api_key',

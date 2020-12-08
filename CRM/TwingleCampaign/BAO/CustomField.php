@@ -1,11 +1,8 @@
 <?php
 
-
-namespace CRM\TwingleCampaign\BAO;
-
 use CRM_TwingleCampaign_ExtensionUtil as E;
 
-class CustomField {
+class CRM_TwingleCampaign_BAO_CustomField {
 
   private $id;
 
@@ -159,7 +156,7 @@ class CustomField {
    * @param string|null $name
    * The name of the field you wish to instantiate.
    *
-   * @return array|\CRM\TwingleCampaign\BAO\CustomField
+   * @return array|CRM_TwingleCampaign_BAO_CustomField
    * The required CustomField or an array with all custom fields.
    *
    * @throws \CiviCRM_API3_Exception
@@ -184,7 +181,7 @@ class CustomField {
 
       // Recursive method call with all custom field names from the json file
       foreach ($campaign_info['custom_fields'] as $custom_field) {
-        $result = CustomField::fetch($custom_field['name']);
+        $result = self::fetch($custom_field['name']);
         array_push($customFields, $result);
       }
       return $customFields;
@@ -258,7 +255,7 @@ class CustomField {
   public static function getMapping() {
 
     // Get an array with all custom fields
-    $customFields = CustomField::fetch();
+    $customFields = self::fetch();
 
     $customFieldMapping = [];
 

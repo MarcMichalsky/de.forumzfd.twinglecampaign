@@ -1,9 +1,7 @@
 <?php
 
 use CRM_TwingleCampaign_ExtensionUtil as E;
-use CRM\TwingleCampaign\Utils\ExtensionCache as Cache;
-
-include_once E::path() . '/CRM/TwingleCampaign/Utils/ExtensionCache.php';
+use CRM_TwingleCampaign_Utils_ExtensionCache as Cache;
 
 /**
  * TwingleForm.Get API specification (optional)

@@ -1,9 +1,7 @@
 <?php
 
+use CRM_TwingleCampaign_BAO_Campaign as Campaign;
 
-namespace CRM\TwingleCampaign\BAO;
-
-
-class TwingleCampaign extends Campaign {
+class CRM_TwingleCampaign_BAO_TwingleCampaign extends Campaign {
 
 }

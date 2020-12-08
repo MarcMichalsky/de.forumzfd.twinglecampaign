@@ -1,16 +1,12 @@
 <?php
 
+use CRM_TwingleCampaign_Utils_ExtensionCache as Cache;
+use CRM_TwingleCampaign_BAO_CampaignType as CampaignType;
+use CRM_TwingleCampaign_BAO_TwingleProject as TwingleProject;
+use CRM_TwingleCampaign_BAO_TwingleEvent as TwingleEvent;
+use CRM_TwingleCampaign_BAO_TwingleCampaign as TwingleCampaign;
 
-namespace CRM\TwingleCampaign\BAO;
-
-use CRM_TwingleCampaign_ExtensionUtil as E;
-use CRM\TwingleCampaign\Utils\ExtensionCache as Cache;
-use DateTime;
-use Exception;
-use CiviCRM_API3_Exception;
-
-
-abstract class Campaign {
+abstract class CRM_TwingleCampaign_BAO_Campaign {
 
   // IN means: heading into CiviCRM database
   public const IN = 'IN';

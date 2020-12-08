@@ -1,15 +1,8 @@
 <?php
 
-namespace CRM\TwingleCampaign\BAO;
+use CRM_TwingleCampaign_BAO_TwingleProject as TwingleProject;
 
-use API_Exception;
-use Civi;
-use CRM_Core_BAO_Setting;
-use CRM_TwingleCampaign_ExtensionUtil as E;
-use Exception;
-
-
-class TwingleApiCall {
+class CRM_TwingleCampaign_BAO_TwingleApiCall {
 
   private $apiKey;
 

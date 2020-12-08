@@ -1,19 +1,11 @@
 <?php
 
+use CRM_TwingleCampaign_Utils_ExtensionCache as Cache;
+use CRM_TwingleCampaign_BAO_Campaign as Campaign;
+use CRM_TwingleCampaign_BAO_TwingleApiCall as TwingleApiCall;
+use CRM_TwingleCampaign_BAO_Configuration as Configuration;
 
-namespace CRM\TwingleCampaign\BAO;
-
-use Civi;
-use CRM_TwingleCampaign_ExtensionUtil as E;
-use CRM\TwingleCampaign\Utils\ExtensionCache as Cache;
-use Exception;
-use CiviCRM_API3_Exception;
-
-include_once E::path() . '/CRM/TwingleCampaign/BAO/Campaign.php';
-include_once E::path() . '/CRM/TwingleCampaign/BAO/Configuration.php';
-include_once E::path() . '/CRM/TwingleCampaign/Utils/ExtensionCache.php';
-
-class TwingleEvent extends Campaign {
+class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
 
   /**
    * TwingleEvent constructor.
@@ -68,7 +60,7 @@ class TwingleEvent extends Campaign {
 
       // Instantiate TwingleEvent
       try {
-        $event = new TwingleEvent(
+        $event = new self(
           $values,
           self::TWINGLE
         );

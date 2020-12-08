@@ -1,9 +1,5 @@
 <?php
 
-
-namespace CRM\TwingleCampaign\BAO;
-
-
-class OptionValue {
+class CRM_TwingleCampaign_BAO_OptionValue {
 
 }

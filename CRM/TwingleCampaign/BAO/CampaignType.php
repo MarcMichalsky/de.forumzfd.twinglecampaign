@@ -1,10 +1,8 @@
 <?php
 
-namespace CRM\TwingleCampaign\BAO;
 
-use CRM_Civirules_Utils_LoggerFactory as Civi;
 
-class CampaignType {
+class CRM_TwingleCampaign_BAO_CampaignType {
 
   private static $campaignTypes = [];
   private $id;
@@ -62,7 +60,7 @@ class CampaignType {
       }
     }
     else {
-      $campaignType = CampaignType::fetch($this->name);
+      $campaignType = self::fetch($this->name);
       foreach ($this as $var => $value) {
         if (array_key_exists($var, $campaignType->getSetAttributes())) {
           $this->$var = $campaignType->getSetAttributes()[$var];
@@ -106,7 +104,7 @@ class CampaignType {
   /**
    * @param string $name
    *
-   * @return \CRM\TwingleCampaign\BAO\CampaignType|null
+   * @return CRM_TwingleCampaign_BAO_CampaignType|null
    * @throws \CiviCRM_API3_Exception
    */
   public static function fetch(string $name) {
