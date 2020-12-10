@@ -1,6 +1,6 @@
 <?php
 
-use CRM\TwingleCampaign\BAO\Configuration;
+use CRM_TwingleCampaign_BAO_Configuration as Configuration;
 use CRM_TwingleCampaign_ExtensionUtil as E;
 
 include_once E::path() . '/CRM/TwingleCampaign/BAO/Configuration.php';

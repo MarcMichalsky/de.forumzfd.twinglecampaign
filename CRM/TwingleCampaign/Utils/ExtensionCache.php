@@ -3,7 +3,6 @@
 use CRM_TwingleCampaign_BAO_CustomField as CustomField;
 use CRM_TwingleCampaign_ExtensionUtil as E;
 
-include_once E::path() . '/CRM/TwingleCampaign/BAO/CustomField.php';
 
 /**
  * A singleton that caches mappings and settings
@@ -24,7 +23,7 @@ class CRM_TwingleCampaign_Utils_ExtensionCache {
 
   /**
    * Get an instance (singleton)
-   * @return ExtensionCache|null
+   * @return self|null
    */
   public static function getInstance() {
     if (null === self::$_instance) {

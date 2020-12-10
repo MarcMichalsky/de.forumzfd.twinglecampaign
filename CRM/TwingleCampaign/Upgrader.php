@@ -1,17 +1,11 @@
 <?php
 
-use CRM\TwingleCampaign\BAO\CampaignType;
-use CRM\TwingleCampaign\BAO\CustomField;
-use CRM\TwingleCampaign\BAO\CustomGroup;
-use CRM\TwingleCampaign\BAO\Configuration;
-use CRM\TwingleCampaign\Utils\ExtensionCache;
+use CRM_TwingleCampaign_BAO_CampaignType as CampaignType;
+use CRM_TwingleCampaign_BAO_CustomField as CustomField;
+use CRM_TwingleCampaign_BAO_CustomGroup as CustomGroup;
+use CRM_TwingleCampaign_BAO_Configuration as Configuration;
+use CRM_TwingleCampaign_Utils_ExtensionCache as Cache;
 use CRM_TwingleCampaign_ExtensionUtil as E;
-
-include_once E::path() . '/CRM/TwingleCampaign/BAO/CampaignType.php';
-include_once E::path() . '/CRM/TwingleCampaign/BAO/CustomField.php';
-include_once E::path() . '/CRM/TwingleCampaign/BAO/CustomGroup.php';
-include_once E::path() . '/CRM/TwingleCampaign/BAO/Configuration.php';
-include_once E::path() . '/CRM/TwingleCampaign/Utils/ExtensionCache.php';
 
 /**
  * Collection of upgrade steps.
