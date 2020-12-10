@@ -68,6 +68,7 @@ function civicrm_api3_twingle_form_Get(array $params) {
 
   $request = [
     'sequential' => 1,
+    'is_active' => 1,
     'campaign_type_id' => "twingle_project"
   ];
   foreach($params as $param) {
