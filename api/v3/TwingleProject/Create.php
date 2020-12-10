@@ -50,6 +50,7 @@ function _civicrm_api3_twingle_project_Create_spec(array &$spec) {
  *
  */
 function civicrm_api3_twingle_project_Create($params) {
+  $returnValues = [];
 
   $title = $params['title'];
   $name = strtolower(preg_replace('/[^A-Za-z0-9]/', '_', $title));
@@ -65,14 +66,29 @@ function civicrm_api3_twingle_project_Create($params) {
 
   $project = new TwingleProject($values, 'CIVICRM');
 
-  $project->create();
+  $create_project = $project->create();
 
-  $sync = $result = civicrm_api3('TwingleSync', 'post');
+  $projectId = $project->getId();
+
+  $sync = $result = civicrm_api3(
+    'TwingleSync',
+    'singlesync',
+    ['campaign_id' => $projectId]
+  );
 
   if ($sync['is_error'] == 0) {
-    $returnValues = civicrm_api3();
+    $returnValues = $sync['values']['project'];
+  }
+  elseif ($create_project['status'] == "TwingleProject created") {
+    throw new API_Exception(
+      "TwingleProject was created but could not get pushed to Twingle"
+    );
+  }
+  else {
+    throw new API_Exception(
+      "TwingleProject creation failed"
+    );
   }
 
-  $returnValues = null;
   return civicrm_api3_create_success($returnValues, $params, 'TwingleProject', 'Create');
 }
