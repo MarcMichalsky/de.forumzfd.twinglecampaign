@@ -342,7 +342,7 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
 
     // Transfer all embed_data values
     foreach ($embed_data_keys as $key) {
-      $this->values[$key] = htmlspecialchars($embedData[$key]);
+      $this->values[$key] = $embedData[$key];
     }
   }
   

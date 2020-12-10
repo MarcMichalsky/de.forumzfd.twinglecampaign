@@ -111,9 +111,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
       // Translate custom field names back
       $this->translateCustomFields($values, self::OUT);
 
-      // Escape html in embed code fields
-      $this->escapeHtml($values);
-
       // Translate keys from CiviCRM format to Twingle format
       self::translateKeys($values, self::OUT);
 
@@ -419,23 +416,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
       'status'       => $status,
     ];
   }
-
-
-  /**
-   * Escape html in all embed code fields
-   * @param array $values
-   */
-  protected function escapeHtml(array &$values) {
-    $embed_data_keys = Cache::getInstance()
-      ->getTemplates()['project_embed_data'];
-
-    foreach ($embed_data_keys as $key) {
-      if (key_exists($key, $values)) {
-        $values[$key] = htmlspecialchars($values[$key]);
-      }
-    }
-  }
-
 
   /**
    * Validates $input to be either a DateTime string or an Unix timestamp
