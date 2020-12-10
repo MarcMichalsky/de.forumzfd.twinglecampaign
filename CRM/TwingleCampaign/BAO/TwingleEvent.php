@@ -88,7 +88,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
 
         // ... if not, get embed data and create event
         try {
-          $result = $event->create($user, $is_test);
+          $result = $event->create($is_test);
         } catch (Exception $e) {
           $errorMessage = $e->getMessage();
 
@@ -149,7 +149,6 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
   /**
    * Create the Event as a campaign in CiviCRM if it does not exist
    *
-   * @param int $user
    * @param bool $is_test
    * If true: don't do any changes
    *
@@ -158,7 +157,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public function create(int $user, bool $is_test = FALSE) {
+  public function create(bool $is_test = FALSE) {
 
     // Create campaign only if it does not already exist
     if (!$is_test) {
@@ -203,7 +202,6 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
       ) {
         $result = civicrm_api3('Case', 'create', [
           'contact_id' => $formattedValues['contact_id'],
-          'creator_id' => $user,
           'case_type_id' => Configuration::get('twinglecampaign_start_case'),
           'subject' => $formattedValues['title'],
           'start_date' => $formattedValues['created_at'],

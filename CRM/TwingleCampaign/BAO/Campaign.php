@@ -56,7 +56,7 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
       $this->translateCustomFields($campaign, self::OUT);
 
       // Translate keys and values
-      self::formatValues($campaign, self::OUT);
+      //self::formatValues($campaign, self::OUT);
       self::translateKeys($campaign, self::OUT);
 
     }
@@ -171,7 +171,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
           $result['values'],
           self::CIVICRM
         );
-        break;
       case $twingle_campaign_type_values['twingle_event']:
         return new TwingleEvent(
           $result['values'],
@@ -182,7 +181,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
           $result['values'],
           self::CIVICRM
         );
-        break;
       default:
         return NULL;
     }
