@@ -58,14 +58,11 @@ function civicrm_api3_twingle_form_Get(array $params) {
 
   // Get custom fields
   $custom_field_mapping = Cache::getInstance()->getCustomFieldMapping();
-  $cf_twingle_project_id = $custom_field_mapping['twingle_project_id'];
-  $cf_twingle_project_type = $custom_field_mapping['twingle_project_type'];
-  $cf_twingle_project_widget = $custom_field_mapping['twingle_project_widget'];
-  $cf_twingle_project_counter = $custom_field_mapping['twingle_project_counter'];
 
   // Replace twingle_project_type key with custom field name
   if (key_exists('twingle_project_type', $params)) {
-    $params[$cf_twingle_project_type] = $params['twingle_project_type'];
+    $params[$custom_field_mapping['twingle_project_type']] =
+      $params['twingle_project_type'];
     unset($params['twingle_project_type']);
   }
 
@@ -87,12 +84,12 @@ function civicrm_api3_twingle_form_Get(array $params) {
           $returnValues,
           [
             'id' => $value['id'],
-            'twingle_project_id' => $value[$cf_twingle_project_id],
+            'twingle_project_id' => $value[$custom_field_mapping['twingle_project_id']],
             'title' => $value['title'],
             'name' => $value['name'],
-            'project_type' => $value[$cf_twingle_project_type],
-            'embed_code' => $value[$cf_twingle_project_widget],
-            'counter' => $value[$cf_twingle_project_counter]
+            'project_type' => $value[$custom_field_mapping['twingle_project_type']],
+            'embed_code' => $value[$custom_field_mapping['twingle_project_widget']],
+            'counter' => $value[$custom_field_mapping['twingle_project_counter']]
           ]
         );
       }
