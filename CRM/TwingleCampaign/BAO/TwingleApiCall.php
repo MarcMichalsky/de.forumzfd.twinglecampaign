@@ -25,7 +25,7 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
    *
    * @throws API_Exception
    */
-  public function __construct($apiKey, int $limit = 20) {
+  public function __construct($apiKey, int $limit) {
     $this->apiKey = $apiKey;
     $this->limit = $limit;
 
@@ -116,7 +116,7 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
    *
    * @return array
    */
-  public function getEvent(int $projectId, $eventId = NULL) {
+  public function getEvent($projectId, $eventId = NULL) {
     $result = [];
 
     $url = empty($eventId)
@@ -140,8 +140,11 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
       $response = $this->curlGet($url, $params);
       $finished = ($eventId) || count($response['data']) < $this->limit;
       $offset = $offset + $this->limit;
-      if ($response['data']) {
+      if ($response['data'] && !$eventId) {
         $result = array_merge($result, $response['data']);
+      }
+      else {
+        $result = $response;
       }
     }
     return $result;
