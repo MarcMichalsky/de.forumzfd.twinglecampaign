@@ -2,6 +2,7 @@
 
 use CRM_TwingleCampaign_BAO_TwingleProject as TwingleProject;
 use CRM_TwingleCampaign_ExtensionUtil as E;
+use CRM_TwingleCampaign_Utils_StringOperations as StringOps;
 
 include_once E::path() . '/CRM/TwingleCampaign/BAO/TwingleProject.php';
 
@@ -14,19 +15,41 @@ include_once E::path() . '/CRM/TwingleCampaign/BAO/TwingleProject.php';
  * @see https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
  */
 function _civicrm_api3_twingle_project_Create_spec(array &$spec) {
-  $spec['title'] = [
-    'name'         => 'title',
-    'title'        => E::ts('Campaign Title'),
+  $spec['name'] = [
+    'name'         => 'name',
+    'title'        => E::ts('Twingle Project Name'),
     'type'         => CRM_Utils_Type::T_STRING,
     'api.required' => 1,
-    'description'  => E::ts('Title of the Campaign'),
+    'description'  => E::ts('Name of the Twingle Project'),
   ];
-  $spec['project_type'] = [
-    'name'         => 'project_type',
+  $spec['id'] = [
+    'name'         => 'id',
+    'title'        => E::ts('Twingle Project ID'),
+    'type'         => CRM_Utils_Type::T_INT,
+    'api.required' => 0,
+    'description'  => E::ts('The Twingle Project ID'),
+  ];
+  $spec['type'] = [
+    'name'         => 'type',
     'title'        => E::ts('Twingle Project Type'),
     'type'         => CRM_Utils_Type::T_STRING,
     'api.required' => 0,
     'description'  => E::ts('The type of the Twingle Project'),
+    'api.default'  => 'default',
+  ];
+  $spec['organisation_id'] = [
+    'name'         => 'organisation_id',
+    'title'        => E::ts('Organisation ID'),
+    'type'         => CRM_Utils_Type::T_INT,
+    'api.required' => 0,
+    'description'  => E::ts('ID of your Organisation'),
+  ];
+  $spec['last_update'] = [
+    'name'         => 'last_update',
+    'title'        => E::ts('Last Project Update '),
+    'type'         => CRM_Utils_Type::T_STRING,
+    'api.required' => 0,
+    'description'  => E::ts('UNIX-Timestamp ot the moment when the Project was last updated'),
   ];
   $spec['allow_more'] = [
     'name'         => 'allow_more',
@@ -34,6 +57,21 @@ function _civicrm_api3_twingle_project_Create_spec(array &$spec) {
     'type'         => CRM_Utils_Type::T_BOOLEAN,
     'api.required' => 0,
     'description'  => E::ts('Allow to donate more than is defined in the target'),
+    'api.default'  => TRUE,
+  ];
+  $spec['identifier'] = [
+    'name'         => 'identifier',
+    'title'        => E::ts('Project Identifier'),
+    'type'         => CRM_Utils_Type::T_STRING,
+    'api.required' => 0,
+    'description'  => E::ts('Unique identifier of a Project')
+  ];
+  $spec['project_target'] = [
+    'name'         => 'project_target',
+    'title'        => E::ts('Project Target'),
+    'type'         => CRM_Utils_Type::T_MONEY,
+    'api.required' => 0,
+    'description'  => E::ts('Financial Target of a Project'),
   ];
 }
 
@@ -52,42 +90,10 @@ function _civicrm_api3_twingle_project_Create_spec(array &$spec) {
 function civicrm_api3_twingle_project_Create($params) {
   $returnValues = [];
 
-  $title = $params['title'];
-  $name = strtolower(preg_replace('/[^A-Za-z0-9]/', '_', $title));
-  $type = $params['project_type'] ?? 'default';
-  $allow_more = $params['allow_more'] ?? 1;
+  $project = new TwingleProject($params, 'TWINGLE');
 
-  $values = [
-    'title'      => $title,
-    'name'       => $name,
-    'type'       => $type,
-    'allow_more' => $allow_more,
-  ];
-
-  $project = new TwingleProject($values, 'CIVICRM');
-
-  $create_project = $project->create();
-
-  $projectId = $project->getId();
-
-  $sync = $result = civicrm_api3(
-    'TwingleSync',
-    'singlesync',
-    ['campaign_id' => $projectId]
-  );
-
-  if ($sync['is_error'] == 0) {
-    $returnValues = $sync['values']['project'];
-  }
-  elseif ($create_project['status'] == "TwingleProject created") {
-    throw new API_Exception(
-      "TwingleProject was created but could not get pushed to Twingle"
-    );
-  }
-  else {
-    throw new API_Exception(
-      "TwingleProject creation failed"
-    );
+  if (!$project->exists()) {
+    $returnValues = $project->create();
   }
 
   return civicrm_api3_create_success($returnValues, $params, 'TwingleProject', 'Create');
