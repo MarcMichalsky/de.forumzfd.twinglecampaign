@@ -1,5 +1,5 @@
 {
-  "project": [
+  "TwingleProject": [
     "id",
     "identifier",
     "allow_more",
@@ -19,7 +19,7 @@
     "eventlist",
     "counter"
   ],
-  "event": [
+  "TwingleEvent": [
   ],
   "event_embed_data": [
     "page",

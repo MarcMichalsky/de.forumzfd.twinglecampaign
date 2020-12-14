@@ -61,9 +61,15 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
     }
 
-    // Set project values attribute
-    $this->values = $campaign;
+    // Filter project values
+    $filter = Cache::getInstance()->getTemplates()[$this->className];
+    foreach ($campaign as $key => $value) {
+      if (in_array($key, $filter)) {
+        $this->values[$key] = $value;
+      }
 
+
+    }
   }
 
   /**
@@ -77,26 +83,26 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
    *
    * @throws Exception
    */
-  public function exists() {
+  public function exists(): bool {
 
-    $result = [];
+    if (!$this->values['id']) {
+      return FALSE;
+    }
+
     $single = FALSE;
 
-    // If there is more than one campaign for this entity, handle the duplicates
-    while (!$single) {
-      $result = civicrm_api3('Campaign', 'get', [
-        'sequential'           => 1,
-        'is_active'            => 1,
-        $this->id_custom_field => $this->values['id'],
-      ]);
+    $result = civicrm_api3($this->className, 'get', [
+      'sequential' => 1,
+      'is_active'  => 1,
+      'project_id' => $this->values['id'],
+    ]);
 
-      if ($result['count'] > 1) {
-        // TODO: abort loop if function fails
-        self::handleDuplicates($result);
-      }
-      else {
-        $single = TRUE;
-      }
+    // If there is more than one campaign for this entity, handle the duplicates
+    if ($result['count'] > 1) {
+      self::handleDuplicates($result);
+    }
+    else {
+      $single = TRUE;
     }
 
     // If this campaign already exists, get its attributes
@@ -107,12 +113,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
       // Set id attribute
       $this->id = $values['id'];
-
-      // Translate custom field names back
-      $this->translateCustomFields($values, self::OUT);
-
-      // Translate keys from CiviCRM format to Twingle format
-      self::translateKeys($values, self::OUT);
 
       // Set attributes to the values of the existing campaign
       // to reflect the state of the actual campaign in the database
@@ -132,7 +132,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
    * @param array $values
    * Array with values to update
    *
-   * @throws Exception
    */
   public function update(array $values) {
     // Update campaign values
@@ -188,28 +187,22 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
 
   /**
-   * Deactivate all duplicates of a project but the newest one
+   * Deactivate all duplicates of a campaign but the newest one
    *
    * @param array $result
-   * The $result array of a civicrm_api3-get-project call
-   *
    * @throws CiviCRM_API3_Exception
    */
-  protected function handleDuplicates(array $result) {
+  protected function handleDuplicates(array &$result) {
 
-    // Sort projects ascending by the value of the last_modified_date
+    // Sort campaigns ascending by the value of the last_modified_date
     uasort($result['values'], function ($a, $b) {
       return $a['last_modified_date'] <=> $b['last_modified_date'];
     });
 
-    // Delete the newest project from array to keep it active
-    array_shift($result['values']);
-
-    // deactivate the projects
-    foreach ($result['values'] as $p) {
-      self::deactivateById($p['id']);
+    // Deactivate all but the first campaign
+    while (sizeof($result['values']) > 1) {
+      self::deactivateById(array_pop($result['values']));
     }
-
   }
 
 
@@ -230,7 +223,8 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
   public function translateKeys(array &$values, string $direction) {
 
     // Get translations for fields
-    $field_translations = Cache::getInstance()->getTranslations()[$this->className];
+    $field_translations = Cache::getInstance()
+      ->getTranslations()[$this->className];
 
     // Set the direction of the translation
     if ($direction == self::OUT) {
@@ -253,20 +247,19 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
 
   /**
-   * Translate between Twingle field names and custom field names
+   * Translate between field names and custom field names
    *
    * @param array $values
    * array of which keys shall be translated
    *
    * @param string $direction
    * Campaign::IN -> translate field names into custom field names <br>
-   * Campaign::OUT -> translate custom field names into Twingle field
-   * names
+   * Campaign::OUT -> translate custom field names into field names
    *
    */
   public function translateCustomFields(array &$values, string $direction) {
 
-    // Translate from Twingle field name to custom field name
+    // Translate field name to custom field name
     if ($direction == self::IN) {
 
       foreach (Cache::getInstance()
@@ -296,7 +289,7 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
         }
       }
     }
-    // Translate from custom field name to Twingle field name
+    // Translate from custom field name to field name
     elseif ($direction == self::OUT) {
 
       foreach (Cache::getInstance()
