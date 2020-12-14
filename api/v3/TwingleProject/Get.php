@@ -1,5 +1,8 @@
 <?php
+
 use CRM_TwingleCampaign_ExtensionUtil as E;
+use CRM_TwingleCampaign_BAO_TwingleProject as TwingleProject;
+use CRM_TwingleCampaign_Utils_ExtensionCache as Cache;
 
 /**
  * TwingleProject.Get API specification (optional)
@@ -9,8 +12,93 @@ use CRM_TwingleCampaign_ExtensionUtil as E;
  *
  * @see https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
  */
-function _civicrm_api3_twingle_project_Get_spec(&$spec) {
-  $spec['magicword']['api.required'] = 1;
+function _civicrm_api3_twingle_project_Get_spec(array &$spec) {
+  $spec['id'] = [
+    'name'         => 'id',
+    'title'        => E::ts('Campaign ID'),
+    'type'         => CRM_Utils_Type::T_INT,
+    'api.required' => 0,
+    'description'  => E::ts('Unique Campaign ID'),
+  ];
+  $spec['name'] = [
+    'name'         => 'name',
+    'title'        => E::ts('Campaign Name'),
+    'type'         => CRM_Utils_Type::T_STRING,
+    'api.required' => 0,
+    'description'  => E::ts('Name of the Campaign'),
+  ];
+  $spec['title'] = [
+    'name'         => 'title',
+    'title'        => E::ts('Campaign Title'),
+    'type'         => CRM_Utils_Type::T_STRING,
+    'api.required' => 0,
+    'description'  => E::ts('Title of the Campaign'),
+  ];
+  $spec['start_date'] = [
+    'name'         => 'start_date',
+    'title'        => E::ts('Campaign Start Date'),
+    'type'         => CRM_Utils_Type::T_STRING,
+    'api.required' => 0,
+    'description'  => E::ts('Date and Time that Campaign starts.'),
+  ];
+  $spec['project_id'] = [
+    'name'         => 'project_id',
+    'title'        => E::ts('Twingle Project ID'),
+    'type'         => CRM_Utils_Type::T_INT,
+    'api.required' => 0,
+    'description'  => E::ts('Twingle ID for this project'),
+  ];
+  $spec['campaign_type_id'] = [
+    'name'         => 'campaign_type_id',
+    'title'        => E::ts('Campaign Type'),
+    'type'         => CRM_Utils_Type::T_STRING,
+    'api.required' => 0,
+    'description'  => E::ts('Campaign Type ID. Implicit FK to 
+    cicicrm_option_value where option_group = campaign_type'),
+  ];
+  $spec['last_modified_id'] = [
+    'name'         => 'last_modified_id',
+    'title'        => E::ts('Campaign Modified By'),
+    'type'         => CRM_Utils_Type::T_INT,
+    'api.required' => 0,
+    'description'  => E::ts('FK ti civicrm_contact, who recently edited this campaign'),
+    'FKClassName'  => 'CRM_Contact_DAO_Contact',
+  ];
+  $spec['last_modified_date'] = [
+    'name'         => 'last_modified_date',
+    'title'        => E::ts('Campaign Modified Date'),
+    'type'         => CRM_Utils_Type::T_STRING,
+    'api.required' => 0,
+    'description'  => E::ts('FK ti civicrm_contact, who recently edited this campaign'),
+  ];
+  $spec['type'] = [
+    'name'         => 'type',
+    'title'        => E::ts('Twingle Project Type'),
+    'type'         => CRM_Utils_Type::T_STRING,
+    'api.required' => 0,
+    'description'  => E::ts('The type of the Twingle Project'),
+  ];
+  $spec['allow_more'] = [
+    'name'         => 'allow_more',
+    'title'        => E::ts('Allow more'),
+    'type'         => CRM_Utils_Type::T_BOOLEAN,
+    'api.required' => 0,
+    'description'  => E::ts('Allow to donate more than is defined in the target'),
+  ];
+  $spec['organisation_id'] = [
+    'name'         => 'organisation_id',
+    'title'        => E::ts('Twingle Organisation ID'),
+    'type'         => CRM_Utils_Type::T_INT,
+    'api.required' => 0,
+    'description'  => E::ts('Your Twingle Organisation ID'),
+  ];
+  $spec['is_active'] = [
+    'name'         => 'is_active',
+    'title'        => E::ts('Campaign is active'),
+    'type'         => CRM_Utils_Type::T_BOOLEAN,
+    'api.required' => 0,
+    'description'  => E::ts('Is this Campaign enabled or disabled/cancelled?'),
+  ];
 }
 
 /**
@@ -21,25 +109,62 @@ function _civicrm_api3_twingle_project_Get_spec(&$spec) {
  * @return array
  *   API result descriptor
  *
+ * @throws \CiviCRM_API3_Exception|\CiviCRM_API3_Exception
  * @see civicrm_api3_create_success
  *
- * @throws API_Exception
  */
 function civicrm_api3_twingle_project_Get($params) {
-  if (array_key_exists('magicword', $params) && $params['magicword'] == 'sesame') {
-    $returnValues = array(
-      // OK, return several data rows
-      12 => ['id' => 12, 'name' => 'Twelve'],
-      34 => ['id' => 34, 'name' => 'Thirty four'],
-      56 => ['id' => 56, 'name' => 'Fifty six'],
-    );
-    // ALTERNATIVE: $returnValues = []; // OK, success
-    // ALTERNATIVE: $returnValues = ["Some value"]; // OK, return a single value
 
-    // Spec: civicrm_api3_create_success($values = 1, $params = [], $entity = NULL, $action = NULL)
+  $custom_field_mapping = Cache::getInstance()->getCustomFieldMapping();
+  $custom_field_mapping_reverse = array_flip($custom_field_mapping);
+
+  $query = ['sequential' => 1, 'campaign_type_id' => 'twingle_project'];
+
+  foreach ($params as $key => $value) {
+    if ( $key != 'id' &&
+      key_exists('twingle_project_' . $key, $custom_field_mapping)
+    ) {
+      $query[$custom_field_mapping['twingle_project_' . $key]] = $value;
+    }
+    elseif ($key == 'project_id') {
+      $query[$custom_field_mapping['twingle_project_id']] = $value;
+    }
+    else {
+      $query[$key] = $value;
+    }
+  }
+
+  $result = civicrm_api3('Campaign', 'get', $query);
+
+  if ($result['is_error'] == 0) {
+    $returnValues = [];
+    foreach ($result['values'] as $project) {
+      foreach ($project as $key => $value) {
+        if (key_exists($key, $custom_field_mapping_reverse)) {
+          $returnValues[$project['id']][$custom_field_mapping_reverse[$key]]
+            = $value;
+        }
+        else {
+          $returnValues[$project['id']][$key] = $value;
+        }
+      }
+      foreach($returnValues[$project['id']] as $key => $value) {
+        if ($key != 'twingle_project_id' && strpos($key, 'twingle_project_') === 0) {
+          $returnValues[$project['id']][str_replace('twingle_project_', '', $key)]
+            = $value;
+          unset($returnValues[$project['id']][$key]);
+        } elseif($key == 'twingle_project_id'){
+          $returnValues[$project['id']]['project_id'] = $value;
+          unset($returnValues[$project['id']]['twingle_project_id']);
+        }
+      }
+    }
+
+
     return civicrm_api3_create_success($returnValues, $params, 'TwingleProject', 'Get');
   }
+
   else {
-    throw new API_Exception(/*error_message*/ 'Everyone knows that the magicword is "sesame"', /*error_code*/ 'magicword_incorrect');
+    return $result;
   }
 }
