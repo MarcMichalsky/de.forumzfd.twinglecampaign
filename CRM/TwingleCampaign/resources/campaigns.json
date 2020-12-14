@@ -69,20 +69,6 @@
       "is_view": 1,
       "weight": 6
     },
-    "twingle_project_slug": {
-      "custom_group_id": "Twingle_Project_Information",
-      "label": "Twingle Project Slug",
-      "name": "twingle_project_slug",
-      "is_required": 0,
-      "is_searchable": 1,
-      "data_type": "String",
-      "html_type": "Text",
-      "text_length": 120,
-      "is_active": 1,
-      "is_view": 1,
-      "weight": 9,
-      "help_post": "The slug of the Project name (auto generated)"
-    },
     "twingle_project_identifier": {
       "custom_group_id": "Twingle_Project_Information",
       "label": "Twingle Project identifier",
