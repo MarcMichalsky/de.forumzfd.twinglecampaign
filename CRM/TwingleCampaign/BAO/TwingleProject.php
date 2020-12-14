@@ -22,8 +22,7 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
   function __construct(array $project, string $origin) {
     parent::__construct($project, $origin);
 
-    $className = explode('_', (new ReflectionClass($this))->getShortName());
-    $this->className = array_pop($className);;
+    $this->id = $id;
     $this->prefix = 'twingle_project_';
     $this->values['campaign_type_id'] = 'twingle_project';
     $this->id_custom_field = Cache::getInstance()

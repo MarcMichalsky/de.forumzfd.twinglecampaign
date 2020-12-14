@@ -43,8 +43,8 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
    */
   protected function __construct(array $campaign, string $origin) {
 
-    $className = explode('_', get_class($this));
-    $this->className = array_pop($className);
+    $tmpClassName = explode('_', get_class($this));
+    $this->className = array_pop($tmpClassName);
 
     // If values come from CiviCRM Campaign API
     if ($origin == self::CIVICRM) {
