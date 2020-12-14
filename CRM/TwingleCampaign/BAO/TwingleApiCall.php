@@ -25,7 +25,7 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
    *
    * @throws API_Exception
    */
-  public function __construct($apiKey, int $limit) {
+  public function __construct(string $apiKey, int $limit) {
     $this->apiKey = $apiKey;
     $this->limit = $limit;
 
@@ -118,13 +118,14 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
    *
    * @return array
    */
-  public function getEvent($projectId, $eventId = NULL) {
+  public
+  function getEvent($projectId, $eventId = NULL) {
     $result = [];
 
     $url = empty($eventId)
       ? $this->protocol . 'project' . $this->baseUrl . $projectId . '/event'
       : $this->protocol . 'project' . $this->baseUrl . $projectId . '/event/'
-        . $eventId;
+      . $eventId;
 
     $offset = 0;
     $finished = FALSE;
@@ -157,7 +158,8 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
    *
    * @return array|NULL
    */
-  public function getProjectEmbedData($projectId) {
+  public
+  function getProjectEmbedData($projectId) {
 
     $result = $this->getProject($projectId);
 
@@ -186,7 +188,8 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
    * @return array|bool
    * Returns the result array of the curl or FALSE, if the curl failed
    */
-  private function curlGet($url, $params = NULL) {
+  private
+  function curlGet($url, $params = NULL) {
     if (!empty($params)) {
       $url = $url . '?' . http_build_query($params);
     }
@@ -216,7 +219,8 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
    * @return false|mixed
    * Returns the result array of the curl or FALSE, if the curl failed
    */
-  private function curlPost($url, $data) {
+  private
+  function curlPost($url, $data) {
     $curl = curl_init($url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
     curl_setopt($curl, CURLOPT_POST, TRUE);

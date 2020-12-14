@@ -245,7 +245,7 @@ class CRM_TwingleCampaign_BAO_CustomField {
   }
 
   /**
-   * Get a custom field mapping (e.g. ['project_id' => 'custom_42'])
+   * Get a custom field mapping (e.g. ['twingle_project_id' => 'custom_42'])
    *
    * @return array
    * Associative array with a mapping of all custom fields used by this extension
