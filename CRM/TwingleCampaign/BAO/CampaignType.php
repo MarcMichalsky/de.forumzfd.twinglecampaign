@@ -55,8 +55,9 @@ class CRM_TwingleCampaign_BAO_CampaignType {
         );
       }
       else {
+        $error_message = $this->results['error_message'];
         Civi::log()->error("Twingle Extension could not create new campaign type
-      for \"$this->label\": $this->results['error_message']");
+      for \"$this->label\": $error_message");
       }
     }
     else {
@@ -145,14 +146,16 @@ class CRM_TwingleCampaign_BAO_CampaignType {
       }
     }
     else {
+      $error_message = $this->results['error_message'];
       if ($this->label) {
         Civi::log()->error("TwingleCampaign Extension could not delete campaign type
-        \"$this->label\": $this->results['error_message']"
+        \"$this->label\": $error_message"
         );
       }
       else {
         Civi::log()->error("TwingleCampaign Extension could not delete campaign type: 
-        $this->results['error_message']");
+        $error_message"
+        );
       }
     }
   }
