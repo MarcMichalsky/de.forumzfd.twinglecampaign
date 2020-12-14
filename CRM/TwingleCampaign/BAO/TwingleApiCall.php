@@ -96,7 +96,13 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
     }
 
     // Prepare url for curl
-    $url = $this->protocol . 'project' . $this->baseUrl . $values['id'];
+    if ($values['id']) {
+      $url = $this->protocol . 'project' . $this->baseUrl . $values['id'];
+    }
+    else {
+      $url = $this->protocol . 'project' . $this->baseUrl . 'by-organisation/' .
+        $this->organisationId;
+    }
 
     // Send curl and return result
     return $this->curlPost($url, $values);
