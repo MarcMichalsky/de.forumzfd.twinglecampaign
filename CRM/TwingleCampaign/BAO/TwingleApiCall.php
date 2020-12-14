@@ -45,32 +45,28 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
         "Twingle API call failed. Please check your api key.");
     }
 
-    $this->organisationId = array_column($response, 'id');
+    $this->organisationId = array_column($response, 'id')[0];
   }
 
   /**
    * If $id parameter is empty, this function returns all projects for all
    * organisations this API key is assigned to.
    *
-   * TODO: Keys can only get assigned to one organisation. Save multiple keys
-   * in settings instead.
-   *
    * If $id parameter is given, this function returns a single project.
    *
    * @param int|null $projectId
    *
    * @return mixed
+   * @throws \Exception
    */
   public function getProject(int $projectId = NULL) {
     $response = [];
-    foreach ($this->organisationId as $organisationId) {
-      $url = empty($projectId)
-        ? $this->protocol . 'project' . $this->baseUrl . 'by-organisation/' . $organisationId
-        : $this->protocol . 'project' . $this->baseUrl . $projectId;
 
-      $response = array_merge($this->curlGet($url));
-    }
-    return $response;
+    $url = empty($projectId)
+      ? $this->protocol . 'project' . $this->baseUrl . 'by-organisation/' . $this->organisationId
+      : $this->protocol . 'project' . $this->baseUrl . $projectId;
+
+    return $this->curlGet($url);
   }
 
   /**
