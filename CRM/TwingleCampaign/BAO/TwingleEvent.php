@@ -330,34 +330,13 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    * Returns a contact id
    */
   private function matchContact(string $names, string $email) {
-    $names = explode(' ', $names);
-    $lastname = '';
-
-    if (is_array($names) && count($names) > 1) {
-      $lastname = array_pop($names);
-      $test = $names[count($names) - 1];
-      $lastnamePrefixes = ['da', 'de', 'der', 'van', 'von'];
-
-      if (in_array($test, $lastnamePrefixes)) {
-        if ($test == 'der' &&
-          $names[count($names) - 2] == 'van' ||
-          $names[count($names) - 2] == 'von'
-        ) {
-          $lastname = implode(' ', array_splice($names, -2))
-            . ' ' . $lastname;
-        }
-        else {
-          array_pop($names);
-          $lastname = $test . ' ' . $lastname;
-        }
-      }
-
-      $names = implode(" ", $names);
-    }
+    $names = StringOps::split_names($names); // Hopefully just a temporary solution
+    $firstnames = $names['firstnames'];
+    $lastname = $names['lastname'];
     try {
       $contact = civicrm_api3('Contact', 'getorcreate', [
         'xcm_profile' => Civi::settings()->get('twinglecampaign_xcm_profile'),
-        'first_name'  => $names,
+        'first_name'  => $firstnames,
         'last_name'   => $lastname,
         'email'       => $email,
       ]);
@@ -365,7 +344,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
     } catch (CiviCRM_API3_Exception $e) {
       $errorMessage = $e->getMessage();
       Civi::log()->error("TwingleCampaign extension could not match or create a contact for:
-      $names $lastname $email./nError Message: $errorMessage");
+      $firstnames $lastname $email./nError Message: $errorMessage");
       return NULL;
     }
   }
