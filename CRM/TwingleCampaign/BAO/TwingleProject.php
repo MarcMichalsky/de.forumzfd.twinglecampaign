@@ -49,9 +49,9 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    */
   public static function sync(
     array $values,
-    TwingleApiCall &$twingleApi,
+    TwingleApiCall $twingleApi,
     bool $is_test = FALSE
-  ) {
+  ): ?array {
 
     // If $values is an array
     if (is_array($values)) {
@@ -180,7 +180,7 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
         }
       }
 
-      // Return a response of the synchronization
+      // Return the result of the synchronization
       return $result;
     }
     else {
@@ -198,13 +198,13 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    *
    * @throws Exception
    */
-  public function export() {
+  public function export(): array {
 
     $values = $this->values;
     self::formatValues($values, self::OUT);
 
     // Get template for project
-    $project = Cache::getInstance()->getTemplates()['project'];
+    $project = Cache::getInstance()->getTemplates()['TwingleProject'];
 
     // Replace array items which the Twingle API does not expect
     foreach ($values as $key => $value) {
@@ -229,7 +229,7 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    * @throws CiviCRM_API3_Exception
    * @throws Exception
    */
-  public function create(bool $is_test = FALSE) {
+  public function create(bool $is_test = FALSE): array {
 
     // Create campaign only if this is not a test
     if (!$is_test) {
@@ -345,7 +345,7 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
       $this->values[$key] = $embedData[$key];
     }
   }
-  
+
 
   /**
    * Deactivate this TwingleProject campaign

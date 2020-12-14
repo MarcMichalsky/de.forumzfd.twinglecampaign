@@ -1,6 +1,7 @@
 <?php
 
 use CRM_TwingleCampaign_Utils_ExtensionCache as Cache;
+use CRM_TwingleCampaign_Utils_StringOperations as StringOps;
 use CRM_TwingleCampaign_BAO_Campaign as Campaign;
 use CRM_TwingleCampaign_BAO_TwingleApiCall as TwingleApiCall;
 use CRM_TwingleCampaign_BAO_Configuration as Configuration;
@@ -199,11 +200,11 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
         Configuration::get('twinglecampaign_start_case')
       ) {
         $result = civicrm_api3('Case', 'create', [
-          'contact_id' => $formattedValues['contact_id'],
+          'contact_id'   => $formattedValues['contact_id'],
           'case_type_id' => Configuration::get('twinglecampaign_start_case'),
-          'subject' => $formattedValues['title'],
-          'start_date' => $formattedValues['created_at'],
-          'status_id' => "Open",
+          'subject'      => $formattedValues['title'],
+          'start_date'   => $formattedValues['created_at'],
+          'status_id'    => "Open",
         ]);
       }
 
@@ -321,9 +322,6 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
   /**
    * Matches a single string that should contain first and lastname to match a
    * contact or create a new one if it does not exist yet.
-   *
-   * TODO: The logic of this method should instead be handled in the XCM
-   * extension. This ist only a temporary solution.
    *
    * @param string $names
    * @param string $email

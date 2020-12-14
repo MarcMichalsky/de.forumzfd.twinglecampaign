@@ -74,6 +74,7 @@ class CRM_TwingleCampaign_Utils_ExtensionCache {
   protected function __clone() {}
 
   /**
+   * Returns a mapping of all custom field of the TwingleCampaign extension
    * @return array
    */
   public function getCustomFieldMapping(): array {
