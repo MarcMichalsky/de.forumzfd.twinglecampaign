@@ -27,6 +27,13 @@ function _civicrm_api3_twingle_sync_Sync_spec(array &$spec) {
     'api.required' => 0,
     'description'  => E::ts('Limit for the number of events that should get requested per call to the Twingle API'),
   ];
+  $spec['project_id'] = [
+    'name'         => 'project_id',
+    'title'        => E::ts('Twingle Project ID'),
+    'type'         => CRM_Utils_Type::T_INT,
+    'api.required' => 0,
+    'description'  => E::ts('Twingle ID for a project'),
+  ];
   $spec['is_test'] = [
     'name'         => 'is_test',
     'title'        => E::ts('Test'),
@@ -64,13 +71,41 @@ function civicrm_api3_twingle_sync_Sync($params) {
   $limit = ($params['limit']) ?? 20;
   $twingleApi = new TwingleApiCall($apiKey, $limit);
 
-  // Get all projects from Twingle
-  $projects = $twingleApi->getProject();
+  if ($params['project_id']) {
+    // Get single project from Twingle
+    $projects_from_twingle = $twingleApi->getProject($params['project_id']);
 
-  // Create projects as campaigns if they do not exist and store results in
-  // $result_values
+    // Get single TwingleProject
+    $projects_from_civicrm = civicrm_api3('TwingleProject', 'get',
+      ['is_active'  => 1, 'project_id' => $params['project_id']]);
+  }
+  else {
+    // Get all projects from Twingle
+    $projects_from_twingle = $twingleApi->getProject();
+
+    // Get all TwingleProjects from CiviCRM
+    $projects_from_civicrm = civicrm_api3('TwingleProject', 'get',
+      ['is_active'  => 1,]);
+  }
+
   $i = 0;
-  foreach ($projects as $project) {
+
+  // Push missing projects to Twingle
+  foreach ($projects_from_civicrm['values'] as $project_from_civicrm) {
+    if (!in_array($project_from_civicrm['project_id'],
+      array_column($projects_from_twingle, 'id'))) {
+      $id = $project_from_civicrm['id'];
+      unset($project_from_civicrm['id']);
+      $project_from_civicrm['name'] = $project_from_civicrm['title'];
+      $project = new TwingleProject($project_from_civicrm, TwingleProject::TWINGLE, $id);
+      $values = $twingleApi->pushProject($project);
+      $project->update($values);
+      $result_values['sync']['projects'][$i++] = $project->create();
+    }
+  }
+
+  // Sync existing projects
+  foreach ($projects_from_twingle as $project) {
     if (is_array($project)) {
       $result_values['sync']['projects'][$i++] =
         TwingleProject::sync($project, $twingleApi, $is_test);
