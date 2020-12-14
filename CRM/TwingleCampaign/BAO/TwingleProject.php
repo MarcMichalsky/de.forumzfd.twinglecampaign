@@ -16,10 +16,11 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    * @param string $origin
    * Origin of the arrays. It can be one of two constants:
    * TwingleProject::TWINGLE|CIVICRM
+   * @param int|null $id
    *
-   * @throws Exception
+   * @throws \Exception
    */
-  function __construct(array $project, string $origin) {
+  function __construct(array $project, string $origin, int $id = NULL) {
     parent::__construct($project, $origin);
 
     $this->id = $id;
