@@ -261,19 +261,6 @@
       "is_view": 1,
       "weight": 3
     },
-    "twingle_event_slug": {
-      "custom_group_id": "Twingle_Event_Information",
-      "label": "Twingle Event Slug",
-      "name": "twingle_event_slug",
-      "is_required": 0,
-      "is_searchable": 0,
-      "data_type": "String",
-      "html_type": "Text",
-      "text_length": 128,
-      "is_active": 1,
-      "is_view": 1,
-      "weight": 4
-    },
     "twingle_event_contact_id": {
       "custom_group_id": "Twingle_Event_Information",
       "label": "Twingle Event Initiator",
