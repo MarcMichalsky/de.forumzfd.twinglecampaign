@@ -64,11 +64,17 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
     $single = FALSE;
 
-    $result = civicrm_api3($this->className, 'get', [
-      'sequential' => 1,
-      'is_active'  => 1,
-      'project_id' => $this->values['id'],
-    ]);
+    $query = ['sequential' => 1,];
+
+    switch($this->className) {
+      case 'TwingleProject':
+        $query['project_id'] = $this->values['id'];
+        break;
+      case 'TwingleEvent':
+        $query['event_id'] = $this->values['id'];
+    }
+
+    $result = civicrm_api3($this->className, 'get', $query);
 
     // If there is more than one campaign for this entity, handle the duplicates
     if ($result['count'] > 1) {
