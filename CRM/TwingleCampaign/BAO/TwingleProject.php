@@ -282,7 +282,7 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    *
    * @throws Exception
    */
-  protected function formatValues(array &$values, string $direction) {
+  public static function formatValues(array &$values, string $direction) {
 
     if ($direction == self::IN) {
 
