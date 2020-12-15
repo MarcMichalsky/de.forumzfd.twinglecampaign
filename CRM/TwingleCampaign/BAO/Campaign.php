@@ -171,6 +171,7 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
    * Deactivate all duplicates of a campaign but the newest one
    *
    * @param array $result
+   *
    * @throws CiviCRM_API3_Exception
    */
   protected function handleDuplicates(array &$result) {
@@ -201,30 +202,7 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
    *
    * @throws Exception
    */
-  public function translateKeys(array &$values, string $direction) {
-
-    // Get translations for fields
-    $field_translations = Cache::getInstance()
-      ->getTranslations()[$this->className];
-
-    // Set the direction of the translation
-    if ($direction == self::OUT) {
-      $field_translations = array_flip($field_translations);
-    }
-    // Throw error if $direction constant does not match IN or OUT
-    elseif ($direction != self::IN) {
-      throw new Exception(
-        "Invalid Parameter $direction for translateKeys()"
-      );
-      // TODO: use specific exception or create own
-    }
-
-    // Translate keys
-    foreach ($field_translations as $origin => $translation) {
-      $values[$translation] = $values[$origin];
-      unset($values[$origin]);
-    }
-  }
+  public static abstract function translateKeys(array &$values, string $direction);
 
 
   /**

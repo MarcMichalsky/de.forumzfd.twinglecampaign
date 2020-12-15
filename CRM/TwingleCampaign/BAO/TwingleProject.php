@@ -321,6 +321,45 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
     }
   }
 
+  /**
+   * Translate array keys between CiviCRM Campaigns and Twingle
+   *
+   * @param array $values
+   * array of which keys shall be translated
+   *
+   * @param string $direction
+   * Campaign::IN -> translate array keys from Twingle format into
+   * CiviCRM format <br>
+   * Campaign::OUT -> translate array keys from CiviCRM format into
+   * Twingle format
+   *
+   * @throws Exception
+   */
+  public static function translateKeys(array &$values, string $direction) {
+
+    // Get translations for fields
+    $field_translations = Cache::getInstance()
+      ->getTranslations()['TwingleProject'];
+
+    // Set the direction of the translation
+    if ($direction == self::OUT) {
+      $field_translations = array_flip($field_translations);
+    }
+    // Throw error if $direction constant does not match IN or OUT
+    elseif ($direction != self::IN) {
+      throw new Exception(
+        "Invalid Parameter $direction for translateKeys()"
+      );
+      // TODO: use specific exception or create own
+    }
+
+    // Translate keys
+    foreach ($field_translations as $origin => $translation) {
+      $values[$translation] = $values[$origin];
+      unset($values[$origin]);
+    }
+  }
+
 
   /**
    * Set embed data fields
