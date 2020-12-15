@@ -223,7 +223,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    *
    * @throws Exception
    */
-  protected function formatValues(array &$values, string $direction) {
+  public static function formatValues(array &$values, string $direction) {
 
     if ($direction == self::IN) {
 
@@ -248,7 +248,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
       }
 
       if ($values['user_name']) {
-        $values['contact_id'] = $this->matchContact(
+        $values['contact_id'] = self::matchContact(
           $values['user_name'],
           $values['user_email']
         );
@@ -361,7 +361,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    * @return int|null
    * Returns a contact id
    */
-  private function matchContact(string $names, string $email) {
+  private static function matchContact(string $names, string $email): ?int {
     $names = StringOps::split_names($names); // Hopefully just a temporary solution
     $firstnames = $names['firstnames'];
     $lastname = $names['lastname'];
