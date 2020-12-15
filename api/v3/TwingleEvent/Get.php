@@ -1,6 +1,7 @@
 <?php
 use CRM_TwingleCampaign_ExtensionUtil as E;
 use CRM_TwingleCampaign_Utils_ExtensionCache as Cache;
+use CRM_TwingleCampaign_BAO_TwingleEvent as TwingleEvent;
 
 /**
  * TwingleEvent.Get API specification (optional)
@@ -148,8 +149,14 @@ function civicrm_api3_twingle_event_Get($params) {
           unset($returnValues[$event['id']]['twingle_event_id']);
         }
       }
+      try {
+        TwingleEvent::translateKeys($returnValues[$event['id']], TwingleEvent::OUT);
+        TwingleEvent::formatValues($returnValues[$event['id']], TwingleEvent::OUT);
+      }
+      catch (Exception $e) {
+        throw new API_Exception($e->getMessage());
+      }
     }
-
 
     return civicrm_api3_create_success($returnValues, $params, 'TwingleProject', 'Get');
   }
