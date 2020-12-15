@@ -30,11 +30,14 @@
     "deleted",
     "confirmed_at",
     "created_at",
+    "updated_at",
+    "target",
     "creation_url",
     "show_internal",
     "show_external",
     "edit_internal",
-    "edit_external"
+    "edit_external",
+    "urls"
   ],
   "event_embed_data": [
     "page",
