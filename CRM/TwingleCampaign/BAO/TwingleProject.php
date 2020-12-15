@@ -311,6 +311,11 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
       // Cast project target to integer
       $values['project_target'] = (int) $values['project_target'];
 
+      // Set default for 'allow_more'
+      $values['allow_more'] = empty($values['allow_more'])
+        ? False
+        : True;
+
     }
     else {
 
