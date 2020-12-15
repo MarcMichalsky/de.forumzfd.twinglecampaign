@@ -1,8 +1,8 @@
 <?php
 
 use CRM_TwingleCampaign_ExtensionUtil as E;
-use CRM_TwingleCampaign_BAO_TwingleProject as TwingleProject;
 use CRM_TwingleCampaign_Utils_ExtensionCache as Cache;
+use CRM_TwingleCampaign_BAO_TwingleProject as TwingleProject;
 
 /**
  * TwingleProject.Get API specification (optional)
@@ -110,6 +110,7 @@ function _civicrm_api3_twingle_project_Get_spec(array &$spec) {
  *   API result descriptor
  *
  * @throws \CiviCRM_API3_Exception|\CiviCRM_API3_Exception
+ * @throws \API_Exception
  * @see civicrm_api3_create_success
  *
  */
@@ -157,6 +158,13 @@ function civicrm_api3_twingle_project_Get($params) {
           $returnValues[$project['id']]['project_id'] = $value;
           unset($returnValues[$project['id']]['twingle_project_id']);
         }
+      }
+      try {
+        TwingleProject::translateKeys($returnValues[$project['id']], TwingleProject::OUT);
+        TwingleProject::formatValues($returnValues[$project['id']], TwingleProject::OUT);
+      }
+      catch (Exception $e) {
+        throw new API_Exception($e->getMessage());
       }
     }
 
