@@ -15,14 +15,10 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    * Result array of Twingle API call to
    * https://project.twingle.de/api/$project_id/event
    *
-   * @param string $origin
-   * Origin of the arrays. It can be one of two constants:
-   * TwingleEvent::TWINGLE|CIVICRM
-   *
    * @throws Exception
    */
-  protected function __construct(array $event, string $origin) {
-    parent::__construct($event, $origin);
+  protected function __construct(array $event) {
+    parent::__construct($event);
 
     $this->prefix = 'twingle_event_';
     $this->values['campaign_type_id'] = 'twingle_event';
@@ -60,10 +56,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
 
       // Instantiate TwingleEvent
       try {
-        $event = new self(
-          $values,
-          self::TWINGLE
-        );
+        $event = new self($values);
       } catch (Exception $e) {
         $errorMessage = $e->getMessage();
 

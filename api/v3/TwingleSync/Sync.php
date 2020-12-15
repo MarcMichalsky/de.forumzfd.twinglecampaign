@@ -97,10 +97,11 @@ function civicrm_api3_twingle_sync_Sync($params) {
       $id = $project_from_civicrm['id'];
       unset($project_from_civicrm['id']);
       $project_from_civicrm['name'] = $project_from_civicrm['title'];
-      $project = new TwingleProject($project_from_civicrm, TwingleProject::TWINGLE, $id);
+      $project = new TwingleProject($project_from_civicrm, $id);
       $values = $twingleApi->pushProject($project);
       $project->update($values);
       $result_values['sync']['projects'][$i++] = $project->create();
+
     }
   }
 

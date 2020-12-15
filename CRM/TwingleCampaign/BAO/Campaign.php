@@ -14,10 +14,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
   // OUT means: coming from the CiviCRM database
   public const OUT = 'OUT';
 
-  public const CIVICRM = 'CIVICRM';
-
-  public const TWINGLE = 'TWINGLE';
-
   protected $className;
 
   protected $id;
@@ -35,31 +31,18 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
    * @param array $campaign
    * Result array of Twingle API call
    *
-   * @param string $origin
    * Origin of the arrays. It can be one of two constants:
    * Campaign::TWINGLE|CIVICRM
    *
    * @throws Exception
    */
-  protected function __construct(array $campaign, string $origin) {
+  protected function __construct(array $campaign) {
 
     $tmpClassName = explode('_', get_class($this));
     $this->className = array_pop($tmpClassName);
 
-    // If values come from CiviCRM Campaign API
-    if ($origin == self::CIVICRM) {
-
-      // Set id (campaign id) attribute
-      $this->id = $campaign['id'];
-
-      // Translate custom field names into Twingle field names
-      $this->translateCustomFields($campaign, self::OUT);
-
-      // Translate keys and values
-      //self::formatValues($campaign, self::OUT);
-      self::translateKeys($campaign, self::OUT);
-
-    }
+    // Set campaign values
+    $this->update($campaign);
 
     // Filter project values
     $filter = Cache::getInstance()->getTemplates()[$this->className];
