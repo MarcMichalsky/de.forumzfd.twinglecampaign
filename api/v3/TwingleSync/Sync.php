@@ -52,6 +52,7 @@ function _civicrm_api3_twingle_sync_Sync_spec(array &$spec) {
  *   API result descriptor
  *
  * @throws API_Exception|\CiviCRM_API3_Exception
+ * @throws \Exception
  * @see civicrm_api3_create_success
  *
  */
@@ -94,14 +95,23 @@ function civicrm_api3_twingle_sync_Sync($params) {
   foreach ($projects_from_civicrm['values'] as $project_from_civicrm) {
     if (!in_array($project_from_civicrm['project_id'],
       array_column($projects_from_twingle, 'id'))) {
+      // store campaign id in $id
       $id = $project_from_civicrm['id'];
       unset($project_from_civicrm['id']);
+      // change 'title' to 'name' to match Twingle format
       $project_from_civicrm['name'] = $project_from_civicrm['title'];
+      // instantiate project with values from TwingleProject.Get
       $project = new TwingleProject($project_from_civicrm, $id);
-      $values = $twingleApi->pushProject($project);
-      $project->update($values);
-      $result_values['sync']['projects'][$i++] = $project->create();
-
+      // push project to Twingle
+      $result = $twingleApi->pushProject($project);
+      // update local campaign with data coming back from Twingle
+      $project->update($result);
+      $project_create = $project->create();
+      // set status
+      $result_values['sync']['projects'][$i++] =
+        $project_create['status'] == 'TwingleProject created'
+      ? 'TwingleProject pushed to Twingle'
+      : 'TwingleProject got likely pushed to Twingle but local update failed';
     }
   }
 
