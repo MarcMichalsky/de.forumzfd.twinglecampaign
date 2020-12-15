@@ -98,8 +98,6 @@ function civicrm_api3_twingle_sync_Sync($params) {
       // store campaign id in $id
       $id = $project_from_civicrm['id'];
       unset($project_from_civicrm['id']);
-      // change 'title' to 'name' to match Twingle format
-      $project_from_civicrm['name'] = $project_from_civicrm['title'];
       // instantiate project with values from TwingleProject.Get
       $project = new TwingleProject($project_from_civicrm, $id);
       // push project to Twingle
@@ -108,10 +106,11 @@ function civicrm_api3_twingle_sync_Sync($params) {
       $project->update($result);
       $project_create = $project->create();
       // set status
-      $result_values['sync']['projects'][$i++] =
+      $project_create['status'] =
         $project_create['status'] == 'TwingleProject created'
-      ? 'TwingleProject pushed to Twingle'
-      : 'TwingleProject got likely pushed to Twingle but local update failed';
+        ? 'TwingleProject pushed to Twingle'
+        : 'TwingleProject got likely pushed to Twingle but local update failed';
+      $result_values['sync']['projects'][$i++] = $project_create;
     }
   }
 
