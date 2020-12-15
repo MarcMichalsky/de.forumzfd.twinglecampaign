@@ -410,11 +410,12 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    * Returns a response array that contains title, id, project_id and status
    */
   public function getResponse(string $status) {
+    $project_type = empty($this->values['type']) ? 'default' : $this->values['type'];
     return [
       'title'        => $this->values['name'],
       'id'           => (int) $this->id,
       'project_id'   => (int) $this->values['id'],
-      'project_type' => $this->values['type'],
+      'project_type' => $project_type,
       'status'       => $status,
     ];
   }
