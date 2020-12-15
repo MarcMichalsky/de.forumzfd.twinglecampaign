@@ -43,16 +43,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
     // Set campaign values
     $this->update($campaign);
-
-    // Filter project values
-    $filter = Cache::getInstance()->getTemplates()[$this->className];
-    foreach ($campaign as $key => $value) {
-      if (in_array($key, $filter)) {
-        $this->values[$key] = $value;
-      }
-
-
-    }
   }
 
   /**
@@ -118,7 +108,15 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
    */
   public function update(array $values) {
     // Update campaign values
-    $this->values = array_merge($this->values, $values);
+    $filter = Cache::getInstance()->getTemplates()[$this->className];
+    foreach ($values as $key => $value) {
+      if ($this->className == "TwingleProject" && $key == 'project_id') {
+        $this->values['id'] = $value;
+      }
+      else if (in_array($key, $filter)) {
+        $this->values[$key] = $value;
+      }
+    }
   }
 
 
