@@ -20,6 +20,21 @@
     "counter"
   ],
   "TwingleEvent": [
+    "id",
+    "project_id",
+    "identifier",
+    "description",
+    "user_name",
+    "user_email",
+    "is_public",
+    "deleted",
+    "confirmed_at",
+    "created_at",
+    "creation_url",
+    "show_internal",
+    "show_external",
+    "edit_internal",
+    "edit_external"
   ],
   "event_embed_data": [
     "page",
