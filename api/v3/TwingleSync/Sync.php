@@ -34,6 +34,13 @@ function _civicrm_api3_twingle_sync_Sync_spec(array &$spec) {
     'api.required' => 0,
     'description'  => E::ts('Twingle ID for a project'),
   ];
+  $spec['id'] = [
+    'name'         => 'id',
+    'title'        => E::ts('Campaign ID'),
+    'type'         => CRM_Utils_Type::T_INT,
+    'api.required' => 0,
+    'description'  => E::ts('Unique Campaign ID'),
+  ];
   $spec['is_test'] = [
     'name'         => 'is_test',
     'title'        => E::ts('Test'),
@@ -72,9 +79,21 @@ function civicrm_api3_twingle_sync_Sync($params) {
   $limit = ($params['limit']) ?? 20;
   $twingleApi = new TwingleApiCall($apiKey, $limit);
 
-  if ($params['project_id']) {
+  if ($params['id'] && !$params['project_id']) {
+    // Get single TwingleProject
+    $projects_from_civicrm =
+      civicrm_api3('TwingleProject', 'getsingle',
+      ['id' => $params['id'], 'is_active' => 1])['values'];
+
     // Get single project from Twingle
-    $projects_from_twingle = $twingleApi->getProject($params['project_id']);
+    $projects_from_twingle[0] =
+      $projects_from_civicrm[$params['id']]['project_id']
+      ? $twingleApi->getProject($projects_from_civicrm[$params['id']]['project_id'])
+      : Null;
+  }
+  else if ($params['project_id']) {
+    // Get single project from Twingle
+    $projects_from_twingle[0] = $twingleApi->getProject($params['project_id']);
 
     // Get single TwingleProject
     $projects_from_civicrm = civicrm_api3('TwingleProject', 'get',
@@ -92,7 +111,7 @@ function civicrm_api3_twingle_sync_Sync($params) {
   $i = 0;
 
   // Push missing projects to Twingle
-  foreach ($projects_from_civicrm['values'] as $project_from_civicrm) {
+  foreach ($projects_from_civicrm as $project_from_civicrm) {
     if (!in_array($project_from_civicrm['project_id'],
       array_column($projects_from_twingle, 'id'))) {
       // store campaign id in $id
