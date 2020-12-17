@@ -271,7 +271,7 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
 
 
   /**
-   * Translate values between CiviCRM Campaigns and Twingle
+   * Translate values between CiviCRM Campaigns and Twingle format
    *
    * @param array $values
    * array of which values shall be translated
@@ -386,21 +386,6 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
 
 
   /**
-   * Deactivate this TwingleProject campaign
-   *
-   * @return bool
-   * TRUE if deactivation was successful
-   *
-   * @throws CiviCRM_API3_Exception
-   */
-  public function deactivate() {
-
-    return self::deactivateByid($this->id);
-
-  }
-
-
-  /**
    * Get a response that describes the status of a TwingleProject
    *
    * @param string $status
@@ -409,7 +394,7 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    * @return array
    * Returns a response array that contains title, id, project_id and status
    */
-  public function getResponse(string $status) {
+  public function getResponse(string $status): array {
     $project_type = empty($this->values['type']) ? 'default' : $this->values['type'];
     return [
       'title'        => $this->values['name'],
@@ -423,7 +408,7 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
   /**
    * Return a timestamp of the last update of the Campaign
    *
-   * @return int|null
+   * @return int|string|null
    */
   public function lastUpdate() {
 
@@ -436,7 +421,7 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    *
    * @return int
    */
-  public function getProjectId() {
+  public function getProjectId(): int {
     return (int) $this->values['id'];
   }
 

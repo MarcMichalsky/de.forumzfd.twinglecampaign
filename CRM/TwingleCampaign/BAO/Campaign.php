@@ -127,53 +127,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
 
   /**
-   * Instantiate an existing campaign by its id
-   *
-   * @param $id
-   *
-   * @return TwingleProject|TwingleEvent|TwingleCampaign|NULL
-   * @throws CiviCRM_API3_Exception
-   * @throws Exception
-   */
-  public static function fetch($id) {
-    $result = civicrm_api3('Campaign', 'getsingle', [
-      'sequential' => 1,
-      'id'         => $id,
-    ]);
-
-    $twingle_campaign_types = Cache::getInstance()
-      ->getCampaigns()['campaign_types'];
-
-    $twingle_campaign_type_values = [];
-
-    foreach ($twingle_campaign_types as $twingle_campaign_type) {
-      $twingle_campaign_type_values[$twingle_campaign_type['name']] =
-        CampaignType::fetch($twingle_campaign_type['name'])->getValue();
-    }
-
-    switch ($result->values['campaign_type_id']) {
-      case $twingle_campaign_type_values['twingle_project']:
-        return new TwingleProject(
-          $result['values'],
-          self::CIVICRM
-        );
-      case $twingle_campaign_type_values['twingle_event']:
-        return new TwingleEvent(
-          $result['values'],
-          self::CIVICRM
-        );
-      case $twingle_campaign_type_values['twingle_campaign']:
-        return new TwingleCampaign(
-          $result['values'],
-          self::CIVICRM
-        );
-      default:
-        return NULL;
-    }
-  }
-
-
-  /**
    * Deactivate all duplicates of a campaign but the newest one
    *
    * @param array $result
@@ -193,12 +146,26 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     }
   }
 
+  /**
+   * Translate values between CiviCRM Campaigns and Twingle format
+   *
+   * @param array $values
+   * array of which values shall be translated
+   *
+   * @param string $direction
+   * TwingleProject::IN -> translate array values from Twingle to CiviCRM <br>
+   * TwingleProject::OUT -> translate array values from CiviCRM to Twingle
+   *
+   * @throws Exception
+   */
+  public static abstract function formatValues(array &$values, string $direction);
+
 
   /**
    * Translate array keys between CiviCRM Campaigns and Twingle
    *
    * @param array $values
-   * array of which keys shall be translated
+   * array of which keys to translate
    *
    * @param string $direction
    * Campaign::IN -> translate array keys from Twingle format into
@@ -312,7 +279,7 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
    *
    * @throws CiviCRM_API3_Exception
    */
-  public function deactivate() {
+  public function deactivate(): bool {
 
     return self::deactivateByid($this->id);
 
@@ -329,7 +296,7 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
    *
    * @throws CiviCRM_API3_Exception
    */
-  public static function deactivateById($id) {
+  public static function deactivateById($id): bool {
 
     $result = civicrm_api3('Campaign', 'getsingle', [
       'id'         => $id,
@@ -363,15 +330,7 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
    * @return array
    * Returns a response array that contains title, id, project_id and status
    */
-  public function getResponse(string $status) {
-    return [
-      'title'        => $this->values['name'],
-      'id'           => (int) $this->id,
-      'project_id'   => (int) $this->values['id'],
-      'project_type' => $this->values['type'],
-      'status'       => $status,
-    ];
-  }
+  public abstract function getResponse(string $status): array;
 
   /**
    * Validates $input to be either a DateTime string or an Unix timestamp
@@ -382,7 +341,7 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
    * @return int
    * Returns a Unix timestamp or NULL if $input is invalid
    */
-  public static function getTimestamp($input) {
+  public static function getTimestamp($input): ?int {
 
     // Check whether $input is a Unix timestamp
     if (
@@ -402,6 +361,13 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     }
 
   }
+
+  /**
+ * Return a timestamp of the last update of the Campaign
+ *
+ * @return int|string|null
+ */
+  public abstract function lastUpdate();
 
 
   /**

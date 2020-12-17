@@ -49,7 +49,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
     TwingleApiCall &$twingleApi,
     int $user,
     bool $is_test = FALSE
-  ) {
+  ): ?array {
 
     // If $values is an array
     if (is_array($values)) {
@@ -147,49 +147,18 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    * @return array
    * Returns a response array that contains title, id, project_id and status
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws CiviCRM_API3_Exception
+   * @throws Exception
    */
-  public function create(bool $is_test = FALSE) {
+  public function create(bool $is_test = FALSE): array {
 
     // Create campaign only if it does not already exist
     if (!$is_test) {
-
-      // Prepare project values for import into database
-      $values_prepared_for_import = $this->values;
-      self::formatValues(
-        $values_prepared_for_import,
-        self::IN
-      );
-      self::translateKeys(
-        $values_prepared_for_import,
-        self::IN
-      );
-      $formattedValues = $values_prepared_for_import;
-      $this->translateCustomFields(
-        $values_prepared_for_import,
-        self::IN
-      );
-
-      // Set id
-      $values_prepared_for_import['id'] = $this->id;
-
-      // Create campaign
-      $result = civicrm_api3('Campaign', 'create', $values_prepared_for_import);
-
-      // Update id
-      $this->id = $result['id'];
-
-      // Check if campaign was created successfully
-      if ($result['is_error'] == 0) {
-        $response = $this->getResponse("$this->className created");
-      }
-      else {
-        $response = $this->getResponse("$this->className creation failed");
-      }
+      $response = parent::create($is_test);
 
       // Start a case for event initiator
       if (
-        $result['is_error'] == 0 &&
+        $response['status'] == 'TwingleEvent created' &&
         Configuration::get('twinglecampaign_start_case')
       ) {
         $result = civicrm_api3('Case', 'create', [
@@ -405,7 +374,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
   /**
    * Return a timestamp of the last update of the Campaign
    *
-   * @return int|null
+   * @return int|string|null
    */
   public function lastUpdate() {
 
