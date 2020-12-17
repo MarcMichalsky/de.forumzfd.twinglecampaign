@@ -75,8 +75,7 @@ function civicrm_api3_twingle_form_Get(array $params): array {
 
     if ($result['is_error'] == 0) {
       foreach($result['values'] as $value) {
-        array_push(
-          $returnValues,
+        $returnValues[$value['id']] =
           [
             'id' => $value['id'],
             'twingle_project_id' => $value[$custom_field_mapping['twingle_project_id']],
@@ -85,8 +84,7 @@ function civicrm_api3_twingle_form_Get(array $params): array {
             'project_type' => $value[$custom_field_mapping['twingle_project_type']],
             'embed_code' => $value[$custom_field_mapping['twingle_project_widget']],
             'counter' => $value[$custom_field_mapping['twingle_project_counter']]
-          ]
-        );
+          ];
       }
       return civicrm_api3_create_success($returnValues, $params, 'TwingleForm', 'Get');
     }
