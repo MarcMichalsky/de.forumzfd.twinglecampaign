@@ -109,5 +109,5 @@ function civicrm_api3_twingle_project_Getsingle(array $params): array {
   if ($count != 1) {
     return civicrm_api3_create_error("Expected one TwingleProject but found $count");
   }
-  return civicrm_api3_create_success($returnValues, $params, 'TwingleProject', 'Getsingle');
+  return civicrm_api3_create_success($returnValues['values'], $params, 'TwingleProject', 'Getsingle');
 }
