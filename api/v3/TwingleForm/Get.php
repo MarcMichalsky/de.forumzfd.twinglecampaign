@@ -55,6 +55,7 @@ function _civicrm_api3_twingle_form_Get_spec(array &$spec) {
  *
  */
 function civicrm_api3_twingle_form_Get(array $params): array {
+  $returnValues = [];
 
   // Get custom fields
   $custom_field_mapping = Cache::getInstance()->getCustomFieldMapping();
@@ -78,7 +79,6 @@ function civicrm_api3_twingle_form_Get(array $params): array {
     $result = civicrm_api3('Campaign', 'get', $request);
 
     if ($result['is_error'] == 0) {
-      $returnValues = [];
       foreach($result['values'] as $value) {
         array_push(
           $returnValues,
@@ -96,10 +96,9 @@ function civicrm_api3_twingle_form_Get(array $params): array {
       return civicrm_api3_create_success($returnValues, $params, 'TwingleForm', 'Get');
     }
     else {
-      // TODO: Edit error message
-      throw new API_Exception(/*error_message*/ 'Everyone knows that the magicword is "sesame"', /*error_code*/ 'magicword_incorrect');
+      return civicrm_api3_create_error($result['message']);
     }
   } catch (Exception $e) {
-    throw new API_Exception(/*error_message*/ 'Everyone knows that the magicword is "sesame"', /*error_code*/ 'magicword_incorrect');
+    throw new API_Exception($e->getMessage());
   }
 }
