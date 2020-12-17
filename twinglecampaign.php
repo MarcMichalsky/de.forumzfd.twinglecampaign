@@ -1,7 +1,35 @@
 <?php
 
+use CRM_TwingleCampaign_BAO_CampaignType as CampaignType;
+use CRM_TwingleCampaign_Utils_ExtensionCache as ExtensionCache;
+
 require_once 'twinglecampaign.civix.php';
 use CRM_TwingleCampaign_ExtensionUtil as E;
+//
+//Civi::dispatcher()->addListener('hook_civicrm_postSave_civicrm_campaign',
+//  "twinglecampaign_postSave_civicrm_campaign", -1000);
+/**
+ * Implements hook_civicrm_postSave_Campaigns().
+ *
+ * @param $dao
+ *
+ * @throws CiviCRM_API3_Exception
+ */
+function twinglecampaign_civicrm_postSave_civicrm_campaign($dao) {
+  $twingle_campaign_types = ExtensionCache::getInstance()->getCampaigns()['campaign_types'];
+  $twingle_campaign_type_ids = [];
+  $hook_campaign_type_id = $dao->campaign_type_id;
+  $hook_campaign_id = $dao->id;
+  foreach ($twingle_campaign_types as $twingle_campaign_type) {
+    $id = civicrm_api3('OptionValue', 'get',
+      ['sequential' => 1, 'name' => $twingle_campaign_type['name']]
+    )['values'][0]['value'];
+    array_push($twingle_campaign_type_ids, $id);
+  }
+  if (in_array($hook_campaign_type_id, $twingle_campaign_type_ids)) {
+    civicrm_api3('TwingleSync', 'sync', ['id' => $hook_campaign_id]);
+  }
+}
 
 /**
  * Implements hook_civicrm_config().
