@@ -69,14 +69,9 @@ function civicrm_api3_twingle_form_Get(array $params): array {
 
   $params['campaign_type_id'] = "twingle_project";
   $params['is_active'] = 1;
-  $request = [];
-
-  foreach($params as $key => $param) {
-    $request[$key] = $param;
-  }
 
   try {
-    $result = civicrm_api3('Campaign', 'get', $request);
+    $result = civicrm_api3('Campaign', 'get', $params);
 
     if ($result['is_error'] == 0) {
       foreach($result['values'] as $value) {
