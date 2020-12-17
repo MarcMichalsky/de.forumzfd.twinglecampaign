@@ -48,14 +48,6 @@ function _civicrm_api3_twingle_project_Get_spec(array &$spec) {
     'api.required' => 0,
     'description'  => E::ts('Twingle ID for this project'),
   ];
-  $spec['campaign_type_id'] = [
-    'name'         => 'campaign_type_id',
-    'title'        => E::ts('Campaign Type'),
-    'type'         => CRM_Utils_Type::T_STRING,
-    'api.required' => 0,
-    'description'  => E::ts('Campaign Type ID. Implicit FK to 
-    cicicrm_option_value where option_group = campaign_type'),
-  ];
   $spec['last_modified_id'] = [
     'name'         => 'last_modified_id',
     'title'        => E::ts('Campaign Modified By'),
@@ -109,17 +101,17 @@ function _civicrm_api3_twingle_project_Get_spec(array &$spec) {
  * @return array
  *   API result descriptor
  *
- * @throws \CiviCRM_API3_Exception|\CiviCRM_API3_Exception
+ * @throws \CiviCRM_API3_Exception
  * @throws \API_Exception
  * @see civicrm_api3_create_success
- *
  */
-function civicrm_api3_twingle_project_Get($params) {
+function civicrm_api3_twingle_project_Get(array $params): array {
 
   $custom_field_mapping = Cache::getInstance()->getCustomFieldMapping();
   $custom_field_mapping_reverse = array_flip($custom_field_mapping);
 
-  $query = ['sequential' => 1, 'campaign_type_id' => 'twingle_project'];
+  $params['campaign_type_id'] = 'twingle_project';
+  $query = [];
 
   foreach ($params as $key => $value) {
     if ( $key != 'id' &&
@@ -167,7 +159,6 @@ function civicrm_api3_twingle_project_Get($params) {
         throw new API_Exception($e->getMessage());
       }
     }
-
 
     return civicrm_api3_create_success($returnValues, $params, 'TwingleProject', 'Get');
   }

@@ -54,7 +54,7 @@ function _civicrm_api3_twingle_form_Get_spec(array &$spec) {
  * @see civicrm_api3_create_success
  *
  */
-function civicrm_api3_twingle_form_Get(array $params) {
+function civicrm_api3_twingle_form_Get(array $params): array {
 
   // Get custom fields
   $custom_field_mapping = Cache::getInstance()->getCustomFieldMapping();
@@ -66,11 +66,10 @@ function civicrm_api3_twingle_form_Get(array $params) {
     unset($params['twingle_project_type']);
   }
 
-  $request = [
-    'sequential' => 1,
-    'is_active' => 1,
-    'campaign_type_id' => "twingle_project"
-  ];
+  $params['campaign_type_id'] = "twingle_project";
+  $params['is_active'] = 1;
+  $request = [];
+
   foreach($params as $key => $param) {
     $request[$key] = $param;
   }
