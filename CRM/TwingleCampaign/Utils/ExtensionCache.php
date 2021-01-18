@@ -11,8 +11,6 @@ use CRM_TwingleCampaign_ExtensionUtil as E;
  */
 class CRM_TwingleCampaign_Utils_ExtensionCache {
 
-  protected static $_instance = NULL;
-
   private $customFieldMapping;
 
   private $translations;
@@ -26,10 +24,10 @@ class CRM_TwingleCampaign_Utils_ExtensionCache {
    * @return self|null
    */
   public static function getInstance() {
-    if (null === self::$_instance) {
-      self::$_instance = new self;
+    if (null === Civi::cache()->get('twinglecampaign_cache')) {
+      Civi::cache()->set('twinglecampaign_cache', new self);
     }
-    return self::$_instance;
+    return Civi::cache()->get('twinglecampaign_cache');
   }
 
   /**
