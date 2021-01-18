@@ -41,6 +41,9 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
     curl_close($curl);
 
     if (empty($response)) {
+      // Delete api key from cache
+      Civi::cache()->delete('twinglecampaign_twingle_api');
+      // Throw exception
       throw new API_Exception(
         "Twingle API call failed. Please check your api key.");
     }

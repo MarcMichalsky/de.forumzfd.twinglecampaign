@@ -53,6 +53,11 @@ class CRM_TwingleCampaign_Form_Settings extends CRM_Core_Form {
   //TODO: validate Twingle API key
 
   public function postProcess() {
+
+    // Delete api key from cache
+    Civi::cache()->delete('twinglecampaign_twingle_api');
+
+    // Set configuration values
     Configuration::set($this->exportValues());
     parent::postProcess();
   }

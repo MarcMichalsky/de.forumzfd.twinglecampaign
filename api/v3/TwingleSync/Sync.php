@@ -77,7 +77,12 @@ function civicrm_api3_twingle_sync_Sync($params) {
     : trim($params['twingle_api_key']);
   // If function call does not provide a limit, set a default value
   $limit = ($params['limit']) ?? 20;
-  $twingleApi = new TwingleApiCall($apiKey, $limit);
+
+  // Try to retrieve twingleApi from cache
+  $twingleApi = Civi::cache()->get('twinglecampaign_twingle_api');
+  if (NULL === $twingleApi) {
+    $twingleApi = new TwingleApiCall($apiKey, $limit);
+  }
 
   if ($params['id'] && !$params['project_id']) {
     // Get single TwingleProject
