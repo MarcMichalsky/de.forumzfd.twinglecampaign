@@ -150,7 +150,7 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
         $result = array_merge($result, $response['data']);
       }
       else {
-        $result = $response;
+        $result = $response['data'];
       }
     }
     return $result;

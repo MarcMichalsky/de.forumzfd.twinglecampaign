@@ -310,7 +310,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    * @return array
    * Returns a response array that contains title, id, project_id and status
    */
-  public function getResponse(string $status) {
+  public function getResponse(string $status): array {
     return [
       'title'      => $this->values['description'],
       'id'         => (int) $this->id,

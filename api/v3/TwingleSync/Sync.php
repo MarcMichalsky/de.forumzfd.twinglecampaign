@@ -80,8 +80,9 @@ function civicrm_api3_twingle_sync_Sync($params) {
 
   // Try to retrieve twingleApi from cache
   $twingleApi = Civi::cache()->get('twinglecampaign_twingle_api');
-  if (NULL === $twingleApi) {
+  if (NULL === $twingleApi || $params['twingle_api_key']) {
     $twingleApi = new TwingleApiCall($apiKey, $limit);
+    Civi::cache('long')->set('twinglecampaign_twingle_api', $twingleApi);
   }
 
   if ($params['id'] && !$params['project_id']) {
@@ -116,7 +117,7 @@ function civicrm_api3_twingle_sync_Sync($params) {
   $i = 0;
 
   // Push missing projects to Twingle
-  foreach ($projects_from_civicrm as $project_from_civicrm) {
+  foreach ($projects_from_civicrm['values'] as $project_from_civicrm) {
     if (!in_array($project_from_civicrm['project_id'],
       array_column($projects_from_twingle, 'id'))) {
       // store campaign id in $id
