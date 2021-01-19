@@ -154,7 +154,39 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
 
     // Create campaign only if it does not already exist
     if (!$is_test) {
-      $response = parent::create($is_test);
+
+      // Prepare project values for import into database
+      $values_prepared_for_import = $this->values;
+      self::formatValues(
+        $values_prepared_for_import,
+        self::IN
+      );
+      self::translateKeys(
+        $values_prepared_for_import,
+        self::IN
+      );
+      $formattedValues = $values_prepared_for_import;
+      $this->translateCustomFields(
+        $values_prepared_for_import,
+        self::IN
+      );
+
+      // Set id
+      $values_prepared_for_import['id'] = $this->id;
+
+      // Create campaign
+      $result = civicrm_api3('Campaign', 'create', $values_prepared_for_import);
+
+      // Update id
+      $this->id = $result['id'];
+
+      // Check if campaign was created successfully
+      if ($result['is_error'] == 0) {
+        $response = $this->getResponse("$this->className created");
+      }
+      else {
+        $response = $this->getResponse("$this->className creation failed");
+      }
 
       // Start a case for event initiator
       if (
