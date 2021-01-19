@@ -1,7 +1,6 @@
 <?php
 
 
-
 class CRM_TwingleCampaign_BAO_CampaignType {
 
   private static $campaignTypes = [];

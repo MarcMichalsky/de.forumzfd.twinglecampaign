@@ -1,7 +1,6 @@
 <?php
 
 
-
 class CRM_TwingleCampaign_Utils_StringOperations {
 
   /**

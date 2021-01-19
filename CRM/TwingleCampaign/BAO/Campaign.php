@@ -1,10 +1,6 @@
 <?php
 
 use CRM_TwingleCampaign_Utils_ExtensionCache as Cache;
-use CRM_TwingleCampaign_BAO_CampaignType as CampaignType;
-use CRM_TwingleCampaign_BAO_TwingleProject as TwingleProject;
-use CRM_TwingleCampaign_BAO_TwingleEvent as TwingleEvent;
-use CRM_TwingleCampaign_BAO_TwingleCampaign as TwingleCampaign;
 
 abstract class CRM_TwingleCampaign_BAO_Campaign {
 

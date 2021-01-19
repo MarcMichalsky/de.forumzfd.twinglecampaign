@@ -2,7 +2,6 @@
 
 use CRM_TwingleCampaign_BAO_TwingleProject as TwingleProject;
 use CRM_TwingleCampaign_ExtensionUtil as E;
-use CRM_TwingleCampaign_Utils_StringOperations as StringOps;
 
 include_once E::path() . '/CRM/TwingleCampaign/BAO/TwingleProject.php';
 
