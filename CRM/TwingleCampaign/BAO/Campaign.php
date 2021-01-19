@@ -118,6 +118,12 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
       else if (in_array($key, $filter)) {
         $this->values[$key] = $value;
       }
+      else if ($key == 'embed') {
+        self::setEmbedData($value);
+      }
+      else if ($key == 'counter-url') {
+        self::setCounterUrl($value['url']);
+      }
     }
   }
 

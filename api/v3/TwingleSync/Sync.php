@@ -1,4 +1,5 @@
 <?php
+
 use CRM_TwingleCampaign_BAO_TwingleApiCall as TwingleApiCall;
 use CRM_TwingleCampaign_BAO_TwingleProject as TwingleProject;
 use CRM_TwingleCampaign_BAO_TwingleEvent as TwingleEvent;
@@ -66,9 +67,12 @@ function _civicrm_api3_twingle_sync_Sync_spec(array &$spec) {
 function civicrm_api3_twingle_sync_Sync($params) {
 
   $result_values = [];
+  $is_test = FALSE;
 
   // Is this call a test?
-  $is_test = (boolean) $params['is_test'];
+  if ($params['is_test']) {
+    $is_test = $params['is_test'];
+  }
 
   // If function call provides an API key, use it instead of the API key set
   // on the extension settings page
@@ -89,35 +93,37 @@ function civicrm_api3_twingle_sync_Sync($params) {
     // Get single TwingleProject
     $projects_from_civicrm =
       civicrm_api3('TwingleProject', 'getsingle',
-      ['id' => $params['id'], 'is_active' => 1])['values'];
+        ['id' => $params['id'], 'is_active' => 1])['values'];
 
     // Get single project from Twingle
     $projects_from_twingle[0] =
       $projects_from_civicrm[$params['id']]['project_id']
-      ? $twingleApi->getProject($projects_from_civicrm[$params['id']]['project_id'])
-      : Null;
-  }
-  else if ($params['project_id']) {
-    // Get single project from Twingle
-    $projects_from_twingle[0] = $twingleApi->getProject($params['project_id']);
-
-    // Get single TwingleProject
-    $projects_from_civicrm = civicrm_api3('TwingleProject', 'get',
-      ['is_active'  => 1, 'project_id' => $params['project_id']]);
+        ? $twingleApi->getProject($projects_from_civicrm[$params['id']]['project_id'])
+        : NULL;
   }
   else {
-    // Get all projects from Twingle
-    $projects_from_twingle = $twingleApi->getProject();
+    if ($params['project_id']) {
+      // Get single project from Twingle
+      $projects_from_twingle[0] = $twingleApi->getProject($params['project_id']);
 
-    // Get all TwingleProjects from CiviCRM
-    $projects_from_civicrm = civicrm_api3('TwingleProject', 'get',
-      ['is_active'  => 1,]);
+      // Get single TwingleProject
+      $projects_from_civicrm = civicrm_api3('TwingleProject', 'get',
+        ['is_active' => 1, 'project_id' => $params['project_id']]);
+    }
+    else {
+      // Get all projects from Twingle
+      $projects_from_twingle = $twingleApi->getProject();
+
+      // Get all TwingleProjects from CiviCRM
+      $projects_from_civicrm = civicrm_api3('TwingleProject', 'get',
+        ['is_active' => 1,])['values'];
+    }
   }
 
   $i = 0;
 
   // Push missing projects to Twingle
-  foreach ($projects_from_civicrm['values'] as $project_from_civicrm) {
+  foreach ($projects_from_civicrm as $project_from_civicrm) {
     if (!in_array($project_from_civicrm['project_id'],
       array_column($projects_from_twingle, 'id'))) {
       // store campaign id in $id
@@ -133,8 +139,8 @@ function civicrm_api3_twingle_sync_Sync($params) {
       // set status
       $project_create['status'] =
         $project_create['status'] == 'TwingleProject created'
-        ? 'TwingleProject pushed to Twingle'
-        : 'TwingleProject got likely pushed to Twingle but local update failed';
+          ? 'TwingleProject pushed to Twingle'
+          : 'TwingleProject got likely pushed to Twingle but local update failed';
       $result_values['sync']['projects'][$i++] = $project_create;
     }
   }

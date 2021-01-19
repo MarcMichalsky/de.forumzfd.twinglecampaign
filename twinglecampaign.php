@@ -1,22 +1,25 @@
 <?php
 
-//use CRM_TwingleCampaign_BAO_CampaignType as CampaignType;
-//use CRM_TwingleCampaign_Utils_ExtensionCache as ExtensionCache;
+use CRM_TwingleCampaign_BAO_CampaignType as CampaignType;
+use CRM_TwingleCampaign_Utils_ExtensionCache as ExtensionCache;
 
 require_once 'twinglecampaign.civix.php';
+
 use CRM_TwingleCampaign_ExtensionUtil as E;
+
 //
 //Civi::dispatcher()->addListener('hook_civicrm_postSave_civicrm_campaign',
 //  "twinglecampaign_postSave_civicrm_campaign", -1000);
-/*/**
+/**
  * Implements hook_civicrm_postSave_Campaigns().
  *
  * @param $dao
  *
  * @throws CiviCRM_API3_Exception
- *
+ */
 function twinglecampaign_civicrm_postSave_civicrm_campaign($dao) {
-  $twingle_campaign_types = ExtensionCache::getInstance()->getCampaigns()['campaign_types'];
+  $twingle_campaign_types = ExtensionCache::getInstance()
+    ->getCampaigns()['campaign_types'];
   $twingle_campaign_type_ids = [];
   $hook_campaign_type_id = $dao->campaign_type_id;
   $hook_campaign_id = $dao->id;
@@ -27,14 +30,27 @@ function twinglecampaign_civicrm_postSave_civicrm_campaign($dao) {
     array_push($twingle_campaign_type_ids, $id);
   }
   if (in_array($hook_campaign_type_id, $twingle_campaign_type_ids)) {
-    civicrm_api3('TwingleSync', 'sync', ['id' => $hook_campaign_id]);
+    if (CRM_Core_Transaction::isActive()) {
+      CRM_Core_Transaction::addCallback(
+        CRM_Core_Transaction::PHASE_POST_COMMIT,
+        'twinglecampaign_postSave_callback',
+        [$hook_campaign_id]
+      );
+    }
+    else {
+      twinglecampaign_postSave_callback($hook_campaign_id);
+    }
   }
-}*/
+}
+
+function twinglecampaign_postSave_callback($campaign_id) {
+  civicrm_api3('TwingleSync', 'sync', ['id' => $campaign_id]);
+}
 
 /**
  * Implements hook_civicrm_config().
  *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/ 
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/
  */
 function twinglecampaign_civicrm_config(&$config) {
   _twinglecampaign_civix_civicrm_config($config);
@@ -176,23 +192,23 @@ function twinglecampaign_civicrm_themes(&$themes) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_preProcess
  *
-function twinglecampaign_civicrm_preProcess($formName, &$form) {
-
-} // */
+ * function twinglecampaign_civicrm_preProcess($formName, &$form) {
+ *
+ * } // */
 
 /**
  * Implements hook_civicrm_navigationMenu().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_navigationMenu
  *
-function twinglecampaign_civicrm_navigationMenu(&$menu) {
-  _twinglecampaign_civix_insert_navigation_menu($menu, 'Mailings', array(
-    'label' => E::ts('New subliminal message'),
-    'name' => 'mailing_subliminal_message',
-    'url' => 'civicrm/mailing/subliminal',
-    'permission' => 'access CiviMail',
-    'operator' => 'OR',
-    'separator' => 0,
-  ));
-  _twinglecampaign_civix_navigationMenu($menu);
-} // */
+ * function twinglecampaign_civicrm_navigationMenu(&$menu) {
+ * _twinglecampaign_civix_insert_navigation_menu($menu, 'Mailings', array(
+ * 'label' => E::ts('New subliminal message'),
+ * 'name' => 'mailing_subliminal_message',
+ * 'url' => 'civicrm/mailing/subliminal',
+ * 'permission' => 'access CiviMail',
+ * 'operator' => 'OR',
+ * 'separator' => 0,
+ * ));
+ * _twinglecampaign_civix_navigationMenu($menu);
+ * } // */
