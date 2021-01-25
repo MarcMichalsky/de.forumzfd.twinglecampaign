@@ -43,8 +43,13 @@ function twinglecampaign_civicrm_postSave_civicrm_campaign($dao) {
   }
 }
 
+/**
+ * This callback function synchronizes a recently updated TwingleProject campaign
+ * @param $campaign_id
+ * @throws \CiviCRM_API3_Exception
+ */
 function twinglecampaign_postSave_callback($campaign_id) {
-  civicrm_api3('TwingleSync', 'sync', ['id' => $campaign_id]);
+  civicrm_api3('TwingleProject', 'sync', ['id' => $campaign_id]);
 }
 
 /**
