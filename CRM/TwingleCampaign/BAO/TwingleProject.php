@@ -2,7 +2,9 @@
 
 use CRM_TwingleCampaign_Utils_ExtensionCache as Cache;
 use CRM_TwingleCampaign_BAO_Campaign as Campaign;
+use CRM_TwingleCampaign_ExtensionUtil as E;
 use CRM_TwingleCampaign_BAO_TwingleApiCall as TwingleApiCall;
+
 
 class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
 
@@ -15,9 +17,8 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    *
    * @param int|null $id
    *
-   * @throws \Exception
    */
-  function __construct(array $project, int $id = NULL) {
+  public function __construct(array $project, int $id = NULL) {
     parent::__construct($project);
 
     $this->id = $id;
@@ -27,7 +28,7 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
       ->getCustomFieldMapping()['twingle_project_id'];
 
   }
-
+  
 
   /**
    * Export values. Ensures that only those values will be exported which the
@@ -60,8 +61,8 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
   /**
    * Create the Campaign as a campaign in CiviCRM if it does not exist
    *
-   * @param bool $is_test
-   * If true: don't do any changes
+   * @param bool $no_hook
+   * Do not trigger postSave hook to prevent recursion
    *
    * @return bool
    * Returns a boolean
@@ -69,10 +70,7 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    * @throws \CiviCRM_API3_Exception
    * @throws \Exception
    */
-  public function create(bool $is_test = FALSE): array {
-
-    // Create campaign only if this is not a test
-    if (!$is_test) {
+  public function create(bool $no_hook = FALSE): bool {
 
     // Prepare project values for import into database
     $values_prepared_for_import = $this->values;
@@ -92,8 +90,13 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
     // Set id
     $values_prepared_for_import['id'] = $this->id;
 
-      // Create campaign
-      $result = civicrm_api3('Campaign', 'create', $values_prepared_for_import);
+    // Set a flag to not trigger the hook
+    if ($no_hook) {
+      $_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook'] = TRUE;
+    }
+
+    // Create campaign
+    $result = civicrm_api3('Campaign', 'create', $values_prepared_for_import);
 
     // Update id
     $this->id = $result['id'];
@@ -152,8 +155,8 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
 
       // Set default for 'allow_more'
       $values['allow_more'] = empty($values['allow_more'])
-        ? False
-        : True;
+        ? FALSE
+        : TRUE;
 
     }
     else {
