@@ -2,49 +2,65 @@
 
 use CRM_TwingleCampaign_BAO_CampaignType as CampaignType;
 use CRM_TwingleCampaign_Utils_ExtensionCache as ExtensionCache;
+use CRM_TwingleCampaign_ExtensionUtil as E;
 
 require_once 'twinglecampaign.civix.php';
 
-use CRM_TwingleCampaign_ExtensionUtil as E;
 
-//
-//Civi::dispatcher()->addListener('hook_civicrm_postSave_civicrm_campaign',
-//  "twinglecampaign_postSave_civicrm_campaign", -1000);
 /**
  * Implements hook_civicrm_postSave_Campaigns().
+ * This function synchronizes TwingleProject campaigns between CiviCRM and
+ * Twingle when they get created, edited or cloned. To prevent recursion a no
+ * hook flag is getting used.
  *
  * @param $dao
  *
  * @throws CiviCRM_API3_Exception
  */
 function twinglecampaign_civicrm_postSave_civicrm_campaign($dao) {
-  $twingle_campaign_types = ExtensionCache::getInstance()
-    ->getCampaigns()['campaign_types'];
-  $twingle_campaign_type_ids = [];
-  $hook_campaign_type_id = $dao->campaign_type_id;
-  $hook_campaign_id = $dao->id;
-  foreach ($twingle_campaign_types as $twingle_campaign_type) {
-    $id = civicrm_api3('OptionValue', 'get',
-      ['sequential' => 1, 'name' => $twingle_campaign_type['name']]
+
+  if (empty($_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook']) ||
+    $_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook'] != TRUE) {
+
+    // extract variables from $dao object
+    $hook_campaign_type_id = $dao->campaign_type_id;
+    $hook_campaign_id = $dao->id;
+
+    // Get campaign type id for TwingleProject
+    $twingle_project_campaign_type_id = civicrm_api3(
+      'OptionValue',
+      'get',
+      ['sequential' => 1, 'name' => 'twingle_project']
     )['values'][0]['value'];
-    array_push($twingle_campaign_type_ids, $id);
-  }
-  if (in_array($hook_campaign_type_id, $twingle_campaign_type_ids)) {
-    if (CRM_Core_Transaction::isActive()) {
-      CRM_Core_Transaction::addCallback(
-        CRM_Core_Transaction::PHASE_POST_COMMIT,
-        'twinglecampaign_postSave_callback',
-        [$hook_campaign_id]
-      );
+
+    // If $dao is a TwingleProject campaign, synchronize it
+    if ($hook_campaign_type_id == $twingle_project_campaign_type_id) {
+      // If the db transaction is still running, add a function to it that will
+      // be called afterwards
+      if (CRM_Core_Transaction::isActive()) {
+        CRM_Core_Transaction::addCallback(
+          CRM_Core_Transaction::PHASE_POST_COMMIT,
+          'twinglecampaign_postSave_callback',
+          [$hook_campaign_id]
+        );
+      }
+      // If the transaction is already finished, call the function directly
+      else {
+        twinglecampaign_postSave_callback($hook_campaign_id);
+      }
     }
-    else {
-      twinglecampaign_postSave_callback($hook_campaign_id);
-    }
   }
+  // Remove no hook flag
+  unset($_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook']);
 }
 
+/**
+ * This callback function synchronizes a recently updated TwingleProject campaign
+ * @param $campaign_id
+ * @throws \CiviCRM_API3_Exception
+ */
 function twinglecampaign_postSave_callback($campaign_id) {
-  civicrm_api3('TwingleSync', 'sync', ['id' => $campaign_id]);
+  civicrm_api3('TwingleProject', 'sync', ['id' => $campaign_id]);
 }
 
 /**

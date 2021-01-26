@@ -1,6 +1,8 @@
 <?php
 
 use CRM_TwingleCampaign_BAO_TwingleProject as TwingleProject;
+use CRM_TwingleCampaign_ExtensionUtil as E;
+
 
 class CRM_TwingleCampaign_BAO_TwingleApiCall {
 
@@ -14,6 +16,8 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
 
   private $limit;
 
+  private $extensionName;
+
   /**
    * TwingleApiCall constructor.
    *
@@ -25,30 +29,39 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
    *
    * @throws API_Exception
    */
-  public function __construct(string $apiKey, int $limit) {
+  public function __construct(string $apiKey, int $limit = 20) {
     $this->apiKey = $apiKey;
     $this->limit = $limit;
+    $this->extensionName = E::LONG_NAME;
 
-    // Get organisation id
-    $curl = curl_init($this->protocol . 'organisation' . $this->baseUrl);
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($curl, CURLOPT_HTTPHEADER, [
-      "x-access-code: $apiKey",
-      'Content-Type: application/json',
-    ]);
+    // Try to retrieve organisation id from cache
+    $this->organisationId = Civi::cache()
+      ->get('twinglecampaign_organisation_id');
 
-    $response = json_decode(curl_exec($curl), TRUE);
-    curl_close($curl);
+    // else: retrieve organisation id via Twingle api
+    if (NULL === $this->organisationId) {
 
-    if (empty($response)) {
-      // Delete api key from cache
-      Civi::cache()->delete('twinglecampaign_twingle_api');
-      // Throw exception
-      throw new API_Exception(
-        "Twingle API call failed. Please check your api key.");
+      $curl = curl_init($this->protocol . 'organisation' . $this->baseUrl);
+      curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+      curl_setopt($curl, CURLOPT_HTTPHEADER, [
+        "x-access-code: $apiKey",
+        'Content-Type: application/json',
+      ]);
+
+      $response = json_decode(curl_exec($curl), TRUE);
+      curl_close($curl);
+
+      if (empty($response)) {
+        // Delete api key from cache
+        Civi::cache()->delete('twinglecampaign_twingle_api');
+        // Throw exception
+        throw new API_Exception(
+          "Twingle API call failed. Please check your api key.");
+      }
+      $this->organisationId = array_column($response, 'id')[0];
+      Civi::cache('long')->set('twinglecampaign_organisation_id',
+        $this->organisationId);
     }
-
-    $this->organisationId = array_column($response, 'id')[0];
   }
 
   /**
@@ -60,10 +73,8 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
    * @param int|null $projectId
    *
    * @return mixed
-   * @throws \Exception
    */
   public function getProject(int $projectId = NULL) {
-    $response = [];
 
     $url = empty($projectId)
       ? $this->protocol . 'project' . $this->baseUrl . 'by-organisation/' . $this->organisationId
@@ -81,22 +92,11 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
    *
    * @return array
    * Returns a response array that contains title, id, project_id and status
+   * @throws \Exception
    */
   public function pushProject(TwingleProject &$project) {
 
-    try {
-      $values = $project->export();
-    } catch (Exception $e) {
-      // Log Exception
-      $errorMessage = $e->getMessage();
-      Civi::log()->error(
-        "Could not export TwingleProject values: $errorMessage"
-      );
-      // Return result array with error description
-      return $project->getResponse(
-        "Could not export TwingleProject values: $errorMessage"
-      );
-    }
+    $values = $project->export();
 
     // Prepare url for curl
     if ($values['id']) {
@@ -121,8 +121,7 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
    *
    * @return array
    */
-  public
-  function getEvent($projectId, $eventId = NULL) {
+  public function getEvent($projectId, $eventId = NULL) {
     $result = [];
 
     $url = empty($eventId)
@@ -144,13 +143,22 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
         'public'    => 0,
       ];
       $response = $this->curlGet($url, $params);
-      $finished = ($eventId) || count($response['data']) < $this->limit;
-      $offset = $offset + $this->limit;
+
+      // If no $eventId was given, expect one or more events.
+      // Store the events, increase the offset and ask again until there
+      // are no more events incoming.
       if ($response['data'] && !$eventId) {
         $result = array_merge($result, $response['data']);
+        $offset = $offset + $this->limit;
+        $finished = count($response['data']) < $this->limit;
       }
+      // If $eventId was given, expect only one event
       else {
-        $result = $response['data'];
+        // If result the array contains 'message', the $eventId does not exist
+        if (!$result['message']) {
+          $result = $response;
+        }
+        $finished = TRUE;
       }
     }
     return $result;
@@ -160,9 +168,10 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
    * @param $projectId
    *
    * @return array|NULL
+   * @throws \Exception
    */
   public
-  function getProjectEmbedData($projectId) {
+  function getProjectEmbedData($projectId): array {
 
     $result = $this->getProject($projectId);
 
@@ -173,8 +182,9 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
       return $result['embed'];
     }
     else {
-      Civi::log()->error("Could not get embed data for project $projectId.");
-      return NULL;
+      throw new Exception(
+        "Could not get embed data for project $projectId."
+      );
     }
   }
 
