@@ -93,7 +93,7 @@ function _civicrm_api3_twingle_event_Get_spec(array &$spec) {
  * @return array
  *   API result descriptor
  *
- * @throws CiviCRM_API3_Exception|API_Exception
+ * @throws CiviCRM_API3_Exception
  * @see civicrm_api3_create_success
  *
  */
@@ -147,7 +147,7 @@ function civicrm_api3_twingle_event_Get(array $params): array {
         TwingleEvent::formatValues($returnValues[$event['id']], TwingleEvent::OUT);
       }
       catch (Exception $e) {
-        throw new API_Exception($e->getMessage());
+        throw new CiviCRM_API3_Exception($e->getMessage());
       }
     }
 

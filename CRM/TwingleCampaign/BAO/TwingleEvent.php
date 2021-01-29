@@ -3,8 +3,8 @@
 use CRM_TwingleCampaign_Utils_ExtensionCache as Cache;
 use CRM_TwingleCampaign_Utils_StringOperations as StringOps;
 use CRM_TwingleCampaign_BAO_Campaign as Campaign;
-use CRM_TwingleCampaign_BAO_TwingleApiCall as TwingleApiCall;
 use CRM_TwingleCampaign_BAO_Configuration as Configuration;
+use CRM_TwingleCampaign_ExtensionUtil as E;
 
 class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
 
@@ -14,27 +14,32 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    * @param array $event
    * Result array of Twingle API call to
    * https://project.twingle.de/api/$project_id/event
+   * @param int|null $id
    *
-   * @throws Exception
+   * @throws \Exception
    */
-  protected function __construct(array $event) {
-    parent::__construct($event);
+  public function __construct(array $event, int $id = NULL) {
+    parent::__construct($event, $id);
 
     $this->prefix = 'twingle_event_';
     $this->values['campaign_type_id'] = 'twingle_event';
     $this->id_custom_field = Cache::getInstance()
       ->getCustomFieldMapping()['twingle_event_id'];
-    $this->values['parent_id'] = $this->getParentCampaignId();
 
+    try {
+      $this->values['parent_id'] = $this->getParentCampaignId();
+    } catch (CiviCRM_API3_Exception $e) {
+      $errorMessage = $e->getMessage();
+      throw new Exception("Could not identify parent Campaign: $errorMessage");
+    }
   }
 
+
   /**
-   * Synchronizes events between Twingle and CiviCRM (both directions)
+   * Synchronizes events between Twingle and CiviCRM (only Twingle -> CiviCRM)
    * based on the timestamp.
    *
    * @param array $values
-   * @param TwingleApiCall $twingleApi
-   * @param int $user
    * @param bool $is_test
    * If TRUE, don't do any changes
    *
@@ -42,12 +47,10 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    * Returns a response array that contains title, id, event_id, project_id
    * and status or NULL if $values is not an array
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
    */
   public static function sync(
     array $values,
-    TwingleApiCall &$twingleApi,
-    int $user,
     bool $is_test = FALSE
   ): ?array {
 
@@ -59,67 +62,48 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
         $event = new self($values);
       } catch (Exception $e) {
         $errorMessage = $e->getMessage();
-
-        // Log Exception
-        Civi::log()->error(
+        Civi::log()->error(E::LONG_NAME .
+          " failed to instantiate TwingleEvent: $errorMessage"
+        );
+        throw new Exception(
           "Failed to instantiate TwingleEvent: $errorMessage"
         );
-
-        // Return result array with error description
-        return [
-          "title"      => $values['description'],
-          "event_id"   => (int) $values['id'],
-          "project_id" => (int) $values['project_id'],
-          "status"     =>
-            "Failed to instantiate TwingleEvent: $errorMessage",
-        ];
       }
 
       // Check if the TwingleEvent campaign already exists
       if (!$event->exists()) {
 
-        // ... if not, get embed data and create event
+        // ... if not, create event
         try {
           $result = $event->create($is_test);
         } catch (Exception $e) {
           $errorMessage = $e->getMessage();
-
-          // Log Exception
-          Civi::log()->error(
+          Civi::log()->error(E::LONG_NAME .
+            " could not create campaign from TwingleEvent: $errorMessage"
+          );
+          throw new Exception(
             "Could not create campaign from TwingleEvent: $errorMessage"
           );
-
-          // Return result array with error description
-          return [
-            "title"      => $values['description'],
-            "event_id"   => (int) $values['id'],
-            "project_id" => (int) $values['project_id'],
-            "status"     =>
-              "Could not create campaign from TwingleEvent: $errorMessage",
-          ];
         }
       }
       else {
         $result = $event->getResponse('TwingleEvent exists');
 
         // If Twingle's version of the event is newer than the CiviCRM
-        // TwingleEvent campaign update the campaign
+        // TwingleEvent campaign, update the campaign
         if ($values['updated_at'] > $event->lastUpdate()) {
           try {
             $event->update($values);
-            $result = $event->create();
+            $result = $event->create($is_test);
             $result['status'] = $result['status'] == 'TwingleEvent created'
               ? 'TwingleEvent updated'
               : 'TwingleEvent Update failed';
           } catch (Exception $e) {
             $errorMessage = $e->getMessage();
-
-            // Log Exception
-            Civi::log()->error(
-              "Could not update TwingleEvent campaign: $errorMessage"
+            Civi::log()->error(E::LONG_NAME .
+              " could not update TwingleEvent campaign: $errorMessage"
             );
-            // Return result array with error description
-            $result = $event->getResponse(
+            throw new Exception(
               "Could not update TwingleEvent campaign: $errorMessage"
             );
           }
@@ -141,74 +125,58 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
   /**
    * Create the Event as a campaign in CiviCRM if it does not exist
    *
-   * @param bool $is_test
-   * If true: don't do any changes
-   *
-   * @return array
-   * Returns a response array that contains title, id, project_id and status
+   * @return bool
+   * Returns _TRUE_ id creation was successful or _FALSE_ if it creation failed
    *
    * @throws CiviCRM_API3_Exception
    * @throws Exception
    */
-  public function create(bool $is_test = FALSE): array {
+  public function create(): bool {
 
-    // Create campaign only if it does not already exist
-    if (!$is_test) {
+    // Prepare project values for import into database
+    $values_prepared_for_import = $this->values;
+    self::formatValues(
+      $values_prepared_for_import,
+      self::IN
+    );
+    self::translateKeys(
+      $values_prepared_for_import,
+      self::IN
+    );
+    $formattedValues = $values_prepared_for_import;
+    $this->translateCustomFields(
+      $values_prepared_for_import,
+      self::IN
+    );
 
-      // Prepare project values for import into database
-      $values_prepared_for_import = $this->values;
-      self::formatValues(
-        $values_prepared_for_import,
-        self::IN
-      );
-      self::translateKeys(
-        $values_prepared_for_import,
-        self::IN
-      );
-      $formattedValues = $values_prepared_for_import;
-      $this->translateCustomFields(
-        $values_prepared_for_import,
-        self::IN
-      );
+    // Set id
+    $values_prepared_for_import['id'] = $this->id;
 
-      // Set id
-      $values_prepared_for_import['id'] = $this->id;
+    // Create campaign
+    $result = civicrm_api3('Campaign', 'create', $values_prepared_for_import);
 
-      // Create campaign
-      $result = civicrm_api3('Campaign', 'create', $values_prepared_for_import);
+    // Update id
+    $this->id = $result['id'];
 
-      // Update id
-      $this->id = $result['id'];
-
-      // Check if campaign was created successfully
-      if ($result['is_error'] == 0) {
-        $response = $this->getResponse("$this->className created");
-      }
-      else {
-        $response = $this->getResponse("$this->className creation failed");
-      }
-
-      // Start a case for event initiator
-      if (
-        $response['status'] == 'TwingleEvent created' &&
-        Configuration::get('twinglecampaign_start_case')
-      ) {
-        $result = civicrm_api3('Case', 'create', [
-          'contact_id'   => $formattedValues['contact_id'],
-          'case_type_id' => Configuration::get('twinglecampaign_start_case'),
-          'subject'      => $formattedValues['title'],
-          'start_date'   => $formattedValues['created_at'],
-          'status_id'    => "Open",
-        ]);
-      }
-
-    }
-    // If this is a test, do not create campaign
-    else {
-      $response = $this->getResponse("$this->className not yet created");
+    // Check if campaign was created successfully
+    if ($result['is_error'] != 0) {
+      throw new Exception($result['error_message']);
     }
 
-    return $response;
+    // Start a case for event initiator
+    // TODO: save Case in Campaign and test if it already exists
+    if (
+      Configuration::get('twinglecampaign_start_case')
+    ) {
+      $result = civicrm_api3('Case', 'create', [
+        'contact_id'   => $formattedValues['contact_id'],
+        'case_type_id' => Configuration::get('twinglecampaign_start_case'),
+        'subject'      => $formattedValues['title'],
+        'start_date'   => $formattedValues['created_at'],
+        'status_id'    => "Open",
+      ]);
+    }
+    return TRUE;
   }
 
 
@@ -336,21 +304,27 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
   /**
    * Get a response that describes the status of a TwingleEvent
    *
-   * @param string $status
-   * status of the TwingleEvent you want the response for
+   * @param string|null $status
+   * status of the TwingleEvent you want to give back along with the response
    *
    * @return array
-   * Returns a response array that contains title, id, project_id and status
+   * Returns a response array that contains title, id, event_id, project_id and
+   *   status
    */
-  public function getResponse(string $status): array {
-    return [
+  public function getResponse(string $status = NULL): array {
+    $response = [
       'title'      => $this->values['description'],
       'id'         => (int) $this->id,
       'event_id'   => (int) $this->values['id'],
       'project_id' => (int) $this->values['project_id'],
       'status'     => $status,
     ];
+    if ($status) {
+      $response['status'] = $status;
+    }
+    return $response;
   }
+
 
   /**
    * Matches a single string that should contain first and lastname to match a
