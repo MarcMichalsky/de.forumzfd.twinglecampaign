@@ -46,7 +46,16 @@ function _civicrm_api3_twingle_project_Sync_spec(array &$spec) {
 
 
 /**
- * TwingleProject.Sync API
+ * # TwingleProject.Sync API
+ *
+ * Synchronize one ore more campaigns of the type TwingleProject between CiviCRM
+ * and Twingle.
+ *
+ * * If you pass an **id** or **project_id** parameter, *only one project* will
+ * be synchronized.
+ *
+ * * If you pass no **id** or **project_id** parameter, *all projects* will be
+ * synchronized.
  *
  * @param array $params
  *
@@ -215,21 +224,23 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
     foreach ($projects_from_civicrm['values'] as $project_from_civicrm) {
       foreach ($projects_from_twingle as $project_from_twingle) {
         if ($project_from_twingle['id'] == $project_from_civicrm['project_id']) {
+
           // store campaign id in $id
           $id = $project_from_civicrm['id'];
           unset($project_from_civicrm['id']);
+
           // instantiate project with values from TwingleProject.Get
           $project = new TwingleProject($project_from_civicrm, $id);
+
           // sync project
           $result = sync($project, $project_from_twingle, $twingleApi, $params);
           if ($result['is_error'] != 0) {
             $errors_occurred++;
             $result_values[$project->getId()] =
               $project->getResponse($result['error_message']);
-
           }
           else {
-            $result_values[$project->getId()] = $result['values'];
+            $result_values[$project->getId()] = $result['values'][0];
           }
           break;
         }
@@ -291,29 +302,18 @@ function updateLocally(array $project_from_twingle,
       );
     }
     // ... else, update local TwingleProject campaign
-    try {
-      $project->create(TRUE);
-      return civicrm_api3_create_success(
-        $project->getResponse('TwingleProject updated successfully'),
-        $params,
-        'TwingleProject',
-        'Sync'
-      );
-    } catch (Exception $e) {
-      $errorMessage = $e->getMessage();
-      Civi::log()->error(
-        "$extensionName could not update TwingleProject: $errorMessage",
-        $project->getResponse()
-      );
-      return civicrm_api3_create_error(
-        "TwingleProject could not get updated: $errorMessage",
-        $project->getResponse()
-      );
-    }
+    $project->create(TRUE);
+    return civicrm_api3_create_success(
+      $project->getResponse('TwingleProject updated successfully'),
+      $params,
+      'TwingleProject',
+      'Sync'
+    );
   } catch (Exception $e) {
     $errorMessage = $e->getMessage();
     Civi::log()->error(
-      "$extensionName could not update TwingleProject campaign: $errorMessage"
+      "$extensionName could not update TwingleProject campaign: $errorMessage",
+      $project->getResponse()
     );
     return civicrm_api3_create_error(
       "Could not update TwingleProject campaign: $errorMessage",
@@ -437,8 +437,9 @@ function sync(TwingleProject $project,
 
   // If both versions are still synchronized
   else {
+    $response[] = $project->getResponse('TwingleProject up to date');
     return civicrm_api3_create_success(
-      $project->getResponse('TwingleProject up to date'),
+      $response,
       $params,
       'TwingleProject',
       'Sync'

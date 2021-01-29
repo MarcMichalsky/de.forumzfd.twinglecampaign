@@ -2,8 +2,6 @@
 
 use CRM_TwingleCampaign_Utils_ExtensionCache as Cache;
 use CRM_TwingleCampaign_BAO_Campaign as Campaign;
-use CRM_TwingleCampaign_ExtensionUtil as E;
-use CRM_TwingleCampaign_BAO_TwingleApiCall as TwingleApiCall;
 
 
 class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
@@ -14,14 +12,12 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    * @param array $project
    * Result array of Twingle API call to
    * https://project.twingle.de/api/by-organisation/$organisation_id
-   *
    * @param int|null $id
    *
    */
   public function __construct(array $project, int $id = NULL) {
-    parent::__construct($project);
+    parent::__construct($project, $id);
 
-    $this->id = $id;
     $this->prefix = 'twingle_project_';
     $this->values['campaign_type_id'] = 'twingle_project';
     $this->id_custom_field = Cache::getInstance()
@@ -67,7 +63,6 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    * @return bool
    * Returns a boolean
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \Exception
    */
   public function create(bool $no_hook = FALSE): bool {
@@ -106,8 +101,7 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
       return TRUE;
     }
     else {
-      $errorMessage = $result['error_message'];
-      throw new Exception("$errorMessage");
+      throw new Exception($result['error_message']);
     }
   }
 
@@ -230,8 +224,8 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
   /**
    * Get a response that describes the status of a TwingleProject
    *
-   * @param string $status
-   * status of the TwingleProject you want the response for
+   * @param string|null $status
+   * status of the TwingleProject you want to give back along with the response
    *
    * @return array
    * Returns a response array that contains title, id, project_id and status
