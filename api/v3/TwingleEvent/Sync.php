@@ -58,13 +58,13 @@ function _civicrm_api3_twingle_event_Sync_spec(array &$spec) {
  * _NOTE:_ Changes on TwingleEvents are not meant to get pushed to Twingle, so
  * the synchronization takes place only one way
  *
- * * If you pass an **id** or **event_id** parameter, only one event will be
+ * * If you provide an **id** or **event_id** parameter, only one event will be
  * synchronized.
  *
- * * If you pass a **project_id** as parameter, all events of that project will
+ * * If you provide a **project_id** as parameter, all events of that project will
  * be synchronized.
  *
- * * If you pass no **id**, **event_id** or **project_id** parameter, all events
+ * * If you provide no **id**, **event_id** or **project_id** parameter, all events
  * will be synchronized.
  *
  * @param array $params
@@ -307,7 +307,7 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
 
 
 /**
- * Instantiates a TwingleEvent
+ * # Instantiates a TwingleEvent
  *
  * @param $values
  *
@@ -333,7 +333,8 @@ function instantiateEvent($values): CRM_TwingleCampaign_BAO_TwingleEvent {
 
 
 /**
- * Update a TwingleEvent campaign locally
+ * # Update TwingleEvent locally
+ * Updates a TwingleEvent campaign locally.
  *
  * @param array $event_from_twingle
  * @param \CRM_TwingleCampaign_BAO_TwingleEvent $event
@@ -382,7 +383,8 @@ function updateLocally(array $event_from_twingle,
 
 
 /**
- * Synchronize a TwingleEvent campaign with an event from Twingle one way
+ * ## Synchronize TwingleEvent
+ * Synchronizes a TwingleEvent campaign with an event from Twingle one way.
  *
  * _NOTE:_ Changes on TwingleEvents are not meant to get pushed to Twingle, so
  * the synchronization takes place only one way

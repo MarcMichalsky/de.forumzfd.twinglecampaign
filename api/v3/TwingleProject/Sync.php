@@ -51,10 +51,10 @@ function _civicrm_api3_twingle_project_Sync_spec(array &$spec) {
  * Synchronize one ore more campaigns of the type TwingleProject between CiviCRM
  * and Twingle.
  *
- * * If you pass an **id** or **project_id** parameter, *only one project* will
+ * * If you provide an **id** or **project_id** parameter, *only one project* will
  * be synchronized.
  *
- * * If you pass no **id** or **project_id** parameter, *all projects* will be
+ * * If you provide no **id** or **project_id** parameter, *all projects* will be
  * synchronized.
  *
  * @param array $params
@@ -322,7 +322,7 @@ function updateLocally(array $project_from_twingle,
 
 
 /**
- * Push a TwingleProject via API to Twingle
+ * ## Push a TwingleProject to Twingle
  *
  * @param \CRM_TwingleCampaign_BAO_TwingleProject $project
  * @param \CRM_TwingleCampaign_BAO_TwingleApiCall $twingleApi
@@ -407,6 +407,7 @@ function pushToTwingle(TwingleProject $project,
 
 
 /**
+ * ## Synchronize TwingleProject
  * Synchronize a TwingleProject campaign with a project from Twingle
  *
  * @param \CRM_TwingleCampaign_BAO_TwingleProject $project
