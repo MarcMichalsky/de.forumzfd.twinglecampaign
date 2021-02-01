@@ -162,21 +162,9 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
   // Counter for sync errors
   $errors_occurred = 0;
 
-  // Get all events for given project from Twingle and CiviCRM
+  // Get all events for provided project from Twingle and CiviCRM
   if ($params['project_id']) {
     $events_from_twingle = $twingleApi->getEvent($params['project_id']);
-
-    // If Twingle does not know any events for this project_id (yet)
-    if ($events_from_twingle['count'] == 0) {
-      return civicrm_api3_create_success(
-        "Apparently this project does not have any events yet or " .
-        "the provided project_id is unknown to Twingle.",
-        $params,
-        'TwingleEvent',
-        'Sync'
-      );
-    }
-
     $events_from_civicrm = civicrm_api3(
       'TwingleEvent',
       'get',
