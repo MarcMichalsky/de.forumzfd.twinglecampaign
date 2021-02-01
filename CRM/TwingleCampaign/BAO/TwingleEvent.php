@@ -76,19 +76,32 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
       throw new Exception($result['error_message']);
     }
 
-    // Start a case for event initiator
-    // TODO: save Case in Campaign and test if it already exists
+    // Open a case for event initiator if it does not yet exist
+
+    // check for existence
+    $result = $result = civicrm_api3('Case', 'get', [
+      'contact_id'   => $formattedValues['contact_id'],
+      'case_type_id' => Configuration::get('twinglecampaign_start_case'),
+      'subject'      => $formattedValues['title'] . ' | Event-ID: ' . $formattedValues['id'],
+    ]);
+
+    // Open a case
     if (
-      Configuration::get('twinglecampaign_start_case')
+      Configuration::get('twinglecampaign_start_case') &&
+      $result['count'] == 0
     ) {
       $result = civicrm_api3('Case', 'create', [
         'contact_id'   => $formattedValues['contact_id'],
         'case_type_id' => Configuration::get('twinglecampaign_start_case'),
-        'subject'      => $formattedValues['title'],
+        'subject'      => $formattedValues['title'] . ' | Event-ID: ' . $formattedValues['id'],
         'start_date'   => $formattedValues['created_at'],
         'status_id'    => "Open",
       ]);
     }
+    if ($result['is_error'] != 0) {
+      throw new Exception('Could not create case');
+    }
+
     return TRUE;
   }
 
@@ -105,7 +118,8 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    *
    * @throws Exception
    */
-  public static function formatValues(array &$values, string $direction) {
+  public
+  static function formatValues(array &$values, string $direction) {
 
     if ($direction == self::IN) {
 
@@ -170,9 +184,9 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
       throw new Exception(
         "Invalid Parameter $direction for formatValues()"
       );
-
     }
   }
+
 
   /**
    * Translate array keys between CiviCRM Campaigns and Twingle
@@ -188,7 +202,8 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    *
    * @throws Exception
    */
-  public static function translateKeys(array &$values, string $direction) {
+  public
+  static function translateKeys(array &$values, string $direction) {
 
     // Get translations for fields
     $field_translations = Cache::getInstance()
@@ -224,7 +239,8 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    * Returns a response array that contains title, id, event_id, project_id and
    *   status
    */
-  public function getResponse(string $status = NULL): array {
+  public
+  function getResponse(string $status = NULL): array {
     $response = [
       'title'      => $this->values['description'],
       'id'         => (int) $this->id,
@@ -249,7 +265,8 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    * @return int|null
    * Returns a contact id
    */
-  private static function matchContact(string $names, string $email): ?int {
+  private
+  static function matchContact(string $names, string $email): ?int {
     $names = StringOps::split_names($names); // Hopefully just a temporary solution
     $firstnames = $names['firstnames'];
     $lastname = $names['lastname'];
@@ -269,13 +286,15 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
     }
   }
 
+
   /**
    * Gets the campaign id of the parent TwingleProject campaign.
    *
    * @return int|null
    * @throws CiviCRM_API3_Exception
    */
-  private function getParentCampaignId() {
+  private
+  function getParentCampaignId() {
     $cf_project_id = Cache::getInstance()
       ->getCustomFieldMapping()['twingle_project_id'];
     $parentCampaign = civicrm_api3('Campaign', 'get', [
@@ -295,7 +314,8 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    *
    * @return int|string|null
    */
-  public function lastUpdate() {
+  public
+  function lastUpdate() {
 
     return self::getTimestamp($this->values['updated_at']);
   }
@@ -306,7 +326,8 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    *
    * @return int
    */
-  public function getProjectId() {
+  public
+  function getProjectId() {
     return (int) $this->values['project_id'];
   }
 
@@ -316,8 +337,8 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    *
    * @return int
    */
-  public function getEventId() {
+  public
+  function getEventId() {
     return (int) $this->values['id'];
   }
-
 }
