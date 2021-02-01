@@ -9,12 +9,13 @@ use CRM_TwingleCampaign_ExtensionUtil as E;
 class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
 
   /**
-   * TwingleEvent constructor.
+   * ## TwingleEvent constructor
    *
    * @param array $event
-   * Result array of Twingle API call to
-   * https://project.twingle.de/api/$project_id/event
+   * Event values
+   *
    * @param int|null $id
+   * CiviCRM Campaign id
    *
    * @throws \Exception
    */
@@ -36,11 +37,10 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
 
 
   /**
-   * Create the Event as a campaign in CiviCRM if it does not exist
+   * ## Create the Event as a campaign in CiviCRM if it does not exist
+   * Returns _TRUE_ if creation was successful or _FALSE if it creation failed.
    *
    * @return bool
-   * Returns _TRUE_ id creation was successful or _FALSE_ if it creation failed
-   *
    * @throws CiviCRM_API3_Exception
    * @throws Exception
    */
@@ -48,11 +48,11 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
 
     // Prepare project values for import into database
     $values_prepared_for_import = $this->values;
-    self::formatValues(
+    $this::formatValues(
       $values_prepared_for_import,
       self::IN
     );
-    self::translateKeys(
+    $this->translateKeys(
       $values_prepared_for_import,
       self::IN
     );
@@ -107,19 +107,20 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
 
 
   /**
-   * Translate values between CiviCRM Campaigns and Twingle
+   * ## Translate values between CiviCRM Campaigns and Twingle formats
+   * Constants for **$direction**:<br>
+   * **TwingleProject::IN** translate array values from Twingle to CiviCRM format<br>
+   * **TwingleProject::OUT** translate array values from CiviCRM to Twingle format
    *
    * @param array $values
-   * array of which values shall be translated
+   * array of values to translate
    *
    * @param string $direction
-   * self::IN -> translate array values from Twingle to CiviCRM <br>
-   * self::OUT -> translate array values from CiviCRM to Twingle
+   * const: TwingleProject::IN or TwingleProject::OUT
    *
    * @throws Exception
    */
-  public
-  static function formatValues(array &$values, string $direction) {
+  public function formatValues(array &$values, string $direction) {
 
     if ($direction == self::IN) {
 
@@ -189,55 +190,15 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
 
 
   /**
-   * Translate array keys between CiviCRM Campaigns and Twingle
-   *
-   * @param array $values
-   * array of which keys shall be translated
-   *
-   * @param string $direction
-   * Campaign::IN -> translate array keys from Twingle format into
-   * CiviCRM format <br>
-   * Campaign::OUT -> translate array keys from CiviCRM format into
-   * Twingle format
-   *
-   * @throws Exception
-   */
-  public
-  static function translateKeys(array &$values, string $direction) {
-
-    // Get translations for fields
-    $field_translations = Cache::getInstance()
-      ->getTranslations()['TwingleEvent'];
-
-    // Set the direction of the translation
-    if ($direction == self::OUT) {
-      $field_translations = array_flip($field_translations);
-    }
-    // Throw error if $direction constant does not match IN or OUT
-    elseif ($direction != self::IN) {
-      throw new Exception(
-        "Invalid Parameter $direction for translateKeys()"
-      );
-      // TODO: use specific exception or create own
-    }
-
-    // Translate keys
-    foreach ($field_translations as $origin => $translation) {
-      $values[$translation] = $values[$origin];
-      unset($values[$origin]);
-    }
-  }
-
-
-  /**
-   * Get a response that describes the status of a TwingleEvent
+   * ## Get a response
+   * Get a response that describes the status of this TwingleEvent instance.
+   * Returns an array that contains **title**, **id**, **event_id**,
+   * **project_id** and **status** (if provided)
    *
    * @param string|null $status
    * status of the TwingleEvent you want to give back along with the response
    *
    * @return array
-   * Returns a response array that contains title, id, event_id, project_id and
-   *   status
    */
   public
   function getResponse(string $status = NULL): array {
@@ -256,8 +217,9 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
 
 
   /**
-   * Matches a single string that should contain first and lastname to match a
-   * contact or create a new one if it does not exist yet.
+   * ## Match a contact
+   * This method uses a single string that is expected to contain first and
+   * lastname to match a contact or create a new one if it does not exist yet.
    *
    * @param string $names
    * @param string $email
@@ -288,13 +250,14 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
 
 
   /**
-   * Gets the campaign id of the parent TwingleProject campaign.
+   * ## Get parent campaign id
+   * Returns the campaign id of the parent TwingleProject campaign.
    *
    * @return int|null
    * @throws CiviCRM_API3_Exception
    */
   private
-  function getParentCampaignId() {
+  function getParentCampaignId(): ?int {
     $cf_project_id = Cache::getInstance()
       ->getCustomFieldMapping()['twingle_project_id'];
     $parentCampaign = civicrm_api3('Campaign', 'get', [
@@ -310,35 +273,37 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
   }
 
   /**
-   * Return a timestamp of the last update of the Campaign
+   * ## Last update
+   * Returns a timestamp of the last update of the TwingleEvent campaign.
    *
    * @return int|string|null
    */
   public
   function lastUpdate() {
-
     return self::getTimestamp($this->values['updated_at']);
   }
 
 
   /**
-   * Returns the project_id of a TwingleEvent
+   * ## Get project id
+   * Returns the **project_id** of this TwingleEvent.
    *
    * @return int
    */
   public
-  function getProjectId() {
+  function getProjectId(): int {
     return (int) $this->values['project_id'];
   }
 
 
   /**
-   * Returns the event_id of a TwingleEvent
+   * ## Get event id
+   * Returns the **event_id** of this TwingleEvent.
    *
    * @return int
    */
   public
-  function getEventId() {
+  function getEventId(): int {
     return (int) $this->values['id'];
   }
 }

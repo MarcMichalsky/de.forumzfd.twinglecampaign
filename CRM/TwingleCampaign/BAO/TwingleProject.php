@@ -7,16 +7,16 @@ use CRM_TwingleCampaign_BAO_Campaign as Campaign;
 class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
 
   /**
-   * TwingleProject constructor.
+   * ## TwingleProject constructor
    *
-   * @param array $project
-   * Result array of Twingle API call to
-   * https://project.twingle.de/api/by-organisation/$organisation_id
+   * @param array $values
+   * Project values
+   *
    * @param int|null $id
-   *
+   * CiviCRM Campaign id
    */
-  public function __construct(array $project, int $id = NULL) {
-    parent::__construct($project, $id);
+  public function __construct(array $values, int $id = NULL) {
+    parent::__construct($values, $id);
 
     $this->prefix = 'twingle_project_';
     $this->values['campaign_type_id'] = 'twingle_project';
@@ -27,8 +27,10 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
   
 
   /**
-   * Export values. Ensures that only those values will be exported which the
-   * Twingle API expects.
+   * ## Export values
+   * Ensures that only those values will be exported which the Twingle API
+   * expects. These values are defined in
+   * *CRM/TwingleCampaign/resources/twingle_api_templates.json*
    *
    * @return array
    * Array with all values to send to the Twingle API
@@ -55,25 +57,25 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
 
 
   /**
-   * Create the Campaign as a campaign in CiviCRM if it does not exist
+   * ## Create this TwingleProject as a campaign in CiviCRM
+   *
+   * Returns _TRUE_ if creation was successful or _FALSE_ if it creation failed.
    *
    * @param bool $no_hook
    * Do not trigger postSave hook to prevent recursion
    *
    * @return bool
-   * Returns a boolean
-   *
    * @throws \Exception
    */
   public function create(bool $no_hook = FALSE): bool {
 
     // Prepare project values for import into database
     $values_prepared_for_import = $this->values;
-    self::formatValues(
+    $this->formatValues(
       $values_prepared_for_import,
       self::IN
     );
-    self::translateKeys(
+    $this->translateKeys(
       $values_prepared_for_import,
       self::IN
     );
@@ -121,17 +123,23 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
     $this->create(); // this will also trigger the postSave hook
   }
 
+
+  /**
+   * ## Translate values between CiviCRM Campaigns and Twingle formats
+   *
+   * Constants for **$direction**:<br>
+   * **TwingleProject::IN** translate array values from Twingle to CiviCRM format<br>
+   * **TwingleProject::OUT** translate array values from CiviCRM to Twingle format
    *
    * @param array $values
-   * array of which values shall be translated
+   * array of values to translate
    *
    * @param string $direction
-   * TwingleProject::IN -> translate array values from Twingle to CiviCRM <br>
-   * TwingleProject::OUT -> translate array values from CiviCRM to Twingle
+   * const: TwingleProject::IN or TwingleProject::OUT
    *
    * @throws Exception
    */
-  public static function formatValues(array &$values, string $direction) {
+  public function formatValues(array &$values, string $direction) {
 
     if ($direction == self::IN) {
 
@@ -164,7 +172,6 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
       $values['allow_more'] = empty($values['allow_more'])
         ? FALSE
         : TRUE;
-
     }
     else {
 
@@ -175,73 +182,18 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
     }
   }
 
-  /**
-   * Translate array keys between CiviCRM Campaigns and Twingle
-   *
-   * @param array $values
-   * array of which keys shall be translated
-   *
-   * @param string $direction
-   * Campaign::IN -> translate array keys from Twingle format into
-   * CiviCRM format <br>
-   * Campaign::OUT -> translate array keys from CiviCRM format into
-   * Twingle format
-   *
-   * @throws Exception
-   */
-  public static function translateKeys(array &$values, string $direction) {
-
-    // Get translations for fields
-    $field_translations = Cache::getInstance()
-      ->getTranslations()['TwingleProject'];
-
-    // Set the direction of the translation
-    if ($direction == self::OUT) {
-      $field_translations = array_flip($field_translations);
-    }
-    // Throw error if $direction constant does not match IN or OUT
-    elseif ($direction != self::IN) {
-      throw new Exception(
-        "Invalid Parameter $direction for translateKeys()"
-      );
-      // TODO: use specific exception or create own
-    }
-
-    // Translate keys
-    foreach ($field_translations as $origin => $translation) {
-      $values[$translation] = $values[$origin];
-      unset($values[$origin]);
-    }
-  }
-
 
   /**
-   * Set embed data fields
-   *
-   * @param array $embedData
-   * Array with embed data from Twingle API
-   */
-  public function setEmbedData(array $embedData) {
-
-    // Get all embed_data keys from template
-    $embed_data_keys = Cache::getInstance()
-      ->getTemplates()['project_embed_data'];
-
-    // Transfer all embed_data values
-    foreach ($embed_data_keys as $key) {
-      $this->values[$key] = $embedData[$key];
-    }
-  }
-
-
-  /**
-   * Get a response that describes the status of a TwingleProject
+   * ## Get a response
+   * Get a response that describes the status of this TwingleProject instance
+   * Returns an array that contains **title**, **id**, **project_id** and
+   * **status** (if provided)
    *
    * @param string|null $status
    * status of the TwingleProject you want to give back along with the response
    *
    * @return array
-   * Returns a response array that contains title, id, project_id and status
+   *
    */
   public function getResponse(string $status = NULL): array {
     $project_type = empty($this->values['type']) ? 'default' : $this->values['type'];
@@ -258,19 +210,21 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
     return $response;
   }
 
+
   /**
-   * Return a timestamp of the last update of the Campaign
+   * ## Last update
+   * Returns a timestamp of the last update of the TwingleProject campaign.
    *
    * @return int|string|null
    */
   public function lastUpdate() {
-
     return self::getTimestamp($this->values['last_update']);
   }
 
 
   /**
-   * Returns the project_id of a TwingleProject
+   * ## Get project id
+   * Returns the **project_id** of this TwingleProject.
    *
    * @return int
    */

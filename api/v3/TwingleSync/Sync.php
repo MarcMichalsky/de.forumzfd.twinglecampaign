@@ -74,7 +74,7 @@ function civicrm_api3_twingle_sync_Sync($params) {
     $is_test = $params['is_test'];
   }
 
-  // If function call provides an API key, use it instead of the API key set
+  // If call provides an API key, use it instead of the API key set
   // on the extension settings page
   $apiKey = empty($params['twingle_api_key'])
     ? trim(Civi::settings()->get('twingle_api_key'))

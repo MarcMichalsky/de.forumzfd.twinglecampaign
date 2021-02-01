@@ -143,8 +143,15 @@ function civicrm_api3_twingle_event_Get(array $params): array {
         }
       }
       try {
-        TwingleEvent::translateKeys($returnValues[$event['id']], TwingleEvent::OUT);
-        TwingleEvent::formatValues($returnValues[$event['id']], TwingleEvent::OUT);
+        $tmp_event = new TwingleEvent([]);
+        $tmp_event->translateKeys(
+          $returnValues[$event['id']],
+          TwingleEvent::OUT
+        );
+        TwingleEvent::formatValues(
+          $returnValues[$event['id']],
+          TwingleEvent::OUT
+        );
       }
       catch (Exception $e) {
         throw new CiviCRM_API3_Exception($e->getMessage());

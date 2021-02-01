@@ -22,91 +22,30 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
 
   /**
-   * Campaign constructor.
+   * ## Campaign constructor.
    *
-   * @param array $campaign
-   * Result array of Twingle API call
-   *
-   * Origin of the arrays. It can be one of two constants:
-   * Campaign::TWINGLE|CIVICRM
-   *
-   * @throws Exception
+   * @param array $values
+   * @param int|null $id
    */
-  protected function __construct(array $campaign) {
+  protected function __construct(array $values, int $id = NULL) {
 
+    $this->id = $id;
     $tmpClassName = explode('_', get_class($this));
     $this->className = array_pop($tmpClassName);
 
     // Set campaign values
-    $this->update($campaign);
-  }
-
-  /**
-   * Check if a campaign already exists and if so set attributes
-   * to the values of the existing campaign.
-   *
-   * @return bool
-   * Returns TRUE id the campaign already exists
-   *
-   * @throws CiviCRM_API3_Exception
-   *
-   * @throws Exception
-   */
-  public function exists(): bool {
-
-    if (!$this->values['id']) {
-      return FALSE;
-    }
-
-    $single = FALSE;
-
-    $query = ['sequential' => 1,];
-
-    switch($this->className) {
-      case 'TwingleProject':
-        $query['project_id'] = $this->values['id'];
-        break;
-      case 'TwingleEvent':
-        $query['event_id'] = $this->values['id'];
-    }
-
-    $result = civicrm_api3($this->className, 'get', $query);
-
-    // If there is more than one campaign for this entity, handle the duplicates
-    if ($result['count'] > 1) {
-      self::handleDuplicates($result);
-    }
-    else {
-      $single = TRUE;
-    }
-
-    // If this campaign already exists, get its attributes
-    if ($result['count'] == 1) {
-
-      // Extract campaign values from result array
-      $values = $result['values'][0];
-
-      // Set id attribute
-      $this->id = $values['id'];
-
-      // Set attributes to the values of the existing campaign
-      // to reflect the state of the actual campaign in the database
-      $this->update($values);
-
-      return TRUE;
-    }
-    else {
-      return FALSE;
-    }
+    $this->update($values);
   }
 
 
   /**
-   * Update an existing campaign
+   * ## Update instance values
+   * This method updates the **$values** array of this instance with the values
+   * from the provided array if they are defined in
+   * *CRM/TwingleCampaign/resources/twingle_api_templates.json*
    *
    * @param array $values
    * Array with values to update
-   *
    */
   public function update(array $values) {
     // Update campaign values
@@ -129,67 +68,85 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
 
   /**
-   * Deactivate all duplicates of a campaign but the newest one
+   * ## Set embed data fields
+   * This method sets all embed data fields that are defined in
+   * *CRM/TwingleCampaign/resources/twingle_api_templates.json*
    *
-   * @param array $result
-   *
-   * @throws CiviCRM_API3_Exception
+   * @param array $embedData
+   * Array with embed data from Twingle API
    */
-  protected function handleDuplicates(array &$result) {
+  public function setEmbedData(array $embedData) {
 
-    // Sort campaigns ascending by the value of the last_modified_date
-    uasort($result['values'], function ($a, $b) {
-      return $a['last_modified_date'] <=> $b['last_modified_date'];
-    });
+    // Get all embed_data keys from template
+    $embed_data_keys = Cache::getInstance()
+      ->getTemplates()['project_embed_data'];
 
-    // Deactivate all but the first campaign
-    while (sizeof($result['values']) > 1) {
-      self::deactivateById(array_pop($result['values']));
+    // Transfer all embed_data values
+    foreach ($embed_data_keys as $key) {
+      $this->values[$key] = $embedData[$key];
     }
   }
 
-  /**
-   * Translate values between CiviCRM Campaigns and Twingle format
-   *
-   * @param array $values
-   * array of which values shall be translated
-   *
-   * @param string $direction
-   * TwingleProject::IN -> translate array values from Twingle to CiviCRM <br>
-   * TwingleProject::OUT -> translate array values from CiviCRM to Twingle
-   *
-   * @throws Exception
-   */
-  public static abstract function formatValues(array &$values, string $direction);
+
+  public abstract function formatValues(array &$values, string $direction);
 
 
   /**
-   * Translate array keys between CiviCRM Campaigns and Twingle
+   * ## Translate array keys between CiviCRM Campaigns and Twingle
    *
-   * @param array $values
-   * array of which keys to translate
-   *
-   * @param string $direction
-   * Campaign::IN -> translate array keys from Twingle format into
+   * Constants for **$direction**:<br>
+   * **Campaign::IN** translate array keys from Twingle format into
    * CiviCRM format <br>
-   * Campaign::OUT -> translate array keys from CiviCRM format into
+   * **Campaign::OUT** translate array keys from CiviCRM format into
    * Twingle format
    *
+   * @param array $values
+   * array of keys to translate
+   *
+   * @param string $direction
+   * const: Campaign::OUT or Campaign::OUT
+   *
    * @throws Exception
    */
-  public static abstract function translateKeys(array &$values, string $direction);
+  public function translateKeys(array &$values, string $direction) {
+
+    // Get translations for fields
+    $field_translations = Cache::getInstance()
+      ->getTranslations()[$this->className];
+
+    // Set the direction of the translation
+    if ($direction == self::OUT) {
+      $field_translations = array_flip($field_translations);
+    }
+    // Throw error if $direction constant does not match IN or OUT
+    elseif ($direction != self::IN) {
+      throw new Exception(
+        "Invalid Parameter $direction for translateKeys()"
+      );
+    }
+
+    // Translate keys
+    foreach ($field_translations as $origin => $translation) {
+      $values[$translation] = $values[$origin];
+      unset($values[$origin]);
+    }
+  }
 
 
   /**
-   * Translate between field names and custom field names
+   * ## Translate field names and custom field names
+   *
+   * Constants for **$direction**:<br>
+   * **Campaign::IN** translate array keys from Twingle format into
+   * CiviCRM format <br>
+   * **Campaign::OUT** translate array keys from CiviCRM format into
+   * Twingle format
    *
    * @param array $values
-   * array of which keys shall be translated
+   * array of keys to translate
    *
    * @param string $direction
-   * Campaign::IN -> translate field names into custom field names <br>
-   * Campaign::OUT -> translate custom field names into field names
-   *
+   * const: Campaign::OUT or Campaign::OUT
    */
   public function translateCustomFields(array &$values, string $direction) {
 
@@ -245,23 +202,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     }
   }
 
-  /**
-   * Set embed data fields
-   *
-   * @param array $embedData
-   * Array with embed data from Twingle API
-   */
-  public function setEmbedData(array $embedData) {
-
-    // Get all embed_data keys from template
-    $embed_data_keys = Cache::getInstance()
-      ->getTemplates()['project_embed_data'];
-
-    // Transfer all embed_data values
-    foreach ($embed_data_keys as $key) {
-      $this->values[$key] = htmlspecialchars($embedData[$key]);
-    }
-  }
 
   /**
    * Set counter url
@@ -273,8 +213,9 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     $this->values['counter'] = $counterUrl;
   }
 
+
   /**
-   * Deactivate this Campaign campaign
+   * ## Deactivate this campaign
    *
    * @return bool
    * TRUE if deactivation was successful
@@ -282,13 +223,12 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
    * @throws CiviCRM_API3_Exception
    */
   public function deactivate(): bool {
-
     return self::deactivateByid($this->id);
-
   }
 
+
   /**
-   * Deactivate a Campaign campaign by ID
+   * ## Deactivate campaign by ID
    *
    * @param $id
    * ID of the campaign that should get deactivated
@@ -319,28 +259,21 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     else {
       return FALSE;
     }
-
   }
 
 
-  /**
-   * Get a response that describes the status of a Campaign
-   *
-   * @param string $status
-   * status of the Campaign you want the response for
-   *
-   * @return array
-   * Returns a response array that contains title, id, project_id and status
-   */
   public abstract function getResponse(string $status): array;
 
+
   /**
-   * Validates $input to be either a DateTime string or an Unix timestamp
+   * ## Get timestamp
+   * Validates **$input** to be either a *DateTime string* or an *Unix timestamp*
+   * and in both cases returns a *Unix time stamp*.
    *
    * @param $input
-   * Pass a DateTime string or a Unix timestamp
+   * Provide a DateTime string or a Unix timestamp
    *
-   * @return int
+   * @return int|null
    * Returns a Unix timestamp or NULL if $input is invalid
    */
   public static function getTimestamp($input): ?int {
@@ -361,27 +294,24 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     else {
       return NULL;
     }
-
   }
 
-  /**
- * Return a timestamp of the last update of the Campaign
- *
- * @return int|string|null
- */
+
   public abstract function lastUpdate();
 
 
   /**
-   * Validates $input to be either a DateTime string or an Unix timestamp
+   * ## Get DateTime
+   * Validates **$input** to be either a *DateTime string* or an *Unix timestamp*
+   * and in both cases returns *DateTime string*.
    *
    * @param $input
-   * Pass a DateTime string or a Unix timestamp
+   * Provide a DateTime string or a Unix timestamp
    *
    * @return string
    * Returns a DateTime string or NULL if $input is invalid
    */
-  public static function getDateTime($input) {
+  public static function getDateTime($input): ?string {
 
     // Check whether $input is a Unix timestamp
     if (
@@ -399,25 +329,17 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     else {
       return NULL;
     }
-
   }
 
 
   /**
-   * Returns the project_id of a Campaign
+   * ## Get id
+   * Returns the **id** of this campaign.
    *
    * @return int
    */
-  public function getProjectId() {
-    return $this->values['id'];
-  }
-
-
-  /**
-   * @return mixed
-   */
-  public function getId() {
-    return $this->id;
+  public function getId(): int {
+    return (int) $this->id;
   }
 
 }

@@ -152,8 +152,9 @@ function civicrm_api3_twingle_project_Get(array $params): array {
         }
       }
       try {
-        TwingleProject::translateKeys($returnValues[$project['id']], TwingleProject::OUT);
-        TwingleProject::formatValues($returnValues[$project['id']], TwingleProject::OUT);
+        $tmp_project = new TwingleProject([]);
+        $tmp_project->translateKeys($returnValues[$project['id']], TwingleProject::OUT);
+        $tmp_project->formatValues($returnValues[$project['id']], TwingleProject::OUT);
       }
       catch (Exception $e) {
         throw new API_Exception($e->getMessage());

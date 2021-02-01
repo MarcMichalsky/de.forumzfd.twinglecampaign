@@ -41,6 +41,13 @@ function _civicrm_api3_twingle_event_Sync_spec(array &$spec) {
     'api.required' => 0,
     'description'  => E::ts('The key to access the Twingle API'),
   ];
+  $spec['limit'] = [
+    'name'         => 'limit',
+    'title'        => E::ts('Limit'),
+    'type'         => CRM_Utils_Type::T_INT,
+    'api.required' => 0,
+    'description'  => E::ts('Limit for the number of events that should get requested per call to the Twingle API'),
+  ];
 }
 
 /**
@@ -65,6 +72,7 @@ function _civicrm_api3_twingle_event_Sync_spec(array &$spec) {
  * @return array
  *   API result descriptor
  * @throws \CiviCRM_API3_Exception
+ * @throws \Exception
  * @see civicrm_api3_create_success
  */
 function civicrm_api3_twingle_event_Sync(array $params): array {
@@ -80,9 +88,14 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
 
   // Try to retrieve twingleApi from cache or create a new
   $twingleApi = Civi::cache()->get('twinglecampaign_twingle_api');
-  if (NULL === $twingleApi || $params['twingle_api_key']) {
+  if (NULL === $twingleApi || $params['twingle_api_key'] || $params['limit']) {
     try {
-      $twingleApi = new TwingleApiCall($apiKey);
+      if ($params['limit']) {
+        $twingleApi = new TwingleApiCall($apiKey, $params['limit']);
+      }
+      else {
+        $twingleApi = new TwingleApiCall($apiKey);
+      }
     } catch (Exception $e) {
       return civicrm_api3_create_error($e->getMessage());
     }
@@ -154,6 +167,18 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
   // Get all events for given project from Twingle and CiviCRM
   if ($params['project_id']) {
     $events_from_twingle = $twingleApi->getEvent($params['project_id']);
+
+    // If Twingle does not know any events for this project_id (yet)
+    if ($events_from_twingle['count'] == 0) {
+      return civicrm_api3_create_success(
+        "Apparently this project does not have any events yet or " .
+        "the provided project_id is unknown to Twingle.",
+        $params,
+        'TwingleEvent',
+        'Sync'
+      );
+    }
+
     $events_from_civicrm = civicrm_api3(
       'TwingleEvent',
       'get',
@@ -181,17 +206,17 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
       'get',
       ['sequential' => 1]
     );
-  }
 
-  // Get all events for the chosen project from Twingle
-  foreach ($projects_from_civicrm['values'] as $project_from_civicrm) {
-    $event_from_twingle = $twingleApi->getEvent($project_from_civicrm['project_id']);
-    array_push(
-      $events_from_twingle,
-      $event_from_twingle
-    );
+    // Get all events for the chosen project from Twingle
+    foreach ($projects_from_civicrm['values'] as $project_from_civicrm) {
+      $event_from_twingle = $twingleApi->getEvent($project_from_civicrm['project_id']);
+      array_push(
+        $events_from_twingle,
+        $event_from_twingle
+      );
+    }
+    $events_from_twingle = array_merge(... $events_from_twingle);
   }
-  $events_from_twingle = array_merge(... $events_from_twingle);
 
   // Synchronize existing events or create new ones
   foreach ($events_from_twingle as $event_from_twingle) {
@@ -275,7 +300,7 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
     return civicrm_api3_create_success(
       $result_values,
       $params,
-      'TwingleProject',
+      'TwingleEvent',
       'Sync'
     );
   }
@@ -292,7 +317,7 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
  */
 function instantiateEvent($values): CRM_TwingleCampaign_BAO_TwingleEvent {
   try {
-    return new TwingleEvent($values);
+    return new TwingleEvent($values, $values['id']);
   } catch (Exception $e) {
     throw new CiviCRM_API3_Exception(
       $e->getMessage(),
@@ -379,7 +404,7 @@ function sync(TwingleEvent $event,
               array $params): array {
 
   // If Twingle's timestamp of the event differs from the timestamp of the
-  // CiviCRM TwingleProject campaign, update the campaign on CiviCRM's side.
+  // CiviCRM TwingleEvent campaign, update the campaign on CiviCRM's side.
   // NOTE: Changes on TwingleEvents are not meant to get pushed to Twingle
   if ($event_from_twingle['updated_at'] != $event->lastUpdate()) {
     return updateLocally($event_from_twingle, $event, $params, $twingleApi);
@@ -387,7 +412,7 @@ function sync(TwingleEvent $event,
 
   // If both versions are still synchronized
   else {
-    $response[] = $event->getResponse('TwingleEvent up to date');
+    $response = $event->getResponse('TwingleEvent up to date');
     return civicrm_api3_create_success(
       $response,
       $params,

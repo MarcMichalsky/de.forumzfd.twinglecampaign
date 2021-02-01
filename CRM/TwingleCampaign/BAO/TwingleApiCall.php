@@ -19,7 +19,7 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
   private $extensionName;
 
   /**
-   * TwingleApiCall constructor.
+   * ## TwingleApiCall constructor
    *
    * @param $apiKey
    *
@@ -65,16 +65,17 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
   }
 
   /**
-   * If $id parameter is empty, this function returns all projects for all
-   * organisations this API key is assigned to.
+   * ## Get project from Twingle
+   * If the **$id** parameter is empty, this function returns all projects for
+   * this organisation.
    *
-   * If $id parameter is given, this function returns a single project.
+   * If the **$id** parameter is provided, this function returns a single
+   * project.
    *
    * @param int|null $projectId
-   *
-   * @return mixed
+   * @return array|false
    */
-  public function getProject(int $projectId = NULL) {
+  public function getProject(int $projectId = NULL): ?array {
 
     $url = empty($projectId)
       ? $this->protocol . 'project' . $this->baseUrl . 'by-organisation/' . $this->organisationId
@@ -84,18 +85,20 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
   }
 
   /**
-   * Sends an curl post call to Twingle to update an existing project and then
-   * updates the TwingleProject campaign.
+   * ## Push project to Twingle
+   * Sends a curl post call to Twingle to update an existing project.
+   *
+   * Returns an array with all project values.
    *
    * @param TwingleProject $project
    * The TwingleProject object that should get pushed to Twingle
    *
    * @return array
-   * Returns a response array that contains title, id, project_id and status
    * @throws \Exception
    */
-  public function pushProject(TwingleProject &$project) {
+  public function pushProject(TwingleProject &$project): array {
 
+    // Get only those values from the TwingleProject object which Twingle expects
     $values = $project->export();
 
     // Prepare url for curl
@@ -112,18 +115,19 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
   }
 
   /**
-   * Returns all Events for the given $projectId or a single event if an
-   * $eventId is given, too.
+   * ## Get event from Twingle
+   * Returns all events for the provided **$projectId** or a single event if an
+   * **$eventId** is provided, too.
    *
    * @param int $projectId
-   *
    * @param null|int $eventId
-   *
    * @return array
+   * @throws Exception
    */
-  public function getEvent($projectId, $eventId = NULL) {
+  public function getEvent(int $projectId, int $eventId = NULL): array {
     $result = [];
 
+    // Construct url for curl
     $url = empty($eventId)
       ? $this->protocol . 'project' . $this->baseUrl . $projectId . '/event'
       : $this->protocol . 'project' . $this->baseUrl . $projectId . '/event/'
@@ -147,15 +151,15 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
       // If no $eventId was given, expect one or more events.
       // Store the events, increase the offset and ask again until there
       // are no more events incoming.
-      if ($response['data'] && !$eventId) {
+      if (!$eventId) {
         $result = array_merge($result, $response['data']);
         $offset = $offset + $this->limit;
         $finished = count($response['data']) < $this->limit;
       }
       // If $eventId was given, expect only one event
       else {
-        // If result the array contains 'message', the $eventId does not exist
-        if (!$result['message']) {
+        // If the response array contains 'message', the $eventId does not exist
+        if (!$response['message']) {
           $result = $response;
         }
         $finished = TRUE;
@@ -165,13 +169,15 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
   }
 
   /**
+   * ## Get project embed data
+   * Get embed data for a specific project.
+   *
    * @param $projectId
    *
-   * @return array|NULL
-   * @throws \Exception
+   * @return array
+   * @throws Exception
    */
-  public
-  function getProjectEmbedData($projectId): array {
+  public function getProjectEmbedData($projectId): array {
 
     $result = $this->getProject($projectId);
 
@@ -190,19 +196,21 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
 
 
   /**
-   * Does a cURL and gives back the result array.
+   * ## Send a GET cURL
+   * Sends a GET cURL and returns the result array.
    *
    * @param $url
-   * The url the curl should get sent to
+   * The destination url
    *
    * @param null $params
    * The parameters you want to send (optional)
    *
-   * @return array|bool
+   * @return array
    * Returns the result array of the curl or FALSE, if the curl failed
+   * @throws Exception
    */
   private
-  function curlGet($url, $params = NULL) {
+  function curlGet($url, $params = NULL): array {
     if (!empty($params)) {
       $url = $url . '?' . http_build_query($params);
     }
@@ -213,27 +221,30 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
       'Content-Type: application/json',
     ]);
     $response = json_decode(curl_exec($curl), TRUE);
-    if (empty($response)) {
-      $response = curl_error($curl);
-    }
     curl_close($curl);
+    if ($response === FALSE) {
+      throw new Exception('GET curl failed');
+    }
     return $response;
   }
 
+
   /**
-   * Sends a curl post and gives back the result array.
+   * ## Send a POST cURL
+   * Sends a POST cURL and returns the result array.
    *
    * @param $url
-   * The url the curl should get sent to
+   * The destination url
    *
    * @param $data
-   * The data that should get posted
+   * The data that should get send
    *
-   * @return false|mixed
+   * @return array
    * Returns the result array of the curl or FALSE, if the curl failed
+   * @throws Exception
    */
   private
-  function curlPost($url, $data) {
+  function curlPost($url, $data): array {
     $curl = curl_init($url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
     curl_setopt($curl, CURLOPT_POST, TRUE);
@@ -244,11 +255,10 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
     $json = json_encode($data);
     curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
     $response = json_decode(curl_exec($curl), TRUE);
-    if (empty($response)) {
-      $response = FALSE;
-    }
     curl_close($curl);
+    if ($response === FALSE) {
+      throw new Exception('POST curl failed');
+    }
     return $response;
   }
-
 }
