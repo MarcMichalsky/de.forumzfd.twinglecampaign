@@ -77,9 +77,6 @@ function _civicrm_api3_twingle_event_Sync_spec(array &$spec) {
  */
 function civicrm_api3_twingle_event_Sync(array $params): array {
 
-  // For logging purpose
-  $extensionName = E::LONG_NAME;
-
   // If call provides an API key, use it instead of the API key set
   // on the extension settings page
   $apiKey = empty($params['twingle_api_key'])
@@ -149,7 +146,8 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
     // forward API error message
     else {
       Civi::log()->error(
-        "$extensionName could retrieve project from TwingleEvent.getsingle",
+        E::LONG_NAME .
+        ' could retrieve project from TwingleEvent.getsingle',
         $result
       );
       return $result;
@@ -251,13 +249,14 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
           $event->getResponse('TwingleEvent created');
       } catch (Exception $e) {
         $errors_occurred++;
-        $errorMessage = $e->getMessage();
         Civi::log()->error(
-          "$extensionName could not create TwingleEvent: $errorMessage",
+          E::LONG_NAME .
+          ' could not create TwingleEvent: ' .
+          $e->getMessage(),
           $event->getResponse()
         );
         $result_values[$event->getId()] = $event->getResponse(
-          "TwingleEvent could not get created: $errorMessage"
+          'TwingleEvent could not get created: ' . $e->getMessage()
         );
       }
     }
@@ -348,9 +347,6 @@ function updateLocally(array $event_from_twingle,
                        array $params,
                        TwingleApiCall $twingleApi): array {
 
-  // For logging purpose
-  $extensionName = E::LONG_NAME;
-
   try {
     $event->update($event_from_twingle);
     // If this is a test, do not make db changes
@@ -371,13 +367,14 @@ function updateLocally(array $event_from_twingle,
       'Sync'
     );
   } catch (Exception $e) {
-    $errorMessage = $e->getMessage();
     Civi::log()->error(
-      "$extensionName could not update TwingleEvent campaign: $errorMessage",
+      E::LONG_NAME .
+      ' could not update TwingleEvent campaign: ' .
+      $e->getMessage(),
       $event->getResponse()
     );
     return civicrm_api3_create_error(
-      "Could not update TwingleEvent campaign: $errorMessage",
+      'Could not update TwingleEvent campaign: ' . $$e->getMessage(),
       $event->getResponse()
     );
   }

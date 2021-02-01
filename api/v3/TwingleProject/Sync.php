@@ -66,9 +66,6 @@ function _civicrm_api3_twingle_project_Sync_spec(array &$spec) {
  */
 function civicrm_api3_twingle_project_Sync(array $params): array {
 
-  // For logging purpose
-  $extensionName = E::LONG_NAME;
-
   // If call provides an API key, use it instead of the API key set
   // on the extension settings page
   $apiKey = empty($params['twingle_api_key'])
@@ -138,7 +135,8 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
     // forward API error message
     else {
       Civi::log()->error(
-        "$extensionName could retrieve project from TwingleProject.getsingle",
+        E::LONG_NAME .
+        ' could retrieve project from TwingleProject.getsingle',
         $result
       );
       return $result;
@@ -161,7 +159,8 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
     // If call to TwingleProject.get failed, forward error message
     if ($projects_from_civicrm['is_error'] != 0) {
       Civi::log()->error(
-        "$extensionName could retrieve projects from TwingleProject.get",
+        E::LONG_NAME .
+        ' could retrieve projects from TwingleProject.get: ',
         $projects_from_civicrm
       );
       return $projects_from_civicrm;
@@ -208,13 +207,14 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
             $project->getResponse('TwingleProject created');
         } catch (Exception $e) {
           $errors_occurred++;
-          $errorMessage = $e->getMessage();
           Civi::log()->error(
-            "$extensionName could not create TwingleProject: $errorMessage",
+            E::LONG_NAME .
+            ' could not create TwingleProject: ' .
+            $e->getMessage(),
             $project->getResponse()
           );
           $result_values[$project->getId()] = $project->getResponse(
-            "TwingleProject could not get created: $errorMessage"
+            "TwingleProject could not get created: " . $e->getMessage()
           );
         }
       }
@@ -270,7 +270,7 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
 
 
 /**
- * Update a TwingleProject campaign locally
+ * ## Update a TwingleProject campaign locally
  *
  * @param array $project_from_twingle
  * @param \CRM_TwingleCampaign_BAO_TwingleProject $project
@@ -283,9 +283,6 @@ function updateLocally(array $project_from_twingle,
                        TwingleProject $project,
                        array $params,
                        TwingleApiCall $twingleApi): array {
-
-  // For logging purpose
-  $extensionName = E::LONG_NAME;
 
   try {
     $project->update($project_from_twingle);
@@ -310,13 +307,14 @@ function updateLocally(array $project_from_twingle,
       'Sync'
     );
   } catch (Exception $e) {
-    $errorMessage = $e->getMessage();
     Civi::log()->error(
-      "$extensionName could not update TwingleProject campaign: $errorMessage",
+      E::LONG_NAME .
+      ' could not update TwingleProject campaign: ' .
+      $e->getMessage(),
       $project->getResponse()
     );
     return civicrm_api3_create_error(
-      "Could not update TwingleProject campaign: $errorMessage",
+      'Could not update TwingleProject campaign: ' . $e->getMessage(),
       $project->getResponse()
     );
   }
@@ -337,9 +335,6 @@ function pushToTwingle(TwingleProject $project,
                        TwingleApiCall $twingleApi,
                        array $params): array {
 
-  // For logging purpose
-  $extensionName = E::LONG_NAME;
-
   // If this is a test, do not make db changes
   if ($params['is_test']) {
     return civicrm_api3_create_success(
@@ -354,13 +349,14 @@ function pushToTwingle(TwingleProject $project,
   try {
     $result = $twingleApi->pushProject($project);
   } catch (Exception $e) {
-    $errorMessage = $e->getMessage();
     Civi::log()->error(
-      "$extensionName could not push TwingleProject to Twingle: $errorMessage",
+      E::LONG_NAME .
+      ' could not push TwingleProject to Twingle: '
+      . $e->getMessage(),
       $project->getResponse()
     );
     return civicrm_api3_create_error(
-      "Could not push TwingleProject to Twingle: $errorMessage",
+      'Could not push TwingleProject to Twingle: ' . $e->getMessage(),
       $project->getResponse()
     );
   }
@@ -382,13 +378,15 @@ function pushToTwingle(TwingleProject $project,
         'Sync'
       );
     } catch (Exception $e) {
-      $errorMessage = $e->getMessage();
       Civi::log()->error(
-        "$extensionName pushed TwingleProject to Twingle but local update failed: $errorMessage",
+        E::LONG_NAME .
+        ' pushed TwingleProject to Twingle but local update failed: ' .
+        $e->getMessage(),
         $project->getResponse()
       );
       return civicrm_api3_create_error(
-        "TwingleProject was pushed to Twingle but local update failed: $errorMessage",
+        'TwingleProject was pushed to Twingle but local update failed: ' .
+        $e->getMessage(),
         $project->getResponse()
       );
     }
@@ -396,7 +394,8 @@ function pushToTwingle(TwingleProject $project,
   // If the curl fails, the $result may be empty
   else {
     Civi::log()->error(
-      "$extensionName could not push TwingleProject campaign",
+      E::LONG_NAME .
+      ' could not push TwingleProject campaign',
       $project->getResponse()
     );
     return civicrm_api3_create_error(
