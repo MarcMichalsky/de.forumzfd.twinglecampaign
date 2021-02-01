@@ -103,7 +103,7 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
 
         // Synchronize projects
         if (!empty($project_from_twingle)) {
-          return sync($project, $project_from_twingle, $twingleApi, $params);
+          return _projectSync($project, $project_from_twingle, $twingleApi, $params);
         }
 
         // If Twingle does not know a project with the given project_id, give error
@@ -233,7 +233,7 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
           $project = new TwingleProject($project_from_civicrm, $id);
 
           // sync project
-          $result = sync($project, $project_from_twingle, $twingleApi, $params);
+          $result = _projectSync($project, $project_from_twingle, $twingleApi, $params);
           if ($result['is_error'] != 0) {
             $errors_occurred++;
             $result_values[$project->getId()] =
@@ -279,7 +279,7 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
  *
  * @return array
  */
-function updateLocally(array $project_from_twingle,
+function _updateProjectLocally(array $project_from_twingle,
                        TwingleProject $project,
                        array $params,
                        TwingleApiCall $twingleApi): array {
@@ -331,7 +331,7 @@ function updateLocally(array $project_from_twingle,
  * @return array
  * @throws \CiviCRM_API3_Exception
  */
-function pushToTwingle(TwingleProject $project,
+function _pushProjectToTwingle(TwingleProject $project,
                        TwingleApiCall $twingleApi,
                        array $params): array {
 
@@ -418,7 +418,7 @@ function pushToTwingle(TwingleProject $project,
  * @return array
  * @throws \CiviCRM_API3_Exception
  */
-function sync(TwingleProject $project,
+function _projectSync(TwingleProject $project,
               array $project_from_twingle,
               TwingleApiCall $twingleApi,
               array $params): array {
@@ -426,13 +426,13 @@ function sync(TwingleProject $project,
   // If Twingle's version of the project is newer than the CiviCRM
   // TwingleProject campaign, update the campaign
   if ($project_from_twingle['last_update'] > $project->lastUpdate()) {
-    return updateLocally($project_from_twingle, $project, $params, $twingleApi);
+    return _updateProjectLocally($project_from_twingle, $project, $params, $twingleApi);
   }
 
   // If the CiviCRM TwingleProject campaign was changed, update the project
   // on Twingle's side
   elseif ($project_from_twingle['last_update'] < $project->lastUpdate()) {
-    return pushToTwingle($project, $twingleApi, $params);
+    return _pushProjectToTwingle($project, $twingleApi, $params);
   }
 
   // If both versions are still synchronized
