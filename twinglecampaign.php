@@ -55,12 +55,40 @@ function twinglecampaign_civicrm_postSave_civicrm_campaign($dao) {
 }
 
 /**
- * This callback function synchronizes a recently updated TwingleProject campaign
+ * This callback function synchronizes a recently updated TwingleProject
+ * campaign
+ *
  * @param $campaign_id
- * @throws \CiviCRM_API3_Exception
+ *
  */
 function twinglecampaign_postSave_callback($campaign_id) {
-  civicrm_api3('TwingleProject', 'sync', ['id' => $campaign_id]);
+  if ($_POST['action'] == 'clone') {
+    unset($_POST['action']);
+    $result = civicrm_api3('TwingleProject', 'getsingle',
+    ['id' => $campaign_id]
+    )['values'][$campaign_id];
+    $project = new CRM_TwingleCampaign_BAO_TwingleProject($result);
+    try {
+      $project->clone();
+    } catch (Exception $e) {
+      Civi::log()->error(
+        E::LONG_NAME .
+        " could not clone TwingleProject campaign: " .
+        $e->getMessage()
+      );
+      CRM_Utils_System::setUFMessage('TwingleProject could not get cloned.');
+    }
+  }
+  else {
+    try {
+      civicrm_api3('TwingleProject', 'sync', ['id' => $campaign_id]);
+      CRM_Utils_System::setUFMessage('TwingleProject was cloned.');
+    } catch (CiviCRM_API3_Exception $e) {
+      Civi::log()->error(
+        'twinglecampaign_postSave_callback ' . $e->getMessage()
+      );
+    }
+  }
 }
 
 /**

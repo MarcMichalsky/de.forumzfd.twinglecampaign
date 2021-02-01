@@ -107,7 +107,20 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
 
 
   /**
-   * Translate values between CiviCRM Campaigns and Twingle format
+   * ## Clone this TwingleProject
+   *
+   * This method removes the id and the identifier from this instance and in
+   * the next step it pushes the clone as a new project with the same values to
+   * Twingle.
+   *
+   * @throws \Exception
+   */
+  public function clone() {
+    unset($this->values['id']);
+    unset($this->values['identifier']);
+    $this->create(); // this will also trigger the postSave hook
+  }
+
    *
    * @param array $values
    * array of which values shall be translated
