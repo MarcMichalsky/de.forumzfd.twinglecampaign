@@ -196,6 +196,40 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
 
 
   /**
+   * ## Delete Project
+   * Sends a DELETE cURL and returns the result array.
+   *
+   * @param int $projectId
+   *
+   * @return bool
+   * @throws Exception
+   */
+  public function deleteProject(int $projectId): bool {
+    $url = $this->protocol . 'project' . $this->baseUrl . $projectId;
+    return $this->curlDelete($url);
+  }
+
+
+  /**
+   * ## Delete Event
+   * Sends a DELETE cURL and returns TRUE id deletion was successful.
+   *
+   * *NOTE:* It's only possible to delete one event at a time.
+   *
+   * @param int $projectId
+   * @param int $eventId
+   *
+   * @return bool
+   * @throws Exception
+   */
+  public function deleteEvent(int $projectId, int $eventId): bool {
+    $url = $this->protocol . 'project' . $this->baseUrl . $projectId .
+      '/event/' . $eventId;
+    return $this->curlDelete($url);
+  }
+
+
+  /**
    * ## Send a GET cURL
    * Sends a GET cURL and returns the result array.
    *
@@ -261,4 +295,48 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
     }
     return $response;
   }
+
+
+  /**
+   * ## Send a DELETE cURL
+   * Sends a DELETE cURL and returns the result array.
+   *
+   * @param $url
+   * The parameters you want to send
+   *
+   * @param $params
+   * The data that should get send
+   *
+   * @return bool
+   * Returns the result array of the curl or FALSE, if the curl failed
+   * @throws Exception
+   */
+  private
+  function curlDelete($url, $params = NULL): bool {
+    if (!empty($params)) {
+      $url = $url . '?' . http_build_query($params);
+    }
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'DELETE');
+    curl_setopt($curl, CURLOPT_HTTPHEADER,
+      [
+        "x-access-code: $this->apiKey",
+        'Content-Type: application/json',
+      ]
+    );
+    $response = json_decode(curl_exec($curl), TRUE);
+    $curl_status_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_close($curl);
+    if ($response === FALSE) {
+      throw new Exception('DELETE curl failed');
+    }
+    if ($curl_status_code == 404) {
+      throw new Exception('http status code 404 (not found)');
+    } elseif ($curl_status_code == 500) {
+      throw new Exception('https status code 500 (internal error)');
+    }
+    return ($curl_status_code == 200);
+  }
+
 }

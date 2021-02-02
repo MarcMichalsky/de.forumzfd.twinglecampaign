@@ -215,6 +215,26 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
 
   /**
+   * ## Delete Campaign
+   * Deletes this Campaign from CiviCRM
+   *
+   * @throws CiviCRM_API3_Exception
+   */
+  public function delete(): bool {
+
+    // Delete campaign via Campaign.delete api
+    if ($this->getId()) {
+      $result = civicrm_api3('Campaign', 'delete',
+        ['id' => $this->getId()]);
+    }
+    else {
+      throw new CiviCRM_API3_Exception($this->className . ' not found');
+    }
+    return ($result['is_error'] == 0);
+  }
+
+
+  /**
    * ## Deactivate this campaign
    *
    * @return bool

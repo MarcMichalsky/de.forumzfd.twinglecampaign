@@ -1,4 +1,7 @@
 <?php
+
+use CRM_TwingleCampaign_BAO_TwingleProject as TwingleProject;
+use CRM_TwingleCampaign_BAO_TwingleApiCall as TwingleApiCall;
 use CRM_TwingleCampaign_ExtensionUtil as E;
 
 /**
@@ -9,37 +12,132 @@ use CRM_TwingleCampaign_ExtensionUtil as E;
  *
  * @see https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
  */
-function _civicrm_api3_twingle_project_Delete_spec(&$spec) {
-  $spec['magicword']['api.required'] = 1;
+function _civicrm_api3_twingle_project_Delete_spec(array &$spec) {
+  $spec['id'] = [
+    'name'         => 'id',
+    'title'        => E::ts('Campaign ID'),
+    'type'         => CRM_Utils_Type::T_INT,
+    'api.required' => 0,
+    'description'  => E::ts('Unique Campaign ID'),
+  ];
+  $spec['project_id'] = [
+    'name'         => 'project_id',
+    'title'        => E::ts('Twingle Project ID'),
+    'type'         => CRM_Utils_Type::T_INT,
+    'api.required' => 0,
+    'description'  => E::ts('Twingle ID for this project'),
+  ];
+  $spec['is_test'] = [
+    'name'         => 'is_test',
+    'title'        => E::ts('Test'),
+    'type'         => CRM_Utils_Type::T_BOOLEAN,
+    'api.required' => 0,
+    'description'  => E::ts('If this is set true, no database change will be made'),
+  ];
+  $spec['twingle_api_key'] = [
+    'name'         => 'twingle_api_key',
+    'title'        => E::ts('Twingle API key'),
+    'type'         => CRM_Utils_Type::T_STRING,
+    'api.required' => 0,
+    'description'  => E::ts('The key to access the Twingle API'),
+  ];
 }
 
 /**
- * TwingleProject.Delete API
+ * # TwingleProject.Delete API
+ *
+ * Delete a TwingleProject on CiviCRM and Twingle side.
  *
  * @param array $params
  *
  * @return array
  *   API result descriptor
  *
+ * @throws CiviCRM_API3_Exception
  * @see civicrm_api3_create_success
  *
- * @throws API_Exception
  */
-function civicrm_api3_twingle_project_Delete($params) {
-  if (array_key_exists('magicword', $params) && $params['magicword'] == 'sesame') {
-    $returnValues = array(
-      // OK, return several data rows
-      12 => ['id' => 12, 'name' => 'Twelve'],
-      34 => ['id' => 34, 'name' => 'Thirty four'],
-      56 => ['id' => 56, 'name' => 'Fifty six'],
-    );
-    // ALTERNATIVE: $returnValues = []; // OK, success
-    // ALTERNATIVE: $returnValues = ["Some value"]; // OK, return a single value
+function civicrm_api3_twingle_project_Delete(array $params): array {
 
-    // Spec: civicrm_api3_create_success($values = 1, $params = [], $entity = NULL, $action = NULL)
-    return civicrm_api3_create_success($returnValues, $params, 'TwingleProject', 'Delete');
+  $result_values = [];
+  $error_occurred = FALSE;
+
+  // If call provides an API key, use it instead of the API key set
+  // on the extension settings page
+  $apiKey = empty($params['twingle_api_key'])
+    ? trim(Civi::settings()->get('twingle_api_key'))
+    : trim($params['twingle_api_key']);
+
+  // Try to retrieve twingleApi from cache or create a new
+  $twingleApi = Civi::cache()->get('twinglecampaign_twingle_api');
+  if (NULL === $twingleApi || $params['twingle_api_key']) {
+    try {
+      $twingleApi = new TwingleApiCall($apiKey);
+    } catch (Exception $e) {
+      return civicrm_api3_create_error($e->getMessage());
+    }
+    Civi::cache('long')->set('twinglecampaign_twingle_api', $twingleApi);
+  }
+
+  $params['sequential'] = 1;
+
+  // Delete TwingleProject on Twingle's side
+  try {
+    $twingleApi->deleteProject($params['project_id']);
+    $result_values['twingle'] = 'TwingleProject deleted';
+  } catch (Exception $e) {
+    // If Twingle does not know the project_id
+    if ($e->getMessage() == 'http status code 404 (not found)') {
+      $result_values['twingle'] = 'project not found';
+    }
+    // If the deletion curl failed
+    else {
+      $error_occurred = TRUE;
+      Civi::log()->error(
+        E::LONG_NAME .
+        ' could not delete TwingleProject (project_id ' . $params['project_id']
+        . ') on Twingle\'s side: ' . $e->getMessage(),
+      );
+      // Set deletion status
+      $result_values['twingle'] = 'Could not delete TwingleProject: ' . $e->getMessage();
+    }
+  }
+
+  // Delete the TwingleProject campaign on CiviCRM's side
+  try {
+    $project = civicrm_api3('TwingleProject', 'getsingle', $params);
+    // The TwingleProject campaign may be already deleted
+    if ($project['is_error'] == 0) {
+      $project = new TwingleProject($project['values'][0], $project['values'][0]['id']);
+      $project->delete();
+      $result_values['civicrm'] = 'TwingleProject deleted';
+    }
+    // If deletion fails
+  } catch (Exception $e) {
+    $error_occurred = TRUE;
+    Civi::log()->error(
+      E::LONG_NAME .
+      ' could not delete TwingleProject (project_id ' . $params['project_id'] .
+      ') on CiviCRM\'s side: ' . $e->getMessage(),
+    );
+    // Set deletion status
+    $result_values['civicrm'] = 'Could not delete TwingleProject: ' . $e->getMessage();
+  }
+
+  // Return the results
+  if ($error_occurred) {
+    return civicrm_api3_create_error(
+      'TwingleProject deletion failed',
+      ['deletion_status' => $result_values]
+    );
   }
   else {
-    throw new API_Exception(/*error_message*/ 'Everyone knows that the magicword is "sesame"', /*error_code*/ 'magicword_incorrect');
+    return civicrm_api3_create_success(
+      ['deletion_status' => $result_values],
+      $params,
+      'TwingleProject',
+      'Delete'
+    );
   }
+
 }
