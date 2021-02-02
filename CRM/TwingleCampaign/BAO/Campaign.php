@@ -54,13 +54,13 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
       if ($this->className == "TwingleProject" && $key == 'project_id') {
         $this->values['id'] = $value;
       }
-      else if (in_array($key, $filter)) {
+      elseif (in_array($key, $filter)) {
         $this->values[$key] = $value;
       }
-      else if ($key == 'embed') {
+      elseif ($key == 'embed') {
         self::setEmbedData($value);
       }
-      else if ($key == 'counter-url') {
+      elseif ($key == 'counter-url') {
         self::setCounterUrl($value['url']);
       }
     }
@@ -204,7 +204,7 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
 
   /**
-   * Set counter url
+   * ## Set counter url
    *
    * @param String $counterUrl
    * URL of the counter
@@ -287,8 +287,8 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
   /**
    * ## Get timestamp
-   * Validates **$input** to be either a *DateTime string* or an *Unix timestamp*
-   * and in both cases returns a *Unix time stamp*.
+   * Validates **$input** to be either a *DateTime string* or an *Unix
+   * timestamp* and in both cases returns a *Unix time stamp*.
    *
    * @param $input
    * Provide a DateTime string or a Unix timestamp
@@ -322,8 +322,8 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
   /**
    * ## Get DateTime
-   * Validates **$input** to be either a *DateTime string* or an *Unix timestamp*
-   * and in both cases returns *DateTime string*.
+   * Validates **$input** to be either a *DateTime string* or an *Unix
+   * timestamp* and in both cases returns *DateTime string*.
    *
    * @param $input
    * Provide a DateTime string or a Unix timestamp

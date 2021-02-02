@@ -24,7 +24,7 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
       ->getCustomFieldMapping()['twingle_project_id'];
 
   }
-  
+
 
   /**
    * ## Export values
@@ -128,8 +128,10 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    * ## Translate values between CiviCRM Campaigns and Twingle formats
    *
    * Constants for **$direction**:<br>
-   * **TwingleProject::IN** translate array values from Twingle to CiviCRM format<br>
-   * **TwingleProject::OUT** translate array values from CiviCRM to Twingle format
+   * **TwingleProject::IN** translate array values from Twingle to CiviCRM
+   * format<br>
+   * **TwingleProject::OUT** translate array values from CiviCRM to Twingle
+   * format
    *
    * @param array $values
    * array of values to translate
