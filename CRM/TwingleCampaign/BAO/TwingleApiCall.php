@@ -73,7 +73,9 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
    * project.
    *
    * @param int|null $projectId
+   *
    * @return array|false
+   * @throws Exception
    */
   public function getProject(int $projectId = NULL): ?array {
 
@@ -121,6 +123,7 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
    *
    * @param int $projectId
    * @param null|int $eventId
+   *
    * @return array
    * @throws Exception
    */
@@ -250,14 +253,22 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
     }
     $curl = curl_init($url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($curl, CURLOPT_HTTPHEADER, [
-      "x-access-code: $this->apiKey",
-      'Content-Type: application/json',
-    ]);
+    curl_setopt($curl, CURLOPT_HTTPHEADER,
+      [
+        "x-access-code: $this->apiKey",
+        'Content-Type: application/json',
+      ]
+    );
     $response = json_decode(curl_exec($curl), TRUE);
+    $curl_status_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     curl_close($curl);
     if ($response === FALSE) {
       throw new Exception('GET curl failed');
+    }
+    if ($curl_status_code == 404) {
+      throw new Exception('http status code 404 (not found)');
+    } elseif ($curl_status_code == 500) {
+      throw new Exception('https status code 500 (internal error)');
     }
     return $response;
   }
@@ -282,16 +293,24 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
     $curl = curl_init($url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
     curl_setopt($curl, CURLOPT_POST, TRUE);
-    curl_setopt($curl, CURLOPT_HTTPHEADER, [
-      "x-access-code: $this->apiKey",
-      'Content-Type: application/json',
-    ]);
+    curl_setopt($curl, CURLOPT_HTTPHEADER,
+      [
+        "x-access-code: $this->apiKey",
+        'Content-Type: application/json',
+      ]
+    );
     $json = json_encode($data);
     curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
     $response = json_decode(curl_exec($curl), TRUE);
+    $curl_status_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     curl_close($curl);
     if ($response === FALSE) {
       throw new Exception('POST curl failed');
+    }
+    if ($curl_status_code == 404) {
+      throw new Exception('http status code 404 (not found)');
+    } elseif ($curl_status_code == 500) {
+      throw new Exception('https status code 500 (internal error)');
     }
     return $response;
   }
