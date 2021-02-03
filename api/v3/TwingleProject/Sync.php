@@ -127,7 +127,7 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
         $project = new TwingleProject($result['values'][0], $id);
 
         // Push project to Twingle
-        return pushToTwingle($project, $twingleApi, $params);
+        return _pushProjectToTwingle($project, $twingleApi, $params);
       }
     }
 
