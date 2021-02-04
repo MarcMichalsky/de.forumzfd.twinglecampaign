@@ -27,11 +27,9 @@ function twinglecampaign_civicrm_postSave_civicrm_campaign($dao) {
     $hook_campaign_id = $dao->id;
 
     // Get campaign type id for TwingleProject
-    $twingle_project_campaign_type_id = civicrm_api3(
-      'OptionValue',
-      'get',
-      ['sequential' => 1, 'name' => 'twingle_project']
-    )['values'][0]['value'];
+    $twingle_project_campaign_type_id =
+      ExtensionCache::getInstance()
+        ->getCampaigns()['campaign_types']['twingle_project']['id'];
 
     // If $dao is a TwingleProject campaign, synchronize it
     if ($hook_campaign_type_id == $twingle_project_campaign_type_id) {

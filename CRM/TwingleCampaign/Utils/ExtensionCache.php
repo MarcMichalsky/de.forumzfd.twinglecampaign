@@ -20,11 +20,12 @@ class CRM_TwingleCampaign_Utils_ExtensionCache {
   private $templates;
 
   /**
-   * Get an instance (singleton)
-   * @return self|null
+   * ## Get an instance (singleton)
+   *
+   * @return CRM_TwingleCampaign_Utils_ExtensionCache
    */
-  public static function getInstance() {
-    if (null === Civi::cache()->get('twinglecampaign_cache')) {
+  public static function getInstance(): CRM_TwingleCampaign_Utils_ExtensionCache {
+    if (NULL === Civi::cache()->get('twinglecampaign_cache')) {
       Civi::cache()->set('twinglecampaign_cache', new self);
     }
     return Civi::cache()->get('twinglecampaign_cache');
@@ -34,6 +35,7 @@ class CRM_TwingleCampaign_Utils_ExtensionCache {
    * Protected ExtensionCache constructor.
    *
    * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
    */
   protected function __construct() {
 
@@ -67,12 +69,21 @@ class CRM_TwingleCampaign_Utils_ExtensionCache {
       // Set attribute
       $this->$key = $array;
     }
-  }
 
-  protected function __clone() {}
+    // Get ids for Twingle related campaign types
+    foreach ($this->campaigns['campaign_types'] as $campaign_type) {
+      $this->campaigns['campaign_types'][$campaign_type['name']]['id'] = civicrm_api3(
+        'OptionValue',
+        'get',
+        ['sequential' => 1, 'name' => $campaign_type['name']]
+      )['values'][0]['value'];
+    }
+
+  }
 
   /**
    * Returns a mapping of all custom field of the TwingleCampaign extension
+   *
    * @return array
    */
   public function getCustomFieldMapping(): array {
@@ -80,23 +91,23 @@ class CRM_TwingleCampaign_Utils_ExtensionCache {
   }
 
   /**
-   * @return mixed
+   * @return array
    */
-  public function getTranslations() {
+  public function getTranslations(): array {
     return $this->translations;
   }
 
   /**
-   * @return mixed
+   * @return array
    */
-  public function getCampaigns() {
+  public function getCampaigns(): array {
     return $this->campaigns;
   }
 
   /**
-   * @return mixed
+   * @return array
    */
-  public function getTemplates() {
+  public function getTemplates(): array {
     return $this->templates;
   }
 
