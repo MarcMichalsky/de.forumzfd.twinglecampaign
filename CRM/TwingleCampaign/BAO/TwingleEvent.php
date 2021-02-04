@@ -62,9 +62,6 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
       self::IN
     );
 
-    // Set id
-    $values_prepared_for_import['id'] = $this->id;
-
     // Create campaign
     $result = civicrm_api3('Campaign', 'create', $values_prepared_for_import);
 

@@ -96,11 +96,17 @@ function _civicrm_api3_twingle_event_Getsingle_spec(array &$spec) {
  * @see civicrm_api3_create_success
  */
 function civicrm_api3_twingle_event_Getsingle(array $params): array {
+
   $returnValues = civicrm_api3('TwingleEvent', 'get', $params);
   $count = $returnValues['count'];
 
   if ($count != 1) {
     return civicrm_api3_create_error("Expected one TwingleEvent but found $count");
   }
-  return civicrm_api3_create_success($returnValues['values'], $params, 'TwingleEvent', 'Getsingle');
+  return civicrm_api3_create_success(
+    $returnValues['values'][$returnValues['id']],
+    $params,
+    'TwingleEvent',
+    'Getsingle'
+  );
 }

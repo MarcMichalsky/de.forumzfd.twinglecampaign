@@ -256,7 +256,7 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
       if ($event_from_twingle['id'] == $event_from_civicrm['event_id']) {
 
         // instantiate project with values from TwingleEvent.Get
-        $event = _instantiateEvent($event_from_civicrm);
+        $event = _instantiateEvent($event_from_civicrm, $event_from_civicrm['id']);
 
         // sync event
         $result = _eventSync($event, $event_from_twingle, $twingleApi, $params);
@@ -298,13 +298,14 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
  * # Instantiates a TwingleEvent
  *
  * @param $values
+ * @param null $id
  *
  * @return \CRM_TwingleCampaign_BAO_TwingleEvent
  * @throws \CiviCRM_API3_Exception
  */
-function _instantiateEvent($values): CRM_TwingleCampaign_BAO_TwingleEvent {
+function _instantiateEvent($values, $id = NULL): CRM_TwingleCampaign_BAO_TwingleEvent {
   try {
-    return new TwingleEvent($values, $values['id']);
+    return new TwingleEvent($values, $id);
   } catch (Exception $e) {
     throw new CiviCRM_API3_Exception(
       $e->getMessage(),
