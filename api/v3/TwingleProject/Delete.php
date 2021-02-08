@@ -81,27 +81,42 @@ function civicrm_api3_twingle_project_Delete(array $params): array {
 
   $params['sequential'] = 1;
 
-  // Delete TwingleProject on Twingle's side
-  try {
-    $twingleApi->deleteProject($params['project_id']);
-    $result_values['twingle'] = 'TwingleProject deleted';
-  } catch (Exception $e) {
-    // If Twingle does not know the project_id
-    if ($e->getMessage() == 'http status code 404 (not found)') {
-      $result_values['twingle'] = 'project not found';
-    }
-    // If the deletion curl failed
-    else {
-      $error_occurred = TRUE;
-      Civi::log()->error(
-        E::LONG_NAME .
-        ' could not delete TwingleProject (project_id ' . $params['project_id']
-        . ') on Twingle\'s side: ' . $e->getMessage(),
-      );
-      // Set deletion status
+  // To delete the TwingleProject on Twingle's side, we need the project_id
+  // If no project_id is provided, try to get it via TwingleProject.getsingle
+  if (!$params['project_id']) {
+    try {
+      $project = civicrm_api3('TwingleProject', 'getsingle', $params);
+      $params['project_id'] = $project['values'][0]['project_id'];
+    } catch (CiviCRM_API3_Exception $e) {
       $result_values['twingle'] = 'Could not delete TwingleProject: ' . $e->getMessage();
     }
   }
+
+  // Delete TwingleProject on Twingle's side
+  if ($params['project_id']) {
+    try {
+      $twingleApi->deleteProject($params['project_id']);
+      $result_values['twingle'] = 'TwingleProject deleted';
+    } catch (Exception $e) {
+      // If Twingle does not know the project_id
+      if ($e->getMessage() == 'http status code 404 (not found)') {
+        $result_values['twingle'] = 'project not found';
+      }
+      // If the deletion curl failed
+      else {
+        $error_occurred = TRUE;
+        Civi::log()->error(
+          E::LONG_NAME .
+          ' could not delete TwingleProject (project_id ' . $params['project_id']
+          . ') on Twingle\'s side: ' . $e->getMessage(),
+        );
+        // Set deletion status
+        $result_values['twingle'] = 'Could not delete TwingleProject: ' . $e->getMessage();
+      }
+    }
+  }
+
+
 
   // Delete the TwingleProject campaign on CiviCRM's side
   try {
@@ -139,5 +154,4 @@ function civicrm_api3_twingle_project_Delete(array $params): array {
       'Delete'
     );
   }
-
 }
