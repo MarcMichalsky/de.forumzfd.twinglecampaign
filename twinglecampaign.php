@@ -89,7 +89,10 @@ function twinglecampaign_postSave_callback (
       $result = civicrm_api3($entity, 'getsingle',
         ['id' => $campaign_id]
       )['values'][$campaign_id];
-      $project = new $entity($result);
+      $className = 'CRM_TwingleCampaign_BAO_' . $entity;
+      $id = $result['id'];
+      unset($result['id']);
+      $project = new $className($result, $id);
       try {
         $project->clone();
       } catch (Exception $e) {

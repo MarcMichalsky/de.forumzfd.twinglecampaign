@@ -91,8 +91,8 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    * @throws \Exception
    */
   public function clone() {
-    unset($this->values['id']);
-    unset($this->values['identifier']);
+    $this->values['id'] = 0;
+    $this->values['identifier'] = 0;
     $this->create(); // this will also trigger the postSave hook
   }
 
