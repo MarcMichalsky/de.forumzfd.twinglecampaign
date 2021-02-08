@@ -61,7 +61,7 @@ function civicrm_api3_twingle_campaign_Create(array $params): array {
 
   // Try to create the TwingleCampaign
   try {
-    $campaign->create();
+    $campaign->create(TRUE);
     return civicrm_api3_create_success(
       $campaign->getResponse('TwingleCampaign created'),
       $params,
