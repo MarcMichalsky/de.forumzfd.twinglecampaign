@@ -82,11 +82,18 @@ class CRM_TwingleCampaign_Utils_ExtensionCache {
   }
 
   /**
-   * Returns a mapping of all custom field of the TwingleCampaign extension
+   * ## Get custom field mapping
+   * Returns a mapping custom fields of the TwingleCampaign extension.
+   * * If a **$fieldName** is provided, this method returns its custom field name
+   * * Without parameter, the method returns the whole mapping
+   * @param string|null $fieldName
    *
-   * @return array
+   * @return array|string
    */
-  public function getCustomFieldMapping(): array {
+  public function getCustomFieldMapping(string $fieldName = NULL) {
+    if ($fieldName) {
+      return $this->customFieldMapping[$fieldName];
+    }
     return $this->customFieldMapping;
   }
 
