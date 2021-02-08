@@ -84,23 +84,45 @@ function twinglecampaign_postSave_callback (
       $entity = 'TwingleCampaign';
     }
 
-    if ($_POST['action'] == 'clone') {
-      unset($_POST['action']);
-      $result = civicrm_api3($entity, 'getsingle',
-        ['id' => $campaign_id]
-      )['values'][$campaign_id];
-      $className = 'CRM_TwingleCampaign_BAO_' . $entity;
-      $id = $result['id'];
-      unset($result['id']);
-      $project = new $className($result, $id);
-      try {
-        $project->clone();
-      } catch (Exception $e) {
-        Civi::log()->error(
-          E::LONG_NAME .
-          ' could not clone ' . $entity . ': ' . $e->getMessage()
-        );
-        CRM_Utils_System::setUFMessage($entity. ' could not get cloned.');
+    if (isset($_POST['action'])) {
+      if ($_POST['action'] == 'clone') {
+        unset($_POST['action']);
+        $result = civicrm_api3($entity, 'getsingle',
+          ['id' => $campaign_id]
+        )['values'][$campaign_id];
+        $className = 'CRM_TwingleCampaign_BAO_' . $entity;
+        $id = $result['id'];
+        unset($result['id']);
+        $project = new $className($result, $id);
+        try {
+          $project->clone();
+        } catch (Exception $e) {
+          Civi::log()->error(
+            E::LONG_NAME .
+            ' could not clone ' . $entity . ': ' . $e->getMessage()
+          );
+          CRM_Utils_System::setUFMessage($entity . ' could not get cloned.');
+        }
+      }
+      elseif ($entity == 'TwingleProject') {
+        try {
+          civicrm_api3('TwingleProject', 'sync', ['id' => $campaign_id]);
+          CRM_Utils_System::setUFMessage('TwingleProject was saved.');
+        } catch (CiviCRM_API3_Exception $e) {
+          Civi::log()->error(
+            'twinglecampaign_postSave_callback ' . $e->getMessage()
+          );
+        }
+      }
+      else {
+        try {
+          civicrm_api3('TwingleCampaign', 'create', ['id' => $campaign_id]);
+          CRM_Utils_System::setUFMessage('TwingleCampaign was saved.');
+        } catch (CiviCRM_API3_Exception $e) {
+          Civi::log()->error(
+            'twinglecampaign_postSave_callback ' . $e->getMessage()
+          );
+        }
       }
     }
     elseif ($entity == 'TwingleProject') {
