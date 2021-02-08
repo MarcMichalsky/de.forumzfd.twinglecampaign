@@ -68,8 +68,8 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
       self::IN
     );
 
-//    // Set id
-//    $values_prepared_for_import['id'] = $this->id;
+    // Set id
+    $values_prepared_for_import['id'] = $this->id;
 
     // Set a flag to not trigger the hook
     if ($no_hook) {
