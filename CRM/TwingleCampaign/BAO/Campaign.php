@@ -20,6 +20,8 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
   protected $prefix = NULL;
 
+  protected  $formattedValues;
+
 
   /**
    * ## Campaign constructor.
@@ -35,6 +37,56 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
     // Set campaign values
     $this->update($values);
+  }
+
+  /**
+   * ## Create this entity as campaign in CiviCRM
+   *
+   * Returns _TRUE_ if creation was successful or _FALSE_ if it creation failed.
+   *
+   * @param bool $no_hook
+   * Do not trigger postSave hook to prevent recursion
+   *
+   * @return bool
+   * @throws \Exception
+   */
+  public function create(bool $no_hook = FALSE): bool {
+
+    // Prepare project values for import into database
+    $values_prepared_for_import = $this->values;
+    $this->formatValues(
+      $values_prepared_for_import,
+      self::IN
+    );
+    $this->translateKeys(
+      $values_prepared_for_import,
+      self::IN
+    );
+    $this->formattedValues = $values_prepared_for_import;
+    $this->translateCustomFields(
+      $values_prepared_for_import,
+      self::IN
+    );
+
+//    // Set id
+//    $values_prepared_for_import['id'] = $this->id;
+
+    // Set a flag to not trigger the hook
+    if ($no_hook) {
+      $_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook'] = TRUE;
+    }
+
+    // Create campaign
+    $result = civicrm_api3('Campaign', 'create', $values_prepared_for_import);
+
+    // Update id
+    $this->id = $result['id'];
+
+    // Check if campaign was created successfully
+    if ($result['is_error'] != 0) {
+      throw new Exception($result['error_message']);
+    }
+    return TRUE;
   }
 
 
@@ -137,10 +189,8 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
    * ## Translate field names and custom field names
    *
    * Constants for **$direction**:<br>
-   * **Campaign::IN** translate array keys from Twingle format into
-   * CiviCRM format <br>
-   * **Campaign::OUT** translate array keys from CiviCRM format into
-   * Twingle format
+   * **Campaign::IN** Translate field name to custom field name <br>
+   * **Campaign::OUT** Translate from custom field name to field name
    *
    * @param array $values
    * array of keys to translate

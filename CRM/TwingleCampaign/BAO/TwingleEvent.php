@@ -40,66 +40,41 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    * ## Create the Event as a campaign in CiviCRM if it does not exist
    * Returns _TRUE_ if creation was successful or _FALSE if it creation failed.
    *
+   * @param bool $no_hook
    * @return bool
-   * @throws CiviCRM_API3_Exception
-   * @throws Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
    */
-  public function create(): bool {
+  public function create(bool $no_hook = FALSE): bool {
 
-    // Prepare project values for import into database
-    $values_prepared_for_import = $this->values;
-    $this::formatValues(
-      $values_prepared_for_import,
-      self::IN
-    );
-    $this->translateKeys(
-      $values_prepared_for_import,
-      self::IN
-    );
-    $formattedValues = $values_prepared_for_import;
-    $this->translateCustomFields(
-      $values_prepared_for_import,
-      self::IN
-    );
+    if (parent::create()) {
 
-    // Create campaign
-    $result = civicrm_api3('Campaign', 'create', $values_prepared_for_import);
-
-    // Update id
-    $this->id = $result['id'];
-
-    // Check if campaign was created successfully
-    if ($result['is_error'] != 0) {
-      throw new Exception($result['error_message']);
-    }
-
-    // Open a case for event initiator if it does not yet exist
-
-    // check for existence
-    $result = $result = civicrm_api3('Case', 'get', [
-      'contact_id'   => $formattedValues['contact_id'],
-      'case_type_id' => Configuration::get('twinglecampaign_start_case'),
-      'subject'      => $formattedValues['title'] . ' | Event-ID: ' . $formattedValues['id'],
-    ]);
-
-    // Open a case
-    if (
-      Configuration::get('twinglecampaign_start_case') &&
-      $result['count'] == 0
-    ) {
-      $result = civicrm_api3('Case', 'create', [
-        'contact_id'   => $formattedValues['contact_id'],
+      // check for existence
+      $result = civicrm_api3('Case', 'get', [
+        'contact_id'   => $this->formattedValues['contact_id'],
         'case_type_id' => Configuration::get('twinglecampaign_start_case'),
-        'subject'      => $formattedValues['title'] . ' | Event-ID: ' . $formattedValues['id'],
-        'start_date'   => $formattedValues['created_at'],
-        'status_id'    => "Open",
+        'subject'      => $this->formattedValues['title'] . ' | Event-ID: ' . $formattedValues['id'],
       ]);
-    }
-    if ($result['is_error'] != 0) {
-      throw new Exception('Could not create case');
-    }
 
-    return TRUE;
+      // Open a case
+      if (
+        Configuration::get('twinglecampaign_start_case') &&
+        $result['count'] == 0
+      ) {
+        $result = civicrm_api3('Case', 'create', [
+          'contact_id'   => $this->formattedValues['contact_id'],
+          'case_type_id' => Configuration::get('twinglecampaign_start_case'),
+          'subject'      => $formattedValues['title'] . ' | Event-ID: ' . $formattedValues['id'],
+          'start_date'   => $formattedValues['created_at'],
+          'status_id'    => "Open",
+        ]);
+      }
+      if ($result['is_error'] != 0) {
+        throw new Exception('Could not create case');
+      }
+
+      return TRUE;
+    }
   }
 
 
@@ -204,7 +179,6 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
       'id'         => (int) $this->id,
       'event_id'   => (int) $this->values['id'],
       'project_id' => (int) $this->values['project_id'],
-      'status'     => $status,
     ];
     if ($status) {
       $response['status'] = $status;

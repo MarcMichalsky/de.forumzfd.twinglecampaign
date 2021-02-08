@@ -69,34 +69,7 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    */
   public function create(bool $no_hook = FALSE): bool {
 
-    // Prepare project values for import into database
-    $values_prepared_for_import = $this->values;
-    $this->formatValues(
-      $values_prepared_for_import,
-      self::IN
-    );
-    $this->translateKeys(
-      $values_prepared_for_import,
-      self::IN
-    );
-    $this->translateCustomFields(
-      $values_prepared_for_import,
-      self::IN
-    );
-
-    // Set id
-    $values_prepared_for_import['id'] = $this->id;
-
-    // Set a flag to not trigger the hook
-    if ($no_hook) {
-      $_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook'] = TRUE;
-    }
-
-    // Create campaign
-    $result = civicrm_api3('Campaign', 'create', $values_prepared_for_import);
-
-    // Update id
-    $this->id = $result['id'];
+    $result = parent::create($no_hook);
 
     // Check if campaign was created successfully
     if ($result['is_error'] == 0) {
