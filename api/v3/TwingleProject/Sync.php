@@ -48,20 +48,22 @@ function _civicrm_api3_twingle_project_Sync_spec(array &$spec) {
 /**
  * # TwingleProject.Sync API
  *
- * Synchronize one ore more campaigns of the type TwingleProject between CiviCRM
+ * Synchronize one ore more campaigns of the type TwingleProject between
+ * CiviCRM
  * and Twingle.
  *
- * * If you provide an **id** or **project_id** parameter, *only one project* will
- * be synchronized.
+ * * If you provide an **id** or **project_id** parameter, *only one project*
+ * will be synchronized.
  *
- * * If you provide no **id** or **project_id** parameter, *all projects* will be
- * synchronized.
+ * * If you provide no **id** or **project_id** parameter, *all projects* will
+ * be synchronized.
  *
  * @param array $params
  *
  * @return array
  *   API result descriptor
  * @throws \CiviCRM_API3_Exception
+ * @throws \Exception
  * @see civicrm_api3_create_success
  */
 function civicrm_api3_twingle_project_Sync(array $params): array {
@@ -195,13 +197,18 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
         array_column($projects_from_civicrm['values'], 'project_id'))) {
         $project = new TwingleProject($project_from_twingle);
 
-        // If this is a test, do not make db changes
-        if ($params['is_test']) {
-          $result_values[$project->getId()] =
-            $project->getResponse('Ready to create TwingleProject');
-        }
-
         try {
+          // Get embed data
+          $project->setEmbedData(
+            $twingleApi->getProjectEmbedData($project->getProjectId())
+          );
+
+          // If this is a test, do not make db changes
+          if ($params['is_test']) {
+            $result_values[$project->getId()] =
+              $project->getResponse('Ready to create TwingleProject');
+          }
+
           $project->create(TRUE);
           $result_values[$project->getId()] =
             $project->getResponse('TwingleProject created');
@@ -247,7 +254,7 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
       }
     }
 
-    // Give back results
+    // Return results
     if ($errors_occurred > 0) {
       $errorMessage = ($errors_occurred > 1)
         ? "$errors_occurred synchronisation processes resulted with an error"
@@ -300,8 +307,9 @@ function _updateProjectLocally(array $project_from_twingle,
     }
     // ... else, update local TwingleProject campaign
     $project->create(TRUE);
+    $response[] = $project->getResponse('TwingleProject updated successfully');
     return civicrm_api3_create_success(
-      $project->getResponse('TwingleProject updated successfully'),
+      $response,
       $params,
       'TwingleProject',
       'Sync'
@@ -371,8 +379,9 @@ function _pushProjectToTwingle(TwingleProject $project,
       );
       // Create updated campaign
       $project->create(TRUE);
+      $response[] = $project->getResponse('TwingleProject pushed to Twingle');
       return civicrm_api3_create_success(
-        $project->getResponse('TwingleProject pushed to Twingle'),
+        $response,
         $params,
         'TwingleProject',
         'Sync'

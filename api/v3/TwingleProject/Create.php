@@ -88,9 +88,6 @@ function _civicrm_api3_twingle_project_Create_spec(array &$spec) {
  */
 function civicrm_api3_twingle_project_Create($params): array {
 
-  // For logging purpose
-  $extensionName = E::LONG_NAME;
-
   // instantiate project
   $project = new TwingleProject($params, 'TWINGLE');
 
@@ -104,13 +101,14 @@ function civicrm_api3_twingle_project_Create($params): array {
         'Create'
       );
     } catch(Exception $e){
-      $errorMessage = $e->getMessage();
       Civi::log()->error(
-        "$extensionName could not create TwingleProject: $errorMessage",
+        E::LONG_NAME .
+        ' could not create TwingleProject: ' .
+        $e->getMessage(),
         $project->getResponse()
       );
       return civicrm_api3_create_error(
-        "Could not create TwingleProject: $errorMessage",
+        'Could not create TwingleProject: ' . $e->getMessage(),
         $project->getResponse()
       );
     }

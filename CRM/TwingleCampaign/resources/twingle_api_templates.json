@@ -11,6 +11,7 @@
     "last_update"
   ],
   "project_embed_data": [
+    "page",
     "widget",
     "form",
     "form-single",
@@ -49,5 +50,11 @@
     "eventall",
     "eventlist",
     "eventeditcreate"
+  ],
+  "TwingleCampaign": [
+    "id",
+    "parent_id",
+    "name",
+    "title"
   ]
 }
