@@ -72,11 +72,15 @@ class CRM_TwingleCampaign_Utils_ExtensionCache {
 
     // Get ids for Twingle related campaign types
     foreach ($this->campaigns['campaign_types'] as $campaign_type) {
-      $this->campaigns['campaign_types'][$campaign_type['name']]['id'] = civicrm_api3(
+      $campaign_type_id = civicrm_api3(
         'OptionValue',
         'get',
         ['sequential' => 1, 'name' => $campaign_type['name']]
-      )['values'][0]['value'];
+      )['values'];
+      if ($campaign_type_id) {
+        $this->campaigns['campaign_types'][$campaign_type['name']]['id'] =
+          $campaign_type_id[0]['value'];
+      }
     }
 
   }
@@ -84,8 +88,10 @@ class CRM_TwingleCampaign_Utils_ExtensionCache {
   /**
    * ## Get custom field mapping
    * Returns a mapping custom fields of the TwingleCampaign extension.
-   * * If a **$fieldName** is provided, this method returns its custom field name
+   * * If a **$fieldName** is provided, this method returns its custom field
+   * name
    * * Without parameter, the method returns the whole mapping
+   *
    * @param string|null $fieldName
    *
    * @return array|string

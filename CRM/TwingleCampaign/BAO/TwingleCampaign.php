@@ -114,19 +114,21 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
       $parent_campaign = civicrm_api3('Campaign', 'getsingle',
         ['id' => $parent_id]);
 
-      if ($parent_campaign['is_error'] != 1) {
-        $parent_campaign_type_id = $parent_campaign['campaign_type_id'];
-        if ($parent_campaign['parent_id']) {
-          $parent_id = $parent_campaign['parent_id'];
+      if (isset($parent_campaign['is_error'])) {
+        if ($parent_campaign['is_error'] != 1) {
+          throw new CiviCRM_API3_Exception($parent_campaign['error_message']);
         }
-        else {
-          break;
-        }
+      }
+
+      $parent_campaign_type_id = $parent_campaign['campaign_type_id'];
+      if (isset($parent_campaign['parent_id'])) {
+        $parent_id = $parent_campaign['parent_id'];
       }
       else {
-        throw new CiviCRM_API3_Exception($parent_campaign['error_message']);
+        break;
       }
     }
+
 
     // Set parent_project_id and retrieve parent_project_url
     if ($parent_campaign_type_id == $twingle_project_campaign_type_id) {
@@ -187,7 +189,8 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    * ## Create URL
    * Create a URL by adding a tw_cid
    */
-  private function createUrl() {
+  private
+  function createUrl() {
     $this->values['url'] =
       $this->values['parent_project_url'] . '?tw_cid=' . $this->values['cid'];
   }
@@ -196,14 +199,16 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
   /**
    *
    */
-  private function createCid() {
+  private
+  function createCid() {
     $this->values['cid'] = md5($this->id . '_' . $this->values['name']);
   }
 
   /**
    *
    */
-  private function validateCid() {
+  private
+  function validateCid() {
 
   }
 
@@ -211,7 +216,8 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
   /**
    *
    */
-  private function decodeCid() {
+  private
+  function decodeCid() {
 
   }
 
@@ -229,7 +235,8 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    * @param string $direction
    * const: Campaign::OUT or Campaign::OUT
    */
-  public function translateCustomFields(array &$values, string $direction) {
+  public
+  function translateCustomFields(array &$values, string $direction) {
 
     // Translate field name to custom field name
     if ($direction == self::IN) {
@@ -288,7 +295,8 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    * ## Delete TwingleCampaign
    * Deletes this TwingleCampaign from CiviCRM
    */
-  private function delete() {
+  private
+  function delete() {
     if ($this->id) {
       try {
         civicrm_api3('Campaign', 'delete', ['id' => $this->id]);
@@ -315,15 +323,18 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    *
    * @return array
    */
-  public function getResponse(string $status = NULL): array {
+  public
+  function getResponse(string $status = NULL): array {
     $response = [
-      'title' => $this->values['title'],
-      'id'    => (int) $this->id,
+      'id' => (int) $this->id,
     ];
     if ($status) {
       $response['status'] = $status;
     }
-    if ($this->values['parent_project_id']) {
+    if (isset($this->values['title'])) {
+      $response['title'] = $this->values['title'];
+    }
+    if (isset($this->values['parent_project_id'])) {
       $response['parent_project_id'] = (int) $this->values['parent_project_id'];
     }
     return $response;
@@ -337,7 +348,8 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    * @param array $values
    * values that should get updated
    */
-  private function update(array $values) {
+  private
+  function update(array $values) {
     $filter = ExtensionCache::getInstance()->getTemplates()['TwingleCampaign'];
     foreach ($values as $key => $value) {
       if (in_array($key, $filter)) {
@@ -355,7 +367,8 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public function clone() {
+  public
+  function clone() {
     // TODO: implement cloning
   }
 
