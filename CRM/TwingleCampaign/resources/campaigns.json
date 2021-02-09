@@ -131,7 +131,7 @@
       "weight": 5
     },
     "twingle_project_page": {
-      "custom_group_id": "Twingle_Project_Embed_Codes",
+      "custom_group_id": "Twingle_Project_Information",
       "label": "Twingle Project Page",
       "name": "twingle_project_page",
       "is_required": 0,
