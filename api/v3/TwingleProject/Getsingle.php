@@ -103,6 +103,12 @@ function _civicrm_api3_twingle_project_Getsingle_spec(array &$spec) {
  * @see civicrm_api3_create_success
  */
 function civicrm_api3_twingle_project_Getsingle(array $params): array {
+
+  // filter parameters
+  $allowed_params = [];
+  _civicrm_api3_twingle_project_Getsingle_spec($allowed_params);
+  $params = array_intersect_key($params, $allowed_params);
+
   $returnValues = civicrm_api3('TwingleProject', 'get', $params);
   $count = $returnValues['count'];
 

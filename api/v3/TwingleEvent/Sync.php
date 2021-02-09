@@ -77,6 +77,11 @@ function _civicrm_api3_twingle_event_Sync_spec(array &$spec) {
  */
 function civicrm_api3_twingle_event_Sync(array $params): array {
 
+  // filter parameters
+  $allowed_params = [];
+  _civicrm_api3_twingle_event_Sync_spec($allowed_params);
+  $params = array_intersect_key($params, $allowed_params);
+
   // If call provides an API key, use it instead of the API key set
   // on the extension settings page
   $apiKey = empty($params['twingle_api_key'])

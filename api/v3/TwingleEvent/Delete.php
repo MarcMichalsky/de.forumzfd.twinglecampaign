@@ -68,6 +68,11 @@ function _civicrm_api3_twingle_event_Delete_spec(array &$spec) {
  */
 function civicrm_api3_twingle_event_Delete(array $params): array {
 
+  // filter parameters
+  $allowed_params = [];
+  _civicrm_api3_twingle_event_Delete_spec($allowed_params);
+  $params = array_intersect_key($params, $allowed_params);
+
   $result_values = [];
   $events = [];
   $errors_occurred = 0;

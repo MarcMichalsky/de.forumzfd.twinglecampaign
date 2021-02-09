@@ -98,6 +98,12 @@ function _civicrm_api3_twingle_event_Get_spec(array &$spec) {
  *
  */
 function civicrm_api3_twingle_event_Get(array $params): array {
+
+  // filter parameters
+  $allowed_params = [];
+  _civicrm_api3_twingle_event_Get_spec($allowed_params);
+  $params = array_intersect_key($params, $allowed_params);
+
   $custom_field_mapping = Cache::getInstance()->getCustomFieldMapping();
   $custom_field_mapping_reverse = array_flip($custom_field_mapping);
 

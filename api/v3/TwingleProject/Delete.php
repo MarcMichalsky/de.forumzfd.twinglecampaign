@@ -59,6 +59,11 @@ function _civicrm_api3_twingle_project_Delete_spec(array &$spec) {
  */
 function civicrm_api3_twingle_project_Delete(array $params): array {
 
+  // filter parameters
+  $allowed_params = [];
+  _civicrm_api3_twingle_project_Delete_spec($allowed_params);
+  $params = array_intersect_key($params, $allowed_params);
+
   $result_values = [];
   $error_occurred = FALSE;
 

@@ -51,8 +51,12 @@ function _civicrm_api3_twingle_sync_Sync_spec(array &$spec) {
  */
 function civicrm_api3_twingle_sync_Sync(array $params): array {
 
+  // filter parameters
+  $allowed_params = [];
+  _civicrm_api3_twingle_sync_Sync_spec($allowed_params);
+  $params = array_intersect_key($params, $allowed_params);
+
   $result_values = [];
-  unset($params['sequential']);
 
   // Synchronize all TwingleProject campaigns
   $projects = civicrm_api3(

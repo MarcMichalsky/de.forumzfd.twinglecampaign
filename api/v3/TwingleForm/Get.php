@@ -55,6 +55,12 @@ function _civicrm_api3_twingle_form_Get_spec(array &$spec) {
  *
  */
 function civicrm_api3_twingle_form_Get(array $params): array {
+
+  // filter parameters
+  $allowed_params = [];
+  _civicrm_api3_twingle_form_Get_spec($allowed_params);
+  $params = array_intersect_key($params, $allowed_params);
+
   $returnValues = [];
 
   // Get custom fields
