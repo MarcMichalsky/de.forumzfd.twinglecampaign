@@ -67,18 +67,23 @@ function civicrm_api3_twingle_sync_Sync(array $params): array {
 
   // Synchronize all TwingleEvent campaigns
   foreach ($projects as $project) {
-    if (is_array($project)) {
+    // If the project is of type 'event', synchronize all its events
+    if (is_array($project) && $project['project_type'] == 'event') {
       $_params = $params;
       $_params['project_id'] = $project['project_id'];
+      $events = civicrm_api3(
+        'TwingleEvent',
+        'sync',
+        $_params
+      )['values'];
       $result_values[] = [
         'project' => $project,
-        'events'  => array_values(
-          civicrm_api3(
-            'TwingleEvent',
-            'sync',
-            $_params
-          )['values']
-        ),
+        'events'  => array_values($events),
+      ];
+    }
+    else {
+      $result_values[] = [
+        'project' => $project
       ];
     }
   }

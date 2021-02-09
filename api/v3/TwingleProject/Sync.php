@@ -184,7 +184,7 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
         // instantiate project with values from TwingleProject.Get
         $project = new TwingleProject($project_from_civicrm, $id);
         // push project to Twingle
-        $result = pushToTwingle($project, $twingleApi, $params);
+        $result = _pushProjectToTwingle($project, $twingleApi, $params);
         if ($result['is_error'] != 0) {
           $errors_occurred++;
           $result_values[$project->getId()] =
@@ -451,7 +451,7 @@ function _projectSync(TwingleProject $project,
 
   // If both versions are still synchronized
   else {
-    $response[] = $project->getResponse('TwingleProject up to date');
+    $response = $project->getResponse('TwingleProject up to date');
     return civicrm_api3_create_success(
       $response,
       $params,

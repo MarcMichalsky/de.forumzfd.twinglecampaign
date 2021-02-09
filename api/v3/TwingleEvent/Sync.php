@@ -111,7 +111,7 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
     Civi::cache('long')->set('twinglecampaign_twingle_api', $twingleApi);
   }
 
-  // If an id or a project_id is given, synchronize only this one campaign
+  // If an id or a event_id is provided, synchronize only this one campaign
   if ($params['id'] || $params['event_id']) {
 
     // Get project from db via API
@@ -166,7 +166,7 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
     }
   }
 
-  // If no id but an event_id and/or a project_id is given, synchronize all
+  // If no id but an event_id and/or a project_id is provided, synchronize all
   // all events or just the events of the given project
 
   $result_values = [];
@@ -285,7 +285,7 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
     }
   }
 
-  // Give back results
+  // Return results
   if ($errors_occurred > 0) {
     $errorMessage = ($errors_occurred > 1)
       ? "$errors_occurred synchronisation processes resulted with an error"
