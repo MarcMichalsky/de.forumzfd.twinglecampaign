@@ -65,5 +65,10 @@ function civicrm_api3_twingle_form_Getsingle(array $params): array {
   if ($count != 1){
     return civicrm_api3_create_error("Expected one TwingleForm but found $count");
   }
-    return civicrm_api3_create_success($returnValues['values'], $params, 'TwingleForm', 'Getsingle');
+    return civicrm_api3_create_success(
+      $returnValues['values'][$returnValues['id']],
+      $params,
+      'TwingleForm',
+      'Getsingle'
+    );
 }

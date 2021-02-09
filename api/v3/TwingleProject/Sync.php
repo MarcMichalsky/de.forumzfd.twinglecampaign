@@ -100,13 +100,13 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
 
       // If the TwingleProject campaign already has a project_id try to get the
       // project from Twingle
-      if ($result['values'][0]['project_id']) {
-        $project_from_twingle = $twingleApi->getProject($result['values'][0]['project_id']);
+      if ($result['values']['project_id']) {
+        $project_from_twingle = $twingleApi->getProject($result['values']['project_id']);
 
         // instantiate project from CiviCRM
-        $id = $result['values'][0]['id'];
-        unset($result['values'][0]['id']);
-        $project = new TwingleProject($result['values'][0], $id);
+        $id = $result['values']['id'];
+        unset($result['values']['id']);
+        $project = new TwingleProject($result['values'], $id);
 
         // Synchronize projects
         if (!empty($project_from_twingle)) {
@@ -127,11 +127,11 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
       else {
 
         // store campaign id in $id
-        $id = $result['values'][0]['id'];
-        unset($result['values'][0]['id']);
+        $id = $result['values']['id'];
+        unset($result['values']['id']);
 
         // instantiate project
-        $project = new TwingleProject($result['values'][0], $id);
+        $project = new TwingleProject($result['values'], $id);
 
         // Push project to Twingle
         return _pushProjectToTwingle($project, $twingleApi, $params);
@@ -252,7 +252,7 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
               $project->getResponse($result['error_message']);
           }
           else {
-            $result_values[$project->getId()] = $result['values'][0];
+            $result_values[$project->getId()] = $result['values'];
           }
           break;
         }
