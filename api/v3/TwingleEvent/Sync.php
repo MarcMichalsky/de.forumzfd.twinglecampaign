@@ -27,6 +27,13 @@ function _civicrm_api3_twingle_event_Sync_spec(array &$spec) {
     'api.required' => 0,
     'description'  => E::ts('Twingle ID for this Event'),
   ];
+  $spec['project_id'] = [
+    'name'         => 'project_id',
+    'title'        => E::ts('Twingle Project ID'),
+    'type'         => CRM_Utils_Type::T_INT,
+    'api.required' => 0,
+    'description'  => E::ts('Twingle ID for this project'),
+  ];
   $spec['is_test'] = [
     'name'         => 'is_test',
     'title'        => E::ts('Test'),
