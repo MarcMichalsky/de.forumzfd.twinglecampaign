@@ -3,8 +3,6 @@
 use CRM_TwingleCampaign_BAO_TwingleProject as TwingleProject;
 use CRM_TwingleCampaign_ExtensionUtil as E;
 
-include_once E::path() . '/CRM/TwingleCampaign/BAO/TwingleProject.php';
-
 /**
  * TwingleProject.Create API specification (optional)
  * This is used for documentation and validation.
@@ -18,7 +16,7 @@ function _civicrm_api3_twingle_project_Create_spec(array &$spec) {
     'name'         => 'name',
     'title'        => E::ts('Twingle Project Name'),
     'type'         => CRM_Utils_Type::T_STRING,
-    'api.required' => 1,
+    'api.required' => 0,
     'description'  => E::ts('Name of the Twingle Project'),
   ];
   $spec['id'] = [
@@ -36,20 +34,6 @@ function _civicrm_api3_twingle_project_Create_spec(array &$spec) {
     'description'  => E::ts('The type of the Twingle Project'),
     'api.default'  => 'default',
   ];
-  $spec['organisation_id'] = [
-    'name'         => 'organisation_id',
-    'title'        => E::ts('Organisation ID'),
-    'type'         => CRM_Utils_Type::T_INT,
-    'api.required' => 0,
-    'description'  => E::ts('ID of your Organisation'),
-  ];
-  $spec['last_update'] = [
-    'name'         => 'last_update',
-    'title'        => E::ts('Last Project Update '),
-    'type'         => CRM_Utils_Type::T_STRING,
-    'api.required' => 0,
-    'description'  => E::ts('UNIX-Timestamp ot the moment when the Project was last updated'),
-  ];
   $spec['allow_more'] = [
     'name'         => 'allow_more',
     'title'        => E::ts('Allow more'),
@@ -58,19 +42,19 @@ function _civicrm_api3_twingle_project_Create_spec(array &$spec) {
     'description'  => E::ts('Allow to donate more than is defined in the target'),
     'api.default'  => TRUE,
   ];
-  $spec['identifier'] = [
-    'name'         => 'identifier',
-    'title'        => E::ts('Project Identifier'),
-    'type'         => CRM_Utils_Type::T_STRING,
-    'api.required' => 0,
-    'description'  => E::ts('Unique identifier of a Project')
-  ];
   $spec['project_target'] = [
     'name'         => 'project_target',
     'title'        => E::ts('Project Target'),
     'type'         => CRM_Utils_Type::T_MONEY,
     'api.required' => 0,
     'description'  => E::ts('Financial Target of a Project'),
+  ];
+  $spec['page'] = [
+    'name'         => 'page',
+    'title'        => E::ts('Project Page'),
+    'type'         => CRM_Utils_Type::T_STRING,
+    'api.required' => 0,
+    'description'  => E::ts('The URL of the TwingleProject page'),
   ];
 }
 
@@ -82,19 +66,40 @@ function _civicrm_api3_twingle_project_Create_spec(array &$spec) {
  * @return array
  *   API result descriptor
  *
- * @throws \Exception
  * @see civicrm_api3_create_success
- *
  */
-function civicrm_api3_twingle_project_Create($params): array {
+function civicrm_api3_twingle_project_Create(array $params): array {
 
   // filter parameters
   $allowed_params = [];
   _civicrm_api3_twingle_project_Create_spec($allowed_params);
   $params = array_intersect_key($params, $allowed_params);
 
-  // instantiate project
-  $project = new TwingleProject($params, 'TWINGLE');
+  try {
+    // Try to instantiate project
+    // If id parameter is provided, alter the existing project
+    if ($params['id']) {
+      $result = civicrm_api3('TwingleProject', 'getsingle',
+        ['id' => $params['id']]
+      );
+      $result['values']['id'] = $result['values']['project_id'];
+      unset($result['values']['project_id']);
+      $project = new TwingleProject($result['values'], $params['id']);
+      $project->update($params);
+      $project->setEmbedData($params);
+    }
+    // If no id is provided, try to create a new project with provided values
+    else {
+      $id = $params['id'];
+      unset($params['id']);
+      $project = new TwingleProject($params, $id);
+    }
+  } catch (Exception $e) {
+    return civicrm_api3_create_error(
+      'Could not instantiate TwingleProject: ' . $e->getMessage()
+    );
+  }
+
 
     // Try to create the TwingleProject campaign
     try {
