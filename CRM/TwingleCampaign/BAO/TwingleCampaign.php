@@ -134,23 +134,29 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
     if ($parent_campaign_type_id == $twingle_project_campaign_type_id) {
       $this->values['parent_project_id'] = $parent_id;
 
-      // Get custom field name for twingle_project_page field
+      // Get custom field names for twingle_project_page and
+      // twingle_project_url fields
       $cf_page = ExtensionCache::getInstance()
         ->getCustomFieldMapping('twingle_project_page');
+      $cf_url = ExtensionCache::getInstance()
+        ->getCustomFieldMapping('twingle_project_url');
 
-      // Extract twingle_project_page url from parent_campaign
-      if ($parent_campaign[$cf_page]) {
+      // Try to extract twingle_project_url from parent_campaign
+      if (!empty($parent_campaign[$cf_url])) {
+        $this->values['parent_project_url'] = $parent_campaign[$cf_url];
+      }
+      // If there is no twingle_project_url use the parent_project_page instead
+      elseif (!empty($parent_campaign[$cf_page])) {
         $this->values['parent_project_url'] = $parent_campaign[$cf_page];
       }
-
-      // If twingle_project_widget value is missing, try a synchronization
+      // If both values are missing, try a synchronization
       else {
         $parent_campaign = civicrm_api3('TwingleProject', 'sync',
           ['id' => $parent_id]);
 
-        // Now try again to extract the twingle_project_widget url
+        // Now try again to extract the twingle_project_page url
         if ($parent_campaign[$cf_url]) {
-          $this->values['parent_project_url'] = $parent_campaign[$cf_url];
+          $this->values['parent_project_url'] = $parent_campaign[$cf_page];
         }
 
         // If twingle_project_widget value is still missing, show an alert on

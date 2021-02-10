@@ -18,8 +18,8 @@ function _civicrm_api3_twingle_form_Create_spec(array &$spec) {
     'api.required' => 1,
     'description'  => E::ts('ID of the TwingleProject campaign'),
   ];
-  $spec['page'] = [
-    'name'         => 'page',
+  $spec['url'] = [
+    'name'         => 'url',
     'title'        => E::ts('TwingleProject Page URL'),
     'type'         => CRM_Utils_Type::T_STRING,
     'api.required' => 1,

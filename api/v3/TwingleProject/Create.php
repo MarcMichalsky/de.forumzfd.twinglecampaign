@@ -49,9 +49,9 @@ function _civicrm_api3_twingle_project_Create_spec(array &$spec) {
     'api.required' => 0,
     'description'  => E::ts('Financial Target of a Project'),
   ];
-  $spec['page'] = [
-    'name'         => 'page',
-    'title'        => E::ts('Project Page'),
+  $spec['url'] = [
+    'name'         => 'url',
+    'title'        => E::ts('TwingleProject Page URL'),
     'type'         => CRM_Utils_Type::T_STRING,
     'api.required' => 0,
     'description'  => E::ts('The URL of the TwingleProject page'),
