@@ -426,6 +426,19 @@
       "is_view": 1,
       "weight": 1
     },
+    "twingle_campaign_cid": {
+      "custom_group_id": "Twingle_Campaign_Information",
+      "label": "Twingle Campaign CID",
+      "name": "twingle_campaign_cid",
+      "is_required": 0,
+      "is_searchable": 0,
+      "data_type": "Memo",
+      "html_type": "Text",
+      "text_length": 32,
+      "is_active": 1,
+      "is_view": 1,
+      "weight": 2
+    },
     "twingle_campaign_url": {
       "custom_group_id": "Twingle_Campaign_Information",
       "label": "Twingle Campaign URL",
@@ -437,7 +450,7 @@
       "text_length": 600,
       "is_active": 1,
       "is_view": 1,
-      "weight": 2
+      "weight": 3
     }
   }
 }
