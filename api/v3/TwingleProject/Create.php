@@ -59,7 +59,7 @@ function _civicrm_api3_twingle_project_Create_spec(array &$spec) {
 }
 
 /**
- * TwingleProject.Create API
+ * # TwingleProject.Create API
  *
  * @param array $params
  *
@@ -85,6 +85,7 @@ function civicrm_api3_twingle_project_Create(array $params): array {
       $result['values']['id'] = $result['values']['project_id'];
       unset($result['values']['project_id']);
       $project = new TwingleProject($result['values'], $params['id']);
+      unset($params['id']);
       $project->update($params);
       $project->setEmbedData($params);
     }

@@ -1,8 +1,6 @@
 <?php
 
 use CRM_TwingleCampaign_Utils_ExtensionCache as ExtensionCache;
-use CRM_TwingleCampaign_BAO_TwingleCampaign as TwingleCampaign;
-use CRM_TwingleCampaign_BAO_TwingleProject as TwingleProject ;
 use CRM_TwingleCampaign_ExtensionUtil as E;
 
 require_once 'twinglecampaign.civix.php';

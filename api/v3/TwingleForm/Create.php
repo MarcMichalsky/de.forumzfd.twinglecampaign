@@ -49,7 +49,12 @@ function civicrm_api3_twingle_form_Create(array $params): array {
   $result = civicrm_api3('TwingleProject', 'create', $params);
 
   if ($result['is_error'] != 1) {
-    return civicrm_api3_create_success($result,$params,'TwingleForm', 'create',);
+    return civicrm_api3_create_success(
+      $result['values'],
+      $params,
+      'TwingleForm',
+      'create',
+    );
   }
   else {
     return civicrm_api3_create_error(

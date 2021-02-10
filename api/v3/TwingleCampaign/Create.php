@@ -14,10 +14,10 @@ use CRM_TwingleCampaign_ExtensionUtil as E;
 function _civicrm_api3_twingle_campaign_Create_spec(array &$spec) {
   $spec['id'] = [
     'name'         => 'id',
-    'title'        => E::ts('Twingle Project ID'),
+    'title'        => E::ts('Twingle Campaign ID'),
     'type'         => CRM_Utils_Type::T_INT,
     'api.required' => 0,
-    'description'  => E::ts('The Twingle Project ID'),
+    'description'  => E::ts('The Twingle Campaign ID'),
   ];
   $spec['name'] = [
     'name'         => 'name',
