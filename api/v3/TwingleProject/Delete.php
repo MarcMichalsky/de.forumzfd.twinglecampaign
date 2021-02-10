@@ -84,14 +84,12 @@ function civicrm_api3_twingle_project_Delete(array $params): array {
     Civi::cache('long')->set('twinglecampaign_twingle_api', $twingleApi);
   }
 
-  $params['sequential'] = 1;
-
   // To delete the TwingleProject on Twingle's side, we need the project_id
   // If no project_id is provided, try to get it via TwingleProject.getsingle
   if (!$params['project_id']) {
     try {
       $project = civicrm_api3('TwingleProject', 'getsingle', $params);
-      $params['project_id'] = $project['values'][0]['project_id'];
+      $params['project_id'] = $project['values']['project_id'];
     } catch (CiviCRM_API3_Exception $e) {
       $result_values['twingle'] = 'Could not delete TwingleProject: ' . $e->getMessage();
     }
@@ -128,7 +126,7 @@ function civicrm_api3_twingle_project_Delete(array $params): array {
     $project = civicrm_api3('TwingleProject', 'getsingle', $params);
     // The TwingleProject campaign may be already deleted
     if ($project['is_error'] == 0) {
-      $project = new TwingleProject($project['values'][0], $project['values'][0]['id']);
+      $project = new TwingleProject($project['values'], $project['values']['id']);
       $project->delete();
       $result_values['civicrm'] = 'TwingleProject deleted';
     }
