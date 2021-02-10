@@ -120,7 +120,7 @@ function civicrm_api3_twingle_project_Get(array $params): array {
 
   foreach ($params as $key => $value) {
     if ( $key != 'id' &&
-      key_exists('twingle_project_' . $key, $custom_field_mapping)
+      array_key_exists('twingle_project_' . $key, $custom_field_mapping)
     ) {
       $query[$custom_field_mapping['twingle_project_' . $key]] = $value;
     }
@@ -136,9 +136,11 @@ function civicrm_api3_twingle_project_Get(array $params): array {
 
   if ($result['is_error'] == 0) {
     $returnValues = [];
+
+    // Translate custom fields
     foreach ($result['values'] as $project) {
       foreach ($project as $key => $value) {
-        if (key_exists($key, $custom_field_mapping_reverse)) {
+        if (array_key_exists($key, $custom_field_mapping_reverse)) {
           $returnValues[$project['id']][$custom_field_mapping_reverse[$key]]
             = $value;
         }
