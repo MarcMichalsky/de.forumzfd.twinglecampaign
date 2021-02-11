@@ -124,6 +124,14 @@ function twinglecampaign_postSave_callback (
       }
     }
     elseif ($entity == 'TwingleProject') {
+      // Also synchronize all child TwingleCampaign campaigns
+      try {
+        civicrm_api3('TwingleCampaign', 'sync', ['project_id' => $campaign_id]);
+      } catch (CiviCRM_API3_Exception $e) {
+        Civi::log()->error(
+          'twinglecampaign_postSave_callback ' . $e->getMessage()
+        );
+      }
       try {
         civicrm_api3('TwingleProject', 'sync', ['id' => $campaign_id]);
         CRM_Utils_System::setUFMessage('TwingleProject was saved.');
