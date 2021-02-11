@@ -311,17 +311,15 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    */
   public
   function getResponse(string $status = NULL): array {
-    $response = [
-      'id' => (int) $this->id,
-    ];
+    $keys = ['id', 'name', 'title', 'parent_project_id', 'parent_id', 'cid', 'url'];
+    $response = [];
+    foreach ($keys as $key) {
+      if (isset($this->values[$key])) {
+        $response[$key] = $this->values[$key];
+      }
+    }
     if ($status) {
       $response['status'] = $status;
-    }
-    if (isset($this->values['title'])) {
-      $response['title'] = $this->values['title'];
-    }
-    if (isset($this->values['parent_project_id'])) {
-      $response['parent_project_id'] = (int) $this->values['parent_project_id'];
     }
     return $response;
   }
