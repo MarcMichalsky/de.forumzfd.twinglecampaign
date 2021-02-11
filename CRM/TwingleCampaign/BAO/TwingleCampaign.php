@@ -358,5 +358,13 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
     // TODO: implement cloning
   }
 
+  /**
+   * ## Get ID
+   * @return mixed|null
+   */
+  public function getId(): int {
+    return (int) $this->id;
+  }
+
 
 }
