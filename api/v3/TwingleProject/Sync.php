@@ -174,7 +174,7 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
     }
 
     // Push missing projects to Twingle
-    $result_values = [];
+    $returnValues = [];
     foreach ($projects_from_civicrm['values'] as $project_from_civicrm) {
       if (!in_array($project_from_civicrm['project_id'],
         array_column($projects_from_twingle, 'id'))) {
@@ -187,11 +187,11 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
         $result = _pushProjectToTwingle($project, $twingleApi, $params);
         if ($result['is_error'] != 0) {
           $errors_occurred++;
-          $result_values[$project->getId()] =
+          $returnValues[$project->getId()] =
             $project->getResponse($result['error_message']);
         }
         else {
-          $result_values[$project->getId()] = $result['values'];
+          $returnValues[$project->getId()] = $result['values'];
         }
       }
     }
@@ -210,12 +210,12 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
 
           // If this is a test, do not make db changes
           if ($params['is_test']) {
-            $result_values[$project->getId()] =
+            $returnValues[$project->getId()] =
               $project->getResponse('Ready to create TwingleProject');
           }
 
           $project->create(TRUE);
-          $result_values[$project->getId()] =
+          $returnValues[$project->getId()] =
             $project->getResponse('TwingleProject created');
         } catch (Exception $e) {
           $errors_occurred++;
@@ -225,7 +225,7 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
             $e->getMessage(),
             $project->getResponse()
           );
-          $result_values[$project->getId()] = $project->getResponse(
+          $returnValues[$project->getId()] = $project->getResponse(
             "TwingleProject could not get created: " . $e->getMessage()
           );
         }
@@ -248,11 +248,11 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
           $result = _projectSync($project, $project_from_twingle, $twingleApi, $params);
           if ($result['is_error'] != 0) {
             $errors_occurred++;
-            $result_values[$project->getId()] =
+            $returnValues[$project->getId()] =
               $project->getResponse($result['error_message']);
           }
           else {
-            $result_values[$project->getId()] = $result['values'];
+            $returnValues[$project->getId()] = $result['values'];
           }
           break;
         }
@@ -266,12 +266,12 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
         : "1 synchronisation process resulted with an error";
       return civicrm_api3_create_error(
         $errorMessage,
-        $result_values
+        $returnValues
       );
     }
     else {
       return civicrm_api3_create_success(
-        $result_values,
+        $returnValues,
         $params,
         'TwingleProject',
         'Sync'

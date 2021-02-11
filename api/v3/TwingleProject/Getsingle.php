@@ -92,7 +92,7 @@ function _civicrm_api3_twingle_project_Getsingle_spec(array &$spec) {
 }
 
 /**
- * TwingleProject.Getsingle API
+ * # TwingleProject.Getsingle API
  *
  * @param array $params
  *
@@ -109,9 +109,11 @@ function civicrm_api3_twingle_project_Getsingle(array $params): array {
   _civicrm_api3_twingle_project_Getsingle_spec($allowed_params);
   $params = array_intersect_key($params, $allowed_params);
 
+  // Get TwingleProject by provided parameters
   $returnValues = civicrm_api3('TwingleProject', 'get', $params);
   $count = $returnValues['count'];
 
+  // Check whether only a single TwingleProject is found
   if ($count != 1) {
     return civicrm_api3_create_error(
       "Expected one TwingleProject but found $count"
