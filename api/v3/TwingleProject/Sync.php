@@ -302,7 +302,7 @@ function _updateProjectLocally(array $project_from_twingle,
       $twingleApi->getProjectEmbedData($project->getProjectId())
     );
     // If this is a test, do not make db changes
-    if ($params['is_test']) {
+    if (array_key_exists('is_test', $params) && $params['is_test']) {
       return civicrm_api3_create_success(
         $project->getResponse('TwingleProject ready to update'),
         $params,

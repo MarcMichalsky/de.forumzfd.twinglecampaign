@@ -135,7 +135,9 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
     // Transfer all embed_data values
     foreach ($embed_data_keys as $key) {
-      $this->values[$key] = $embedData[$key];
+      if (array_key_exists($key, $embedData)) {
+        $this->values[$key] = $embedData[$key];
+      }
     }
   }
 
