@@ -194,6 +194,13 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    */
   private
   function createUrl() {
+    // Trim parent_project_url
+    $this->values['parent_project_url'] = trim($this->values['parent_project_url']);
+    // If url ends with a '/', remove it
+    if (substr($this->values['parent_project_url'], -1) == '/') {
+      $this->values['parent_project_url'] =
+        substr_replace($this->values['parent_project_url'], '', -1);
+    }
     $this->values['url'] =
       $this->values['parent_project_url'] . '?tw_cid=' . $this->values['cid'];
   }
