@@ -24,25 +24,23 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    * ## TwingleCampaign constructor
    *
    * @param array|null $values
+   * @param int|null $id
    *
-   * @throws CiviCRM_API3_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function __construct(array $values = NULL) {
+  public function __construct(array $values, int $id = NULL) {
 
     $this->prefix = 'twingle_campaign_';
-    $this->id = $values['id'] ?? NULL;
+    $this->id = $id ?? NULL;
     $this->values['campaign_type_id'] = 'twingle_campaign';
 
     if ($this->id) {
-      $this->fetch();
-      if ($values) {
-        $this->update($values);
-      }
+      $this->update($values);
       $this->getParentProject();
       $this->createCid();
       $this->createUrl();
     }
-    elseif ($values) {
+    else {
       $this->update($values);
     }
   }
@@ -83,8 +81,8 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    * @throws CiviCRM_API3_Exception
    */
   private function fetch() {
-    $this->values = civicrm_api3('Campaign', 'getsingle',
-      ['id' => $this->id]);
+    $this->values = civicrm_api3('TwingleCampaign', 'getsingle',
+      ['id' => $this->id])['values'];
   }
 
 
