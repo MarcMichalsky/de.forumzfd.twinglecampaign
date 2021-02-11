@@ -67,9 +67,8 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
 
     $result = civicrm_api3('Campaign', 'create', $values);
 
-    if ($result['is_error'] != 1) {
-      $this->id = $result['id'];
-      $this->values = $result['values'];
+    if (!array_key_exists('is_error', $result) || $result['is_error'] != 0) {
+      throw new CiviCRM_API3_Exception('TwingleCampaign creation failed');
     }
   }
 
