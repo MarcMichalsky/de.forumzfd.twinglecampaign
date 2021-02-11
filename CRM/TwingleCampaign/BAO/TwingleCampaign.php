@@ -207,23 +207,6 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
     $this->values['cid'] = md5($this->id . '_' . $this->values['name']);
   }
 
-  /**
-   *
-   */
-  private
-  function validateCid() {
-
-  }
-
-
-  /**
-   *
-   */
-  private
-  function decodeCid() {
-
-  }
-
 
   /**
    * ## Translate field names and custom field names
