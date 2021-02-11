@@ -130,18 +130,18 @@
       "is_view": 0,
       "weight": 5
     },
-    "twingle_project_page": {
+    "twingle_project_url": {
       "custom_group_id": "Twingle_Project_Information",
-      "label": "Twingle Project Page",
-      "name": "twingle_project_page",
+      "label": "Twingle Project URL",
+      "name": "twingle_project_url",
       "is_required": 0,
       "is_searchable": 0,
       "data_type": "Memo",
       "html_type": "TextArea",
       "text_length": 600,
       "is_active": 1,
-      "is_view": 1,
-      "weight": 1
+      "is_view": 0,
+      "weight": 6
     },
     "twingle_project_widget": {
       "custom_group_id": "Twingle_Project_Embed_Codes",
@@ -233,6 +233,19 @@
       "is_active": 1,
       "is_view": 1,
       "weight": 7
+    },
+    "twingle_project_page": {
+      "custom_group_id": "Twingle_Project_Embed_Codes",
+      "label": "Twingle Project Page",
+      "name": "twingle_project_page",
+      "is_required": 0,
+      "is_searchable": 0,
+      "data_type": "Memo",
+      "html_type": "TextArea",
+      "text_length": 600,
+      "is_active": 1,
+      "is_view": 1,
+      "weight": 8
     },
     "twingle_event_id": {
       "custom_group_id": "Twingle_Event_Information",
