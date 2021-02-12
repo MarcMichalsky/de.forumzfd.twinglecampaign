@@ -1,12 +1,12 @@
-# TwingleCampaign API
+# TwingleForm API
 
-The TwingleCampaign API is meant to offer a simple and secure interface to read and alter only a limited number of
-values provided by the TwingleProject API.
+The TwingleForm API is meant to offer a simple and secure interface to read and alter only a limited number of values
+provided by the TwingleProject API.
 
 It can be used by external CMS (like Drupal) to receive a list of TwingleProjects. The API delivers for example the
 embed codes of all active TwingleProjects so that they can be integrated in a website.
 
-It's also possible to update the TwingleProject `url` field via the TwingleCampaign Create API. In this case the `url`
+It's also possible to update the TwingleProject `url` field via the TwingleForm Create API. In this case the `url`
 fields of all TwingleCampaign children of the TwingleProject will be updated, too.
 
 ## Get & Getsingle API
@@ -23,59 +23,63 @@ fields of all TwingleCampaign children of the TwingleProject will be updated, to
 |**twingle_project_type**|no      |project type can be *default*, *event* or *membership*|default      |
 
 ### Example Get call
+
 ```curl
 curl --location -g --request GET 'http://dmaster.localhost:7979/sites/all/modules/civicrm/extern/rest.php?entity=TwingleForm&action=get&api_key=xxxxxxxxxxxxxxxxxxxx&key=xxxxxxxxxxxxxxxxxxxx&json={}'
 ```
 
 ### Response for successful Get call
+
 ```json
 {
-    "is_error": 0,
-    "version": 3,
-    "count": 2,
-    "values": {
-        "16": {
-            "id": "16",
-            "twingle_project_id": "3237",
-            "title": "Donation Form",
-            "name": "Donation_Form",
-            "project_type": "default",
-            "embed_code": "<!-- twingle --> ... <!-- twingle -->",
-            "counter": "https://donationstatus.twingle.de/donation-status/xxxxxxxxxxxx"
-        },
-        "23": {
-            "id": "23",
-            "twingle_project_id": "3242",
-            "title": "Another Donation Form",
-            "name": "Donation_Form_Copy",
-            "project_type": "event",
-            "embed_code": "<!-- twingle --> ... <!-- twingle -->",
-            "counter": "https://donationstatus.twingle.de/donation-status/xxxxxxxxxxxx"
-        }
+  "is_error": 0,
+  "version": 3,
+  "count": 2,
+  "values": {
+    "16": {
+      "id": "16",
+      "twingle_project_id": "3237",
+      "title": "Donation Form",
+      "name": "Donation_Form",
+      "project_type": "default",
+      "embed_code": "<!-- twingle --> ... <!-- twingle -->",
+      "counter": "https://donationstatus.twingle.de/donation-status/xxxxxxxxxxxx"
+    },
+    "23": {
+      "id": "23",
+      "twingle_project_id": "3242",
+      "title": "Another Donation Form",
+      "name": "Donation_Form_Copy",
+      "project_type": "event",
+      "embed_code": "<!-- twingle --> ... <!-- twingle -->",
+      "counter": "https://donationstatus.twingle.de/donation-status/xxxxxxxxxxxx"
     }
+  }
 }
 ```
 
 ### Example Getsingle call
+
 ```curl
 curl --location -g --request GET 'http://dmaster.localhost:7979/sites/all/modules/civicrm/extern/rest.php?entity=TwingleForm&action=getsingle&api_key=xxxxxxxxxxxxxxxxxxxx&key=xxxxxxxxxxxxxxxxxxxx&json={%22id%22:16}' \
 ```
 
 ### Response for successful Getsingle call
+
 ```json
 {
-    "is_error": 0,
-    "version": 3,
-    "count": 7,
-    "values": {
-        "id": "16",
-        "twingle_project_id": "3237",
-        "title": "Donation Form",
-        "name": "Donation_Form",
-        "project_type": "default",
-        "embed_code": "<!-- twingle --> ... <!-- twingle -->",
-        "counter": "https://donationstatus.twingle.de/donation-status/xxxxxxxxxxxx"
-    }
+  "is_error": 0,
+  "version": 3,
+  "count": 7,
+  "values": {
+    "id": "16",
+    "twingle_project_id": "3237",
+    "title": "Donation Form",
+    "name": "Donation_Form",
+    "project_type": "default",
+    "embed_code": "<!-- twingle --> ... <!-- twingle -->",
+    "counter": "https://donationstatus.twingle.de/donation-status/xxxxxxxxxxxx"
+  }
 }
 ```
 
