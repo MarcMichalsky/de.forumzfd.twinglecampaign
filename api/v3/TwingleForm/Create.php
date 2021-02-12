@@ -46,8 +46,20 @@ function civicrm_api3_twingle_form_Create(array $params): array {
   _civicrm_api3_twingle_form_Create_spec($allowed_params);
   $params = array_intersect_key($params, $allowed_params);
 
+  // Validate url
+  if (!filter_var($params['url'], FILTER_VALIDATE_URL)) {
+    Civi::log()->error(
+      E::LONG_NAME .
+      ': invalid url was provided via TwingleForm.create',
+      $params
+    );
+    return civicrm_api3_create_error('invalid URL', $params);
+  }
+
+  // Re-create TwingleProject
   $result = civicrm_api3('TwingleProject', 'create', $params);
 
+  // Retrun results
   if ($result['is_error'] != 1) {
     return civicrm_api3_create_success(
       $result['values'],
