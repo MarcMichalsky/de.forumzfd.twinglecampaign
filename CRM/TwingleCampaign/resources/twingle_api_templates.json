@@ -8,7 +8,8 @@
     "project_target",
     "transaction_type",
     "type",
-    "last_update"
+    "last_update",
+    "url"
   ],
   "project_embed_data": [
     "page",
