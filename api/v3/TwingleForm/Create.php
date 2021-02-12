@@ -57,7 +57,13 @@ function civicrm_api3_twingle_form_Create(array $params): array {
   }
 
   // Re-create TwingleProject
-  $result = civicrm_api3('TwingleProject', 'create', $params);
+  try {
+    $result = civicrm_api3('TwingleProject', 'create', $params);
+  } catch (CiviCRM_API3_Exception $e) {
+    $extraParams = $e->getExtraParams();
+    unset($extraParams['error_code']);
+    return civicrm_api3_create_error($e->getMessage(), $extraParams);
+  }
 
   // Retrun results
   if ($result['is_error'] != 1) {

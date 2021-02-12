@@ -96,9 +96,7 @@ function civicrm_api3_twingle_project_Create(array $params): array {
       $project = new TwingleProject($params, $id);
     }
   } catch (Exception $e) {
-    return civicrm_api3_create_error(
-      'Could not instantiate TwingleProject: ' . $e->getMessage()
-    );
+    return civicrm_api3_create_error($e->getMessage(), $params);
   }
 
 
