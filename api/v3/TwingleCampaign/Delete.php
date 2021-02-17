@@ -1,4 +1,6 @@
 <?php
+
+use CRM_TwingleCampaign_BAO_TwingleCampaign as TwingleCampaign;
 use CRM_TwingleCampaign_ExtensionUtil as E;
 
 /**
@@ -9,37 +11,46 @@ use CRM_TwingleCampaign_ExtensionUtil as E;
  *
  * @see https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
  */
-function _civicrm_api3_twingle_campaign_Delete_spec(&$spec) {
-  $spec['magicword']['api.required'] = 1;
+function _civicrm_api3_twingle_campaign_Delete_spec(array &$spec) {
+  $spec['id'] = [
+    'name'         => 'id',
+    'title'        => E::ts('Twingle Campaign ID'),
+    'type'         => CRM_Utils_Type::T_INT,
+    'api.required' => 0,
+    'description'  => E::ts('The Twingle Campaign ID'),
+  ];
 }
 
 /**
- * TwingleCampaign.Delete API
+ * # TwingleCampaign.Delete API
+ * This API allows you to delete a single TwingleCampaign at a time.
  *
  * @param array $params
  *
  * @return array
  *   API result descriptor
  *
+ * @throws CiviCRM_API3_Exception
  * @see civicrm_api3_create_success
- *
- * @throws API_Exception
  */
-function civicrm_api3_twingle_campaign_Delete($params) {
-  if (array_key_exists('magicword', $params) && $params['magicword'] == 'sesame') {
-    $returnValues = array(
-      // OK, return several data rows
-      12 => ['id' => 12, 'name' => 'Twelve'],
-      34 => ['id' => 34, 'name' => 'Thirty four'],
-      56 => ['id' => 56, 'name' => 'Fifty six'],
-    );
-    // ALTERNATIVE: $returnValues = []; // OK, success
-    // ALTERNATIVE: $returnValues = ["Some value"]; // OK, return a single value
+function civicrm_api3_twingle_campaign_Delete(array $params): array {
 
-    // Spec: civicrm_api3_create_success($values = 1, $params = [], $entity = NULL, $action = NULL)
-    return civicrm_api3_create_success($returnValues, $params, 'TwingleCampaign', 'Delete');
-  }
-  else {
-    throw new API_Exception(/*error_message*/ 'Everyone knows that the magicword is "sesame"', /*error_code*/ 'magicword_incorrect');
-  }
+  // Filter parameters
+  $allowed_params = [];
+  _civicrm_api3_twingle_campaign_Delete_spec($allowed_params);
+  $params = array_intersect_key($params, $allowed_params);
+
+  // Instantiate TwingleCampaign
+  $campaign = new TwingleCampaign([], $params['id']);
+
+  // Delete TwingleCampaign via method
+  $campaign->delete();
+
+  // Return results
+  return civicrm_api3_create_success(
+    $campaign->getResponse('TwingleCampaign deleted'),
+    $params,
+    'TwingleCampaign',
+    'Delete'
+  );
 }
