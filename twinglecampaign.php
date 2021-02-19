@@ -5,6 +5,25 @@ use CRM_TwingleCampaign_ExtensionUtil as E;
 
 require_once 'twinglecampaign.civix.php';
 
+/**
+ * Implements hook_civicrm_config().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/
+ * @param $config
+ */
+function twinglecampaign_civicrm_config(&$config) {
+  _twinglecampaign_civix_civicrm_config($config);
+
+  // This dispatcher adds an event listener to TwingleDonation.submit
+  // (de.systopia.twingle) and calls an API-Wrapper which maps incoming Twingle
+  // donations to TwingleCampaigns.
+  Civi::dispatcher()->addListener(
+    'civi.api.prepare',
+    ['CRM_TwingleCampaign_Utils_APIWrapper', 'PREPARE'],
+    -100
+  );
+}
+
 
 /**
  * Implements hook_civicrm_postSave_Campaign().
@@ -27,13 +46,13 @@ function twinglecampaign_civicrm_postSave_civicrm_campaign($dao) {
     if (CRM_Core_Transaction::isActive()) {
       CRM_Core_Transaction::addCallback(
         CRM_Core_Transaction::PHASE_POST_COMMIT,
-        'twinglecampaign_postSave_callback',
+        'twinglecampaign_postSave_campaign_callback',
         [$dao->id, $dao->campaign_type_id]
       );
     }
     // If the transaction is already finished, call the function directly
     else {
-      twinglecampaign_postSave_callback($dao->id, $dao->campaign_type_id);
+      twinglecampaign_postSave_campaign_callback($dao->id, $dao->campaign_type_id);
     }
 
   }
@@ -51,7 +70,7 @@ function twinglecampaign_civicrm_postSave_civicrm_campaign($dao) {
  *
  * @throws \CiviCRM_API3_Exception
  */
-function twinglecampaign_postSave_callback (
+function twinglecampaign_postSave_campaign_callback (
   int $campaign_id,
   int $campaign_type_id
 ) {
@@ -188,16 +207,6 @@ function twinglecampaign_postSave_callback (
 //    CRM_Utils_System::setUFMessage($result['error_message']);
 //  }
 //}
-
-
-/**
- * Implements hook_civicrm_config().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/
- */
-function twinglecampaign_civicrm_config(&$config) {
-  _twinglecampaign_civix_civicrm_config($config);
-}
 
 /**
  * Implements hook_civicrm_xmlMenu().
