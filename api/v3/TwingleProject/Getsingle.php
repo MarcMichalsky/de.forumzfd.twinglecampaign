@@ -46,6 +46,13 @@ function _civicrm_api3_twingle_project_Getsingle_spec(array &$spec) {
     'api.required' => 0,
     'description'  => E::ts('Twingle ID for this project'),
   ];
+  $spec['identifier'] = [
+    'name'         => 'identifier',
+    'title'        => E::ts('Twingle Project Identifier'),
+    'type'         => CRM_Utils_Type::T_STRING,
+    'api.required' => 0,
+    'description'  => E::ts('Twingle Project Identifier'),
+  ];
   $spec['last_modified_id'] = [
     'name'         => 'last_modified_id',
     'title'        => E::ts('Campaign Modified By'),
