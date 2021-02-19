@@ -38,7 +38,7 @@ class CRM_TwingleCampaign_Utils_APIWrapper {
       $apiRequest['params'])
     ) {
       if (is_numeric($apiRequest['params']['campaign_id'])) {
-        $targetCampaign = $apiRequest['params']['campaign_id'];
+        $targetCampaign['values']['id'] = $apiRequest['params']['campaign_id'];
       }
       else {
         try {
