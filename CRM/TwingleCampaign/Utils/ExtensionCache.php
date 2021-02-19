@@ -7,7 +7,7 @@ use CRM_TwingleCampaign_ExtensionUtil as E;
 /**
  * A singleton that caches mappings and settings
  *
- * @package CRM\TwingleCampaign\Utilities
+ * @package CRM\TwingleCampaign\Utils
  */
 class CRM_TwingleCampaign_Utils_ExtensionCache {
 

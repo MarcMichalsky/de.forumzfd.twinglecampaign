@@ -15,8 +15,6 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
 
   private $id;
 
-  private $campaign_type_id;
-
   private $values;
 
 
@@ -79,7 +77,7 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    *
    * @throws CiviCRM_API3_Exception
    */
-  private function fetch() {
+  public function fetch() {
     $this->values = civicrm_api3('TwingleCampaign', 'getsingle',
       ['id' => $this->id])['values'];
   }
@@ -103,6 +101,11 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
     // Determine the parent project id by looping through the campaign tree
     // until the parent campaign type is a TwingleProject
     $parent_id = $this->values['parent_id'];
+    $parent_id = $parent_id ?? civicrm_api3(
+      'TwingleCampaign',
+      'getsingle',
+        ['id' => $this->id]
+      )['values']['parent_id'];
 
     $parent_campaign_type_id = NULL;
 
@@ -288,8 +291,7 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    * ## Delete TwingleCampaign
    * Deletes this TwingleCampaign from CiviCRM
    */
-  private
-  function delete() {
+  public function delete() {
     if ($this->id) {
       try {
         civicrm_api3('Campaign', 'delete', ['id' => $this->id]);
