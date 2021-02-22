@@ -1,7 +1,6 @@
 <?php
 
 use CRM_TwingleCampaign_ExtensionUtil as E;
-use CRM_TwingleCampaign_Utils_ExtensionCache as ExtensionCache;
 
 class CRM_TwingleCampaign_BAO_CustomField {
 
@@ -152,11 +151,20 @@ class CRM_TwingleCampaign_BAO_CustomField {
     // If no specific custom field is requested
     if (!$name) {
       $result = [];
-      $customFields =
-        ExtensionCache::getInstance()->getCampaigns()['custom_fields'];
+
+      // Get json file with all custom fields for this extension
+      $json_file = file_get_contents(E::path() .
+        '/CRM/TwingleCampaign/resources/campaigns.json');
+      $campaign_info = json_decode($json_file, TRUE);
+
+      // Log an error and throw an exception if the file cannot get read
+      if (!$campaign_info) {
+        Civi::log()->error("Could not read json file");
+        throw new Exception('Could not read json file');
+      }
 
       // Recursive method call with all custom field names from the json file
-      foreach ($customFields as $customField) {
+      foreach ($campaign_info['custom_fields'] as $customField) {
         $result[] = self::fetch($customField['name']);
       }
       return $result;
@@ -171,7 +179,12 @@ class CRM_TwingleCampaign_BAO_CustomField {
           'name'       => $name,
         ]
       );
-      return new self(array_shift($custom_field['values']));
+      if ($custom_field = array_shift($custom_field['values'])) {
+        return new self($custom_field);
+      }
+      else {
+        return NULL;
+      }
     } catch (CiviCRM_API3_Exception $e) {
       return NULL;
     }

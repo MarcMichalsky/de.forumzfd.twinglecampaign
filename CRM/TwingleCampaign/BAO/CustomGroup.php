@@ -1,5 +1,7 @@
 <?php
 
+use CRM_TwingleCampaign_ExtensionUtil as E;
+
 class CRM_TwingleCampaign_BAO_CustomGroup {
 
   private $id;

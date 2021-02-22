@@ -1,7 +1,6 @@
 <?php
 
 use CRM_TwingleCampaign_ExtensionUtil as E;
-use CRM_TwingleCampaign_Utils_ExtensionCache as ExtensionCache;
 
 class CRM_TwingleCampaign_BAO_OptionValue {
 
@@ -132,10 +131,20 @@ class CRM_TwingleCampaign_BAO_OptionValue {
     // If no specific option value is requested
     if (!$name) {
       $result = [];
-      $optionValues = ExtensionCache::getInstance()->getOptionValues();
+
+      // Get json file with all custom fields for this extension
+      $json_file = file_get_contents(E::path() .
+        '/CRM/TwingleCampaign/resources/option_values.json');
+      $option_values = json_decode($json_file, TRUE);
+
+      // Log an error and throw an exception if the file cannot get read
+      if (!$option_values) {
+        Civi::log()->error("Could not read json file");
+        throw new Exception('Could not read json file');
+      }
 
       // Recursive method call with all custom field names from the json file
-      foreach ($optionValues as $optionValue) {
+      foreach ($option_values as $optionValue) {
         $result[] = self::fetch($optionValue['name']);
       }
       return $result;
@@ -150,7 +159,12 @@ class CRM_TwingleCampaign_BAO_OptionValue {
           'name'       => $name,
         ]
       );
-      return new self(array_shift($option_value['values']));
+      if ($option_value = array_shift($option_value['values'])) {
+        return new self($option_value);
+      }
+      else {
+        return NULL;
+      }
     } catch (CiviCRM_API3_Exception $e) {
       return NULL;
     }
