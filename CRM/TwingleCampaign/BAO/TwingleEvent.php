@@ -51,9 +51,10 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
 
       // check for existence
       $result = civicrm_api3('Case', 'get', [
-        'contact_id'   => $this->formattedValues['contact_id'],
+        'contact_id'   => $this->formattedValues['contact'],
         'case_type_id' => Configuration::get('twinglecampaign_start_case'),
-        'subject'      => $this->formattedValues['title'] . ' | Event-ID: ' . $formattedValues['id'],
+        'subject'      => $this->formattedValues['title'] . ' | Event-ID: ' .
+          $this->formattedValues['id'],
       ]);
 
       // Open a case
@@ -62,10 +63,11 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
         $result['count'] == 0
       ) {
         $result = civicrm_api3('Case', 'create', [
-          'contact_id'   => $this->formattedValues['contact_id'],
+          'contact_id'   => $this->formattedValues['contact'],
           'case_type_id' => Configuration::get('twinglecampaign_start_case'),
-          'subject'      => $formattedValues['title'] . ' | Event-ID: ' . $formattedValues['id'],
-          'start_date'   => $formattedValues['created_at'],
+          'subject'      => $this->formattedValues['title'] . ' | Event-ID: ' .
+            $this->formattedValues['id'],
+          'start_date'   => $this->formattedValues['created_at'],
           'status_id'    => "Open",
         ]);
       }
@@ -75,6 +77,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
 
       return TRUE;
     }
+    return FALSE;
   }
 
 
