@@ -24,6 +24,7 @@
   <requires>
     <ext>de.systopia.xcm</ext>
     <ext>de.systopia.campaign</ext>
+    <ext>de.systopia.twingle</ext>
   </requires>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
