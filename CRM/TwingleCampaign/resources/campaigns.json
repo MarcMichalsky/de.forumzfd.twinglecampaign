@@ -286,10 +286,10 @@
       "is_view": 1,
       "weight": 3
     },
-    "twingle_event_contact_id": {
+    "twingle_event_contact": {
       "custom_group_id": "Twingle_Event_Information",
       "label": "Twingle Event Initiator",
-      "name": "twingle_event_contact_id",
+      "name": "twingle_event_contact",
       "is_required": 0,
       "is_searchable": 1,
       "data_type": "ContactReference",

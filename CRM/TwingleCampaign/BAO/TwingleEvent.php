@@ -120,7 +120,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
       }
 
       if ($values['user_name']) {
-        $values['contact_id'] = self::matchContact(
+        $values['contact'] = self::matchContact(
           $values['user_name'],
           $values['user_email']
         );
