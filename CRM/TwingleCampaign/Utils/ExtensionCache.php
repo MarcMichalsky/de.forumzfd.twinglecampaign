@@ -19,6 +19,8 @@ class CRM_TwingleCampaign_Utils_ExtensionCache {
 
   private $templates;
 
+  private $option_values;
+
   /**
    * ## Get an instance (singleton)
    *
@@ -44,9 +46,10 @@ class CRM_TwingleCampaign_Utils_ExtensionCache {
 
     // Initialize json files as arrays
     $file_paths = [
-      'translations' => '/CRM/TwingleCampaign/resources/dictionary.json',
-      'templates'    => '/CRM/TwingleCampaign/resources/twingle_api_templates.json',
-      'campaigns'    => '/CRM/TwingleCampaign/resources/campaigns.json',
+      'translations'  => '/CRM/TwingleCampaign/resources/dictionary.json',
+      'templates'     => '/CRM/TwingleCampaign/resources/twingle_api_templates.json',
+      'campaigns'     => '/CRM/TwingleCampaign/resources/campaigns.json',
+      'option_values' => '/CRM/TwingleCampaign/resources/option_values.json',
     ];
 
     foreach ($file_paths as $key => $file_path) {
@@ -124,5 +127,11 @@ class CRM_TwingleCampaign_Utils_ExtensionCache {
     return $this->templates;
   }
 
+  /**
+   * @return mixed
+   */
+  public function getOptionValues() {
+    return $this->option_values;
+  }
 
 }

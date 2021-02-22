@@ -23,6 +23,7 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
     // of the json file "campaigns.json"
 
     $campaign_info = Cache::getInstance()->getCampaigns();
+    $option_values = Cache::getInstance()->getOptionValues();
 
     // Create campaign types
     foreach ($campaign_info['campaign_types'] as $campaign_type) {
@@ -48,6 +49,13 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
       $cf = new CustomField($custom_field);
       $cf->create();
     }
+
+    // Create option values
+    foreach ($option_values as $option_value) {
+      $ov = new OptionValue($option_value);
+      $ov->create();
+    }
+
   }
 
   /**
@@ -57,6 +65,7 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
   public function uninstall() {
 
     $campaign_info = Cache::getInstance()->getCampaigns();
+    $option_values = Cache::getInstance()->getOptionValues();
 
     // Delete campaign types
     foreach ($campaign_info['campaign_types'] as $campaign_type) {
@@ -69,6 +78,14 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
     // Delete custom groups
     foreach ($campaign_info['custom_groups'] as $custom_group) {
       $result = CustomGroup::fetch($custom_group['name']);
+      if ($result) {
+        $result->delete();
+      }
+    }
+
+    // Delete option values
+    foreach ($option_values as $option_value) {
+      $result = OptionValue::fetch($option_value['name']);
       if ($result) {
         $result->delete();
       }
