@@ -14,12 +14,17 @@ require_once 'twinglecampaign.civix.php';
 function twinglecampaign_civicrm_config(&$config) {
   _twinglecampaign_civix_civicrm_config($config);
 
-  // This dispatcher adds an event listener to TwingleDonation.submit
-  // (de.systopia.twingle) and calls an API-Wrapper which maps incoming Twingle
-  // donations to TwingleCampaigns.
+  // This dispatchers add event listeners to TwingleDonation.submit
+  // (de.systopia.twingle) and call an API-Wrapper which maps incoming Twingle
+  // donations to TwingleCampaigns and create soft credits for event initiators.
   Civi::dispatcher()->addListener(
     'civi.api.prepare',
     ['CRM_TwingleCampaign_Utils_APIWrapper', 'PREPARE'],
+    -100
+  );
+  Civi::dispatcher()->addListener(
+    'civi.api.respond',
+    ['CRM_TwingleCampaign_Utils_APIWrapper', 'RESPOND'],
     -100
   );
 }
