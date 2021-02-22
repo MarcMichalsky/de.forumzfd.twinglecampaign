@@ -1,6 +1,7 @@
 <?php
 
 use CRM_TwingleCampaign_ExtensionUtil as E;
+use CRM_TwingleCampaign_Utils_ExtensionCache as ExtensionCache;
 
 class CRM_TwingleCampaign_BAO_CustomField {
 
@@ -36,12 +37,17 @@ class CRM_TwingleCampaign_BAO_CustomField {
 
   private $result;
 
+  private $extensionName;
+
   /**
    * CustomField constructor.
    *
    * @param array $attributes
    */
   public function __construct(array $attributes) {
+
+    $this->extensionName = E::LONG_NAME;
+
     foreach ($this as $var => $value) {
 
       // put array items into attributes
@@ -86,7 +92,7 @@ class CRM_TwingleCampaign_BAO_CustomField {
 
       // Log field creation
       if ($this->result['is_error'] == 0) {
-        Civi::log()->info("Twingle Extension has created a new custom field.
+        Civi::log()->info("$this->extensionName has created a new custom field.
       label: $this->label
       name: $this->name
       id: $this->id
@@ -97,14 +103,14 @@ class CRM_TwingleCampaign_BAO_CustomField {
       else {
         if ($this->label && $this->custom_group_id) {
           Civi::log()
-            ->error("Twingle Extension could not create new custom field
+            ->error("$this->extensionName could not create new custom field
             \"$this->label\" for group \"$this->custom_group_id\": 
             $this->result['error_message']");
         }
         // If there is not enough information: log simple error message
         else {
           Civi::log()
-            ->error("Twingle Extension could not create new custom field: 
+            ->error("$this->extensionName could not create new custom field: 
             $this->result['error_message']");
         }
       }
@@ -117,7 +123,7 @@ class CRM_TwingleCampaign_BAO_CustomField {
    * @return array
    * Array with all set attributes of this object.
    */
-  private function getSetAttributes() {
+  private function getSetAttributes(): array {
     $setAttributes = [];
     foreach ($this as $var => $value) {
       if (isset($value)) {
@@ -127,27 +133,6 @@ class CRM_TwingleCampaign_BAO_CustomField {
     return $setAttributes;
   }
 
-  /**
-   * Alter a custom field.
-   *
-   * @param $values
-   * Values to alter.
-   *
-   * @return bool
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function alter($values) {
-
-    foreach ($values as $var => $value) {
-      if ($this->$var) {
-        $this->$var = $value;
-      }
-    }
-
-    $this->result = civicrm_api3('CustomField', 'create', $this->getSetAttributes());
-
-    return $this->result['is_error'] == 0;
-  }
 
   /**
    * Get an instance of a CustomField by its name or get an array with all
@@ -166,28 +151,18 @@ class CRM_TwingleCampaign_BAO_CustomField {
 
     // If no specific custom field is requested
     if (!$name) {
-      $customFields = [];
-
-      // Get json file with all custom fields for this extension
-      $json_file = file_get_contents(E::path() .
-        '/CRM/TwingleCampaign/resources/campaigns.json');
-      $campaign_info = json_decode($json_file, TRUE);
-
-      // Log an error and throw an exception if the file cannot get read
-      if (!$campaign_info) {
-        Civi::log()->error("Could not read json file");
-        throw new Exception('Could not read json file');
-      }
+      $result = [];
+      $customFields =
+        ExtensionCache::getInstance()->getCampaigns()['custom_fields'];
 
       // Recursive method call with all custom field names from the json file
-      foreach ($campaign_info['custom_fields'] as $custom_field) {
-        $result = self::fetch($custom_field['name']);
-        array_push($customFields, $result);
+      foreach ($customFields as $customField) {
+        $result[] = self::fetch($customField['name']);
       }
-      return $customFields;
+      return $result;
     }
     // If a specific custom field is required
-    else {
+    try {
       $custom_field = civicrm_api3(
         'CustomField',
         'get',
@@ -196,12 +171,9 @@ class CRM_TwingleCampaign_BAO_CustomField {
           'name'       => $name,
         ]
       );
-      if ($custom_field = array_shift($custom_field['values'])) {
-        return new self($custom_field);
-      }
-      else {
-        return NULL;
-      }
+      return new self(array_shift($custom_field['values']));
+    } catch (CiviCRM_API3_Exception $e) {
+      return NULL;
     }
   }
 
@@ -221,7 +193,7 @@ class CRM_TwingleCampaign_BAO_CustomField {
 
     // Check if custom field was deleted successfully
     if ($this->result['is_error'] == 0) {
-      Civi::log()->info("Twingle Extension has deleted custom field.
+      Civi::log()->info("$this->extensionName has deleted custom field.
       label: $this->label
       name: $this->name
       id: $this->id
@@ -232,13 +204,13 @@ class CRM_TwingleCampaign_BAO_CustomField {
     else {
       if ($this->label && $this->custom_group_id) {
         Civi::log()
-          ->error("TwingleCampaign Extension could not delete custom field
+          ->error("$this->extensionName could not delete custom field
             \"$this->label\" for group \"$this->custom_group_id\": 
             $this->result['error_message']");
       }
       else {
         Civi::log()
-          ->error("TwingleCampaign Extension could not delete custom field: 
+          ->error("$this->extensionName could not delete custom field: 
             $this->result['error_message']");
       }
     }
@@ -248,11 +220,12 @@ class CRM_TwingleCampaign_BAO_CustomField {
    * Get a custom field mapping (e.g. ['twingle_project_id' => 'custom_42'])
    *
    * @return array
-   * Associative array with a mapping of all custom fields used by this extension
+   * Associative array with a mapping of all custom fields used by this
+   *   extension
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public static function getMapping() {
+  public static function getMapping(): array {
 
     // Get an array with all custom fields
     $customFields = self::fetch();
@@ -267,139 +240,6 @@ class CRM_TwingleCampaign_BAO_CustomField {
     }
 
     return $customFieldMapping;
-  }
-
-
-  // TODO: Remove unnecessary getters and setters
-  /**
-   * @param string $custom_group_id
-   *
-   * @return bool
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function setCustomGroupId(string $custom_group_id) {
-    return $this->alter(['custom_group_id', $custom_group_id]);
-  }
-
-  /**
-   * @param string $label
-   *
-   * @return bool
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function setLabel(string $label) {
-    return $this->alter(['label', $label]);
-  }
-
-  /**
-   * @param string $name
-   *
-   * @return bool
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function setName(string $name) {
-    return $this->alter(['name', $name]);
-  }
-
-  /**
-   * @param int $is_required
-   *
-   * @return bool
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function setIsRequired(int $is_required) {
-    return $this->alter(['is_required', $is_required]);
-  }
-
-  /**
-   * @param int $is_searchable
-   *
-   * @return bool
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function setIsSearchable(int $is_searchable) {
-    return $this->alter(['is_searchable', $is_searchable]);
-  }
-
-  /**
-   * @param string $data_type
-   *
-   * @return bool
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function setDataType(string $data_type) {
-    return $this->alter(['data_type', $data_type]);
-  }
-
-  /**
-   * @param string $html_type
-   *
-   * @return bool
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function setHtmlType(string $html_type) {
-    return $this->alter(['html_type', $html_type]);
-  }
-
-  /**
-   * @param mixed $option_values
-   */
-  public function setOptionValues($option_values) {
-    $this->option_values = $option_values;
-  }
-
-  /**
-   * @param int $text_length
-   *
-   * @return bool
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function setTextLength(int $text_length) {
-    return $this->alter(['text_length', $text_length]);
-  }
-
-  /**
-   * @param int $is_active
-   *
-   * @return bool
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function setIsActive(int $is_active) {
-    return $this->alter(['is_active', $is_active]);
-  }
-
-  /**
-   * @param int $is_view
-   *
-   * @return bool
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function setIsView(int $is_view) {
-    return $this->alter(['is_view', $is_view]);
-  }
-
-  /**
-   * @param int $weight
-   *
-   * @return bool
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function setWeight(int $weight) {
-    return $this->alter(['weight', $weight]);
-  }
-
-  /**
-   * @param mixed $help_post
-   */
-  public function setHelpPost($help_post) {
-    $this->help_post = $help_post;
-  }
-
-  /**
-   * @param mixed $default_value
-   */
-  public function setDefaultValue($default_value) {
-    $this->default_value = $default_value;
   }
 
   /**

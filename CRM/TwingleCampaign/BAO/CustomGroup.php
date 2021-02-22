@@ -3,13 +3,22 @@
 class CRM_TwingleCampaign_BAO_CustomGroup {
 
   private $id;
+
   private $title;
+
   private $name;
+
   private $extends;
+
   private $weight;
+
   private $extends_entity_column_value;
+
   private $collapse_display;
+
   private $results;
+
+  private $extensionName;
 
   /**
    * CustomGroup constructor.
@@ -17,9 +26,15 @@ class CRM_TwingleCampaign_BAO_CustomGroup {
    * @param array $attributes
    */
   public function __construct(array $attributes) {
+
+    $this->extensionName = E::LONG_NAME;
+
     foreach ($this as $var => $value) {
-      if (array_key_exists($var, $attributes))
+
+      // put array items into attributes
+      if (array_key_exists($var, $attributes)) {
         $this->$var = $attributes[$var];
+      }
     }
   }
 
@@ -33,7 +48,7 @@ class CRM_TwingleCampaign_BAO_CustomGroup {
       'get',
       [
         'sequential' => 1,
-        'name'       => $this->getName()
+        'name'       => $this->getName(),
       ]
     );
 
@@ -44,7 +59,7 @@ class CRM_TwingleCampaign_BAO_CustomGroup {
       $this->id = $this->results['id'];
 
       if ($this->results['is_error'] == 0) {
-        Civi::log()->info("TwingleCampaign Extension has created a new custom group.
+        Civi::log()->info("$this->extensionName has created a new custom group.
       title: $this->title
       name: $this->name
       extends: $this->extends
@@ -54,12 +69,12 @@ class CRM_TwingleCampaign_BAO_CustomGroup {
       }
       else {
         if ($this->title) {
-          Civi::log()->error("TwingleCampaign Extension could not create new custom group
+          Civi::log()->error("$this->extensionName could not create new custom group
         for \"$this->title\": $this->results['error_message']"
           );
         }
         else {
-          Civi::log()->error("TwingleCampaign Extension could not create new 
+          Civi::log()->error("$this->extensionName could not create new 
         custom group: $this->results['error_message']");
         }
       }
@@ -111,7 +126,7 @@ class CRM_TwingleCampaign_BAO_CustomGroup {
       'get',
       [
         'sequential' => 1,
-        'name'       => $name
+        'name'       => $name,
       ]
     );
     if ($custom_group = array_shift($custom_group['values'])) {
@@ -121,6 +136,7 @@ class CRM_TwingleCampaign_BAO_CustomGroup {
       return NULL;
     }
   }
+
   public function delete() {
     $this->results = civicrm_api3(
       'CustomGroup',
@@ -129,7 +145,7 @@ class CRM_TwingleCampaign_BAO_CustomGroup {
     );
 
     if ($this->results['is_error'] == 0) {
-      Civi::log()->info("TwingleCampaign Extension has deleted custom group.
+      Civi::log()->info("$this->extensionName has deleted custom group.
       title: $this->title
       name: $this->name
       extends: $this->extends
@@ -142,12 +158,12 @@ class CRM_TwingleCampaign_BAO_CustomGroup {
     }
     else {
       if ($this->title) {
-        Civi::log()->error("TwingleCampaign Extension could not delete custom group
+        Civi::log()->error("$this->extensionName could not delete custom group
         \"$this->title\": $this->results['error_message']"
         );
       }
       else {
-        Civi::log()->error("TwingleCampaign Extension could not delete custom group: 
+        Civi::log()->error("$this->extensionName could not delete custom group: 
         $this->results['error_message']");
       }
     }

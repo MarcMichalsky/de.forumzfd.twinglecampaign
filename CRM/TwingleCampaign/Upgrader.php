@@ -4,8 +4,8 @@ use CRM_TwingleCampaign_BAO_CampaignType as CampaignType;
 use CRM_TwingleCampaign_BAO_CustomField as CustomField;
 use CRM_TwingleCampaign_BAO_CustomGroup as CustomGroup;
 use CRM_TwingleCampaign_BAO_Configuration as Configuration;
+use CRM_TwingleCampaign_BAO_OptionValue as OptionValue;
 use CRM_TwingleCampaign_Utils_ExtensionCache as Cache;
-use CRM_TwingleCampaign_ExtensionUtil as E;
 
 /**
  * Collection of upgrade steps.
@@ -56,6 +56,9 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
       $ov->create();
     }
 
+    // Create XCM-Profile
+    // TODO: create XCM-Profil
+    
   }
 
   /**
