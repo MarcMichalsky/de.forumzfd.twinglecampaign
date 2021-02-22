@@ -134,18 +134,21 @@ class CRM_TwingleCampaign_Utils_APIWrapper {
     array $event): array {
     try {
       return civicrm_api3('ContributionSoft', 'create', [
-        'contribution_id'  => $contribution['id'],
-        'amount'           => $contribution['total_amount'],
-        'currency'         => $contribution['currency'],
-        'contact_id'       => $event['contact_id'],
-        'soft_credit_type' => 'twingle_event',
+        'contribution_id'     => $contribution['id'],
+        'amount'              => $contribution['total_amount'],
+        'currency'            => $contribution['currency'],
+        'contact_id'          => $event['contact_id'],
+        'soft_credit_type_id' => 'twingle_event_donation',
       ]);
     } catch (CiviCRM_API3_Exception $e) {
       Civi::log()->error(
         E::LONG_NAME .
-        ' could not create TwingleProject: ' .
-        $e->getMessage(),
-        $project->getResponse()
+        ' could not create soft credit: ',
+        [
+          'contact_id'      => $event['contact_id'],
+          'contact'         => $event['contact'],
+          'contribution_id' => $contribution['id'],
+        ]
       );
     }
   }
