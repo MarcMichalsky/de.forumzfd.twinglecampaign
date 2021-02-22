@@ -134,6 +134,9 @@ function civicrm_api3_twingle_event_Get(array $params): array {
           $returnValues[$event['id']][$custom_field_mapping_reverse[$key]]
             = $value;
         }
+        elseif ($key == $custom_field_mapping['twingle_event_contact'].'_id') {
+          $returnValues[$event['id']]['contact_id'] = $value;
+        }
         else {
           $returnValues[$event['id']][$key] = $value;
         }
