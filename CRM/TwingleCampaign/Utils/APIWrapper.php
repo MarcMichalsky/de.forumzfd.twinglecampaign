@@ -36,20 +36,22 @@ class CRM_TwingleCampaign_Utils_APIWrapper {
       $response = $event->getResponse();
 
       // Create soft credit for contribution
-      $contribution = $response['values']['contribution']
-      [array_key_first($response['values']['contribution'])];
-      if (array_key_exists('campaign_id', $contribution)) {
-        try {
-          $twingle_event = civicrm_api3(
-            'TwingleEvent',
-            'getsingle',
-            ['id' => $contribution['campaign_id']]
-          )['values'];
-          $response['values']['soft_credit'] =
-            self::createSoftCredit($contribution, $twingle_event)['values'];
-          $event->setResponse($response);
-        } catch (CiviCRM_API3_Exception $e) {
-          // Do nothing
+      if (array_key_exists('contribution', $response['values'])) {
+        $contribution = $response['values']['contribution']
+        [array_key_first($response['values']['contribution'])];
+        if (array_key_exists('campaign_id', $contribution)) {
+          try {
+            $twingle_event = civicrm_api3(
+              'TwingleEvent',
+              'getsingle',
+              ['id' => $contribution['campaign_id']]
+            )['values'];
+            $response['values']['soft_credit'] =
+              self::createSoftCredit($contribution, $twingle_event)['values'];
+            $event->setResponse($response);
+          } catch (CiviCRM_API3_Exception $e) {
+            // Do nothing
+          }
         }
       }
     }
