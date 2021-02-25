@@ -37,8 +37,8 @@ class CRM_TwingleCampaign_Utils_APIWrapper {
 
       // Create soft credit for contribution
       if (array_key_exists('contribution', $response['values'])) {
-        $contribution = $response['values']['contribution']
-        [array_key_first($response['values']['contribution'])];
+        $response_copy = $response;
+        $contribution = array_shift($response_copy['values']['contribution']);
         if (array_key_exists('campaign_id', $contribution)) {
           try {
             $twingle_event = civicrm_api3(
