@@ -100,19 +100,34 @@ class CRM_TwingleCampaign_BAO_CustomField {
       }
       // If the field could not get created: log error
       else {
-        if ($this->label && $this->custom_group_id) {
+        if ($this->name && $this->custom_group_id) {
           Civi::log()
             ->error("$this->extensionName could not create new custom field
-            \"$this->label\" for group \"$this->custom_group_id\": 
+            \"$this->name\" for group \"$this->custom_group_id\": 
             $this->result['error_message']");
+          CRM_Utils_System::setUFMessage(ts("Creation of custom field '%1'
+      failed. Find more information in the logs.",
+            $this->name));
         }
         // If there is not enough information: log simple error message
         else {
           Civi::log()
             ->error("$this->extensionName could not create new custom field: 
             $this->result['error_message']");
+          CRM_Utils_System::setUFMessage(ts("Creation of custom field
+      failed. Find more information in the logs."));
         }
       }
+    }
+    else {
+      CRM_Utils_System::setUFMessage(ts("Creation of custom field '%1'
+      failed, because a custom field with that name already exists.
+      Find more information in the logs.",
+        $this->name));
+      Civi::log()
+        ->error("$this->extensionName could not create new custom field
+            \"$this->name\" for group \"$this->custom_group_id\" because a 
+            field with that name already exists.");
     }
   }
 

@@ -79,6 +79,9 @@ class CRM_TwingleCampaign_BAO_OptionValue {
       }
       // If the option value could not get created: log error
       else {
+        CRM_Utils_System::setUFMessage(ts("Creation of custom value '%1'
+      failed. Find more information in the logs.",
+          $this->name));
         if ($this->label && $this->option_group_id) {
           Civi::log()
             ->error("$this->extensionName could not create new option value
@@ -92,6 +95,16 @@ class CRM_TwingleCampaign_BAO_OptionValue {
             $this->result['error_message']");
         }
       }
+    }
+    else {
+      CRM_Utils_System::setUFMessage(ts("Creation of custom value '%1'
+      failed, because a custom value with that name already exists.
+      Find more information in the logs.",
+        $this->name));
+        Civi::log()
+          ->error("$this->extensionName could not create new custom value
+            \"$this->name\" for group \"$this->option_group_id\" because a 
+            value with that name already exists.");
     }
   }
 

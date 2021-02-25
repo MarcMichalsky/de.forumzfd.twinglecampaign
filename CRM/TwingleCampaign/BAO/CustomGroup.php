@@ -70,15 +70,21 @@ class CRM_TwingleCampaign_BAO_CustomGroup {
         );
       }
       else {
-        if ($this->title) {
+        if ($this->name) {
           Civi::log()->error("$this->extensionName could not create new custom group
-        for \"$this->title\": $this->results['error_message']"
+        for \"$this->name\": $this->results['error_message']"
           );
+          CRM_Utils_System::setUFMessage(ts("Creation of custom group '%1'
+      failed. Find more information in the logs.",
+            $this->name));
         }
         else {
           Civi::log()->error("$this->extensionName could not create new 
         custom group: $this->results['error_message']");
+          CRM_Utils_System::setUFMessage(ts("Creation of custom group 
+      failed. Find more information in the logs."));
         }
+
       }
     }
   }
