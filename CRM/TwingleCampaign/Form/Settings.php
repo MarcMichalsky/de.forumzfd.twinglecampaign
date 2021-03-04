@@ -16,21 +16,24 @@ class CRM_TwingleCampaign_Form_Settings extends CRM_Core_Form {
 
   public function buildQuickForm() {
 
-    $this->addElement('text',
+    $this->addElement(
+      'text',
       'twingle_api_key',
       E::ts('Twingle API key')
     );
 
-    $this->addElement('select',
+    $this->addElement(
+      'select',
       'twinglecampaign_xcm_profile',
-      E::ts('XCM Profile to match event initiator'),
+      E::ts('XCM Profile to match event initiators'),
       $this->getXCMProfiles(),
       ['class' => 'crm-select2 huge']
     );
 
-    $this->addElement('select',
+    $this->addElement(
+      'select',
       'twinglecampaign_start_case',
-      E::ts('Start a case for event initiator'),
+      E::ts('Start a case for event initiators'),
       $this->getCaseTypes(),
       ['class' => 'crm-select2 huge']
     );
@@ -75,7 +78,7 @@ class CRM_TwingleCampaign_Form_Settings extends CRM_Core_Form {
    *
    * @return array
    */
-  private function getXCMProfiles() {
+  private function getXCMProfiles(): array {
     $xcmProfiles = [];
     if (method_exists('CRM_Xcm_Configuration', 'getProfileList')) {
       $profiles = CRM_Xcm_Configuration::getProfileList();
@@ -91,7 +94,7 @@ class CRM_TwingleCampaign_Form_Settings extends CRM_Core_Form {
    *
    * @return array
    */
-  private function getCaseTypes() {
+  private function getCaseTypes(): array {
     $caseTypes = [NULL => E::ts('none')];
     try {
       $result = civicrm_api3('CaseType', 'get', [
@@ -104,7 +107,7 @@ class CRM_TwingleCampaign_Form_Settings extends CRM_Core_Form {
       }
     } catch (CiviCRM_API3_Exception $e) {
       Civi::log()->error(
-        'TwingleCampaign could not retrieve case types: ' .
+        E::LONG_NAME . ' could not retrieve case types: ' .
         $e->getMessage());
     }
     return $caseTypes;

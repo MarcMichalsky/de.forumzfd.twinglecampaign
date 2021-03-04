@@ -23,7 +23,7 @@ class CRM_TwingleCampaign_BAO_Configuration {
       if (!array_key_exists('twinglecampaign_soft_credits', $settings)) {
         Civi::settings()->set('twinglecampaign_soft_credits', 0);
       }
-      
+
       Civi::settings()->add($settings);
   }
 

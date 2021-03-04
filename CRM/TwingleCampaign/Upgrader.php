@@ -55,10 +55,6 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
       $ov = new OptionValue($option_value);
       $ov->create();
     }
-
-    // Create XCM-Profile
-    // TODO: create XCM-Profil
-    
   }
 
   /**
