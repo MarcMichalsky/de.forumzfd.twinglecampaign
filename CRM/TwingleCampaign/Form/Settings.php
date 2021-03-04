@@ -35,6 +35,13 @@ class CRM_TwingleCampaign_Form_Settings extends CRM_Core_Form {
       ['class' => 'crm-select2 huge']
     );
 
+    $this->addElement(
+      'checkbox',
+      'twinglecampaign_soft_credits',
+      E::ts('Create soft credits for event initiators'),
+      FALSE
+    );
+
     $this->addButtons([
       [
         'type'      => 'submit',

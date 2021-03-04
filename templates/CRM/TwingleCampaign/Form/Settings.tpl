@@ -21,6 +21,11 @@
         <div class="content">{$form.twinglecampaign_start_case.html}</div>
         <div class="clear"></div>
     </div>
+    <div class="crm-section">
+        <div class="label">{$form.twinglecampaign_soft_credits.label}</div>
+        <div class="content">{$form.twinglecampaign_soft_credits.html}</div>
+        <div class="clear"></div>
+    </div>
 </div>
 
 

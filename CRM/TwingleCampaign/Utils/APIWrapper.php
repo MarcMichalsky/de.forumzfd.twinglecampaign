@@ -1,6 +1,7 @@
 <?php
 
 use CRM_TwingleCampaign_ExtensionUtil as E;
+use CRM_TwingleCampaign_BAO_Configuration as Configuration;
 
 /**
  * # APIWrapper class for TwingleDonation.submit
@@ -31,7 +32,10 @@ class CRM_TwingleCampaign_Utils_APIWrapper {
    */
   public static function RESPOND($event) {
     $request = $event->getApiRequestSig();
-    if ($request == '3.twingledonation.submit') {
+    if (
+      $request == '3.twingledonation.submit' &&
+      Configuration::get('twinglecampaign_soft_credits')
+    ) {
 
       $response = $event->getResponse();
 
