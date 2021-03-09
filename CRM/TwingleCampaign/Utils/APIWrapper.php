@@ -10,8 +10,6 @@ use CRM_TwingleCampaign_BAO_Configuration as Configuration;
  */
 class CRM_TwingleCampaign_Utils_APIWrapper {
 
-  private static $campaign_id;
-
   /**
    * ## PREPARE callback method for event listener
    *
@@ -21,7 +19,6 @@ class CRM_TwingleCampaign_Utils_APIWrapper {
     $request = $event->getApiRequestSig();
     if ($request == '3.twingledonation.submit') {
       $event->wrapAPI(['CRM_TwingleCampaign_Utils_APIWrapper', 'mapDonation']);
-      //TODO: Exception handling and logging
     }
   }
 
@@ -39,9 +36,11 @@ class CRM_TwingleCampaign_Utils_APIWrapper {
 
       $response = $event->getResponse();
 
+      // Make a copy of $response to performe some altering functions on it
+      $response_copy = $response;
+
       // Create soft credit for contribution
       if (array_key_exists('contribution', $response['values'])) {
-        $response_copy = $response;
         $contribution = array_shift($response_copy['values']['contribution']);
         if (array_key_exists('campaign_id', $contribution)) {
           try {
@@ -54,7 +53,42 @@ class CRM_TwingleCampaign_Utils_APIWrapper {
               self::createSoftCredit($contribution, $twingle_event)['values'];
             $event->setResponse($response);
           } catch (CiviCRM_API3_Exception $e) {
-            // Do nothing
+            // If an error is thrown, no event was found: so do nothing
+          }
+        }
+      }
+      // Create soft credit for sepa mandate
+      elseif (array_key_exists('sepa_mandate', $response['values'])) {
+        $sepa_mandate = array_pop($response_copy['values']['sepa_mandate']);
+
+        try {
+          $contribution = civicrm_api3(
+            'Contribution',
+            'getsingle',
+            ['id' => $sepa_mandate['entity_id']]
+          );
+        } catch (CiviCRM_API3_Exception $e) {
+          Civi::log()->error(
+            E::LONG_NAME .
+            ' could not create Soft Credit: contribution id unknown',
+            [
+              'contribution_id' => $sepa_mandate['entity_id']
+            ]
+          );
+        }
+
+        if (isset($contribution['contribution_campaign_id'])) {
+          try {
+            $twingle_event = civicrm_api3(
+              'TwingleEvent',
+              'getsingle',
+              ['id' => $contribution['contribution_campaign_id']]
+            )['values'];
+            $response['values']['soft_credit'] =
+              self::createSoftCredit($contribution, $twingle_event)['values'];
+            $event->setResponse($response);
+          } catch (CiviCRM_API3_Exception $e) {
+            // If an error is thrown, no event was found: so do nothing
           }
         }
       }
@@ -69,6 +103,10 @@ class CRM_TwingleCampaign_Utils_APIWrapper {
    * the de.systopia.twingle extension can include the campaign into the
    * contribution which it will create.
    *
+   * @param $apiRequest
+   * @param $callsame
+   *
+   * @return mixed
    */
   public function mapDonation($apiRequest, $callsame) {
 
