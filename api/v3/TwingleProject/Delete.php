@@ -89,7 +89,7 @@ function civicrm_api3_twingle_project_Delete(array $params): array {
   if (!$params['project_id']) {
     try {
       $project = civicrm_api3('TwingleProject', 'getsingle', $params);
-      $params['project_id'] = $project['values']['project_id'];
+      $params['project_id'] = $project['project_id'];
     } catch (CiviCRM_API3_Exception $e) {
       $result_values['twingle'] = 'Could not delete TwingleProject: ' . $e->getMessage();
     }
@@ -119,17 +119,13 @@ function civicrm_api3_twingle_project_Delete(array $params): array {
     }
   }
 
-
-
   // Delete the TwingleProject campaign on CiviCRM's side
   try {
     $project = civicrm_api3('TwingleProject', 'getsingle', $params);
     // The TwingleProject campaign may be already deleted
-    if ($project['is_error'] == 0) {
-      $project = new TwingleProject($project['values'], $project['values']['id']);
-      $project->delete();
-      $result_values['civicrm'] = 'TwingleProject deleted';
-    }
+    $project = new TwingleProject($project, $project['id']);
+    $project->delete();
+    $result_values['civicrm'] = 'TwingleProject deleted';
     // If deletion fails
   } catch (Exception $e) {
     $error_occurred = TRUE;

@@ -48,7 +48,7 @@ class CRM_TwingleCampaign_Utils_APIWrapper {
               'TwingleEvent',
               'getsingle',
               ['id' => $contribution['campaign_id']]
-            )['values'];
+            );
             $response['values']['soft_credit'] =
               self::createSoftCredit($contribution, $twingle_event)['values'];
             $event->setResponse($response);
@@ -83,7 +83,7 @@ class CRM_TwingleCampaign_Utils_APIWrapper {
               'TwingleEvent',
               'getsingle',
               ['id' => $contribution['contribution_campaign_id']]
-            )['values'];
+            );
             $response['values']['soft_credit'] =
               self::createSoftCredit($contribution, $twingle_event)['values'];
             $event->setResponse($response);
@@ -115,7 +115,7 @@ class CRM_TwingleCampaign_Utils_APIWrapper {
       $apiRequest['params'])
     ) {
       if (is_numeric($apiRequest['params']['campaign_id'])) {
-        $targetCampaign['values']['id'] = $apiRequest['params']['campaign_id'];
+        $targetCampaign['id'] = $apiRequest['params']['campaign_id'];
       }
       else {
         try {
@@ -157,7 +157,7 @@ class CRM_TwingleCampaign_Utils_APIWrapper {
     }
 
     if (isset($targetCampaign)) {
-      $apiRequest['params']['campaign_id'] = $targetCampaign['values']['id'];
+      $apiRequest['params']['campaign_id'] = $targetCampaign['id'];
     }
 
     return $callsame($apiRequest);

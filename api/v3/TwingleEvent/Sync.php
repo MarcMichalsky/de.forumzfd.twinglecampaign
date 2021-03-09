@@ -120,15 +120,15 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
     if ($result['is_error'] == 0) {
 
       // Get the event from Twingle
-      if ($result['values']['event_id']) {
+      if ($result['event_id']) {
         $event_from_twingle = $twingleApi->getEvent(
-          $result['values']['project_id'],
-          $result['values']['event_id']
+          $result['project_id'],
+          $result['event_id']
         );
 
         // instantiate event from CiviCRM
         try {
-          $event = _instantiateEvent($result['values']);
+          $event = _instantiateEvent($result);
         } catch (CiviCRM_API3_Exception $e) {
           Civi::log()->error(
             $e->getMessage(),

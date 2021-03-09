@@ -96,57 +96,43 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
     // Get project from db via API
     $params['sequential'] = 1;
     $result = civicrm_api3('TwingleProject', 'getsingle', $params);
-    if ($result['is_error'] == 0) {
 
-      // If the TwingleProject campaign already has a project_id try to get the
-      // project from Twingle
-      if ($result['values']['project_id']) {
-        $project_from_twingle = $twingleApi->getProject($result['values']['project_id']);
+    // If the TwingleProject campaign already has a project_id try to get the
+    // project from Twingle
+    if ($result['project_id']) {
+      $project_from_twingle = $twingleApi->getProject($result['project_id']);
 
-        // instantiate project from CiviCRM
-        $id = $result['values']['id'];
-        unset($result['values']['id']);
-        $project = new TwingleProject($result['values'], $id);
+      // instantiate project from CiviCRM
+      $id = $result['id'];
+      unset($result['id']);
+      $project = new TwingleProject($result, $id);
 
-        // Synchronize projects
-        if (!empty($project_from_twingle)) {
-          return _projectSync($project, $project_from_twingle, $twingleApi, $params);
-        }
-
-        // If Twingle does not know a project with the given project_id, give error
-        else {
-          return civicrm_api3_create_error(
-            "The project_id appears to be unknown to Twingle",
-            $project->getResponse()
-          );
-        }
+      // Synchronize projects
+      if (!empty($project_from_twingle)) {
+        return _projectSync($project, $project_from_twingle, $twingleApi, $params);
       }
 
-      // If the TwingleProject campaign does not have a project_id, push it to
-      // Twingle and update it with the returning values
+      // If Twingle does not know a project with the given project_id, give error
       else {
-
-        // store campaign id in $id
-        $id = $result['values']['id'];
-        unset($result['values']['id']);
-
-        // instantiate project
-        $project = new TwingleProject($result['values'], $id);
-
-        // Push project to Twingle
-        return _pushProjectToTwingle($project, $twingleApi, $params);
+        return civicrm_api3_create_error(
+          "The project_id appears to be unknown to Twingle",
+          $project->getResponse()
+        );
       }
     }
-
-    // If the project could not get retrieved from TwingleProject.getsingle,
-    // forward API error message
+    // If the TwingleProject campaign does not have a project_id, push it to
+    // Twingle and update it with the returning values
     else {
-      Civi::log()->error(
-        E::LONG_NAME .
-        ' could retrieve project from TwingleProject.getsingle',
-        $result
-      );
-      return $result;
+
+      // store campaign id in $id
+      $id = $result['id'];
+      unset($result['id']);
+
+      // instantiate project
+      $project = new TwingleProject($result, $id);
+
+      // Push project to Twingle
+      return _pushProjectToTwingle($project, $twingleApi, $params);
     }
   }
 
@@ -292,9 +278,9 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
  * @return array
  */
 function _updateProjectLocally(array $project_from_twingle,
-                       TwingleProject $project,
-                       array $params,
-                       TwingleApiCall $twingleApi): array {
+                               TwingleProject $project,
+                               array $params,
+                               TwingleApiCall $twingleApi): array {
 
   try {
     $project->update($project_from_twingle);
@@ -345,8 +331,8 @@ function _updateProjectLocally(array $project_from_twingle,
  * @throws \CiviCRM_API3_Exception
  */
 function _pushProjectToTwingle(TwingleProject $project,
-                       TwingleApiCall $twingleApi,
-                       array $params): array {
+                               TwingleApiCall $twingleApi,
+                               array $params): array {
 
   // If this is a test, do not make db changes
   if ($params['is_test']) {
@@ -433,9 +419,9 @@ function _pushProjectToTwingle(TwingleProject $project,
  * @throws \CiviCRM_API3_Exception
  */
 function _projectSync(TwingleProject $project,
-              array $project_from_twingle,
-              TwingleApiCall $twingleApi,
-              array $params): array {
+                      array $project_from_twingle,
+                      TwingleApiCall $twingleApi,
+                      array $params): array {
 
   // If Twingle's version of the project is newer than the CiviCRM
   // TwingleProject campaign, update the campaign

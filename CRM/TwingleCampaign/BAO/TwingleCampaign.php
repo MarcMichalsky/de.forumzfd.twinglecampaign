@@ -79,7 +79,7 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    */
   public function fetch() {
     $this->values = civicrm_api3('TwingleCampaign', 'getsingle',
-      ['id' => $this->id])['values'];
+      ['id' => $this->id]);
   }
 
 
@@ -105,7 +105,7 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
       'TwingleCampaign',
       'getsingle',
         ['id' => $this->id]
-      )['values']['parent_id'];
+      )['parent_id'];
 
     $parent_campaign_type_id = NULL;
 

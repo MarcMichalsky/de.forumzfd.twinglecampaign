@@ -83,11 +83,11 @@ function civicrm_api3_twingle_event_Delete(array $params): array {
   // provided parameters
   if ($params['id']) {
     $events[] = civicrm_api3('TwingleEvent', 'getsingle',
-      [$params['id']])['values'];
+      [$params['id']]);
   }
   elseif ($params['event_id']) {
     $events[] = civicrm_api3('TwingleEvent', 'getsingle',
-      [$params['event_id']])['values'];
+      [$params['event_id']]);
   }
   elseif ($params['project_id']) {
     $events = civicrm_api3('TwingleEvent', 'get',

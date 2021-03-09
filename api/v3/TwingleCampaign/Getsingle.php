@@ -99,9 +99,5 @@ function civicrm_api3_twingle_campaign_Getsingle(array $params): array {
       "Expected one TwingleCampaign but found $count"
     );
   }
-  return civicrm_api3_create_success(
-    $returnValues['values'][$returnValues['id']],
-    $params, 'TwingleCampaign',
-    'Getsingle'
-  );
+  return $returnValues['values'][$returnValues['id']];
 }
