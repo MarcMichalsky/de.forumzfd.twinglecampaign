@@ -82,9 +82,9 @@ function civicrm_api3_twingle_project_Create(array $params): array {
       $result = civicrm_api3('TwingleProject', 'getsingle',
         ['id' => $params['id']]
       );
-      $result['values']['id'] = $result['values']['project_id'];
-      unset($result['values']['project_id']);
-      $project = new TwingleProject($result['values'], $params['id']);
+      $result['id'] = $result['values']['project_id'];
+      unset($result['project_id']);
+      $project = new TwingleProject($result, $params['id']);
       unset($params['id']);
       $project->update($params);
       $project->setEmbedData($params);

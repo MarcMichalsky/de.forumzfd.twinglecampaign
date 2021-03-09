@@ -110,10 +110,5 @@ function civicrm_api3_twingle_event_Getsingle(array $params): array {
   if ($count != 1) {
     return civicrm_api3_create_error("Expected one TwingleEvent but found $count");
   }
-  return civicrm_api3_create_success(
-    $returnValues['values'][$returnValues['id']],
-    $params,
-    'TwingleEvent',
-    'Getsingle'
-  );
+  return $returnValues['values'][$returnValues['id']];
 }
