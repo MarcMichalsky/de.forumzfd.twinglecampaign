@@ -99,7 +99,7 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
   $twingleApi = Civi::cache()->get('twinglecampaign_twingle_api');
   if (NULL === $twingleApi || $params['twingle_api_key'] || $params['limit']) {
     try {
-      if ($params['limit']) {
+      if (isset($params['limit'])) {
         $twingleApi = new TwingleApiCall($apiKey, $params['limit']);
       }
       else {
@@ -112,7 +112,7 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
   }
 
   // If an id or a event_id is provided, synchronize only this one campaign
-  if ($params['id'] || $params['event_id']) {
+  if (isset($params['id']) || isset($params['event_id'])) {
 
     // Get project from db via API
     $params['sequential'] = 1;

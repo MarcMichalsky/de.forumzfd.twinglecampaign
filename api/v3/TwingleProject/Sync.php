@@ -91,7 +91,7 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
   }
 
   // If an id or a project_id is given, synchronize only this one campaign
-  if ($params['id'] || $params['project_id']) {
+  if (isset($params['id']) || isset($params['project_id'])) {
 
     // Get project from db via API
     $params['sequential'] = 1;
