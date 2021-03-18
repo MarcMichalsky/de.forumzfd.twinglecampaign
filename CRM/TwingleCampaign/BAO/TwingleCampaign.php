@@ -163,10 +163,9 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
         // UI, log an error and delete this TwingleCampaign
         else {
           CRM_Core_Session::setStatus(
-            ts("Could not determine parent TwingleProject URL. This URL is 
-            needed to create the TwingleEvent URL. Please check the logs."),
+            ts("Could not determine parent TwingleProject URL. This URL is needed to create the TwingleEvent URL. Please check the logs."),
             ts('Parent project URL missing'),
-            'alert'
+            'error'
           );
           Civi::log()->error(
             E::LONG_NAME .

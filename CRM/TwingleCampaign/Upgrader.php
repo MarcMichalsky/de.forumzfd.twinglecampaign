@@ -147,13 +147,13 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
   public function enable() {
     // Enable cron job
     try {
-    $jobId = civicrm_api3('Job', 'getsingle', [
-      'name' => "TwingleSync",
-    ])['id'];
-    civicrm_api3('Job', 'create', [
-      'id'        => $jobId,
-      'is_active' => 1,
-    ]);
+      $jobId = civicrm_api3('Job', 'getsingle', [
+        'name' => "TwingleSync",
+      ])['id'];
+      civicrm_api3('Job', 'create', [
+        'id'        => $jobId,
+        'is_active' => 1,
+      ]);
     } catch (CiviCRM_API3_Exception $e) {
       Civi::log()->error(
         E::LONG_NAME .
@@ -200,18 +200,18 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
 
   }
 
- /**
- * Example: Run a couple simple queries.
- *
- * @return TRUE on success
- * @throws Exception
- *
- * public function upgrade_4200() {
- * $this->ctx->log->info('Applying update 4200');
- * CRM_Core_DAO::executeQuery('UPDATE foo SET bar = "whiz"');
- * CRM_Core_DAO::executeQuery('DELETE FROM bang WHERE willy = wonka(2)');
- * return TRUE;
- * } // */
+  /**
+   * Example: Run a couple simple queries.
+   *
+   * @return TRUE on success
+   * @throws Exception
+   *
+   * public function upgrade_4200() {
+   * $this->ctx->log->info('Applying update 4200');
+   * CRM_Core_DAO::executeQuery('UPDATE foo SET bar = "whiz"');
+   * CRM_Core_DAO::executeQuery('DELETE FROM bang WHERE willy = wonka(2)');
+   * return TRUE;
+   * } // */
 
 
   /**
