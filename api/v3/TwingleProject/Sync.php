@@ -298,7 +298,7 @@ function _updateProjectLocally(array $project_from_twingle,
     }
     // ... else, update local TwingleProject campaign
     $project->create(TRUE);
-    $response[] = $project->getResponse('TwingleProject updated successfully');
+    $response = $project->getResponse('TwingleProject updated successfully');
     return civicrm_api3_create_success(
       $response,
       $params,
@@ -370,7 +370,7 @@ function _pushProjectToTwingle(TwingleProject $project,
       );
       // Create updated campaign
       $project->create(TRUE);
-      $response[] = $project->getResponse('TwingleProject pushed to Twingle');
+      $response = $project->getResponse('TwingleProject pushed to Twingle');
       return civicrm_api3_create_success(
         $response,
         $params,
