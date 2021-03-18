@@ -181,8 +181,7 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
     }
     else {
       CRM_Core_Session::setStatus(
-        ts("TwingleCampaigns can only get created as a child of a 
-        TwingleProject in the campaign tree."),
+        ts("TwingleCampaigns can only get created as a child of a TwingleProject in the campaign tree."),
         ts('No parent TwingleProject found'),
         'alert'
       );
