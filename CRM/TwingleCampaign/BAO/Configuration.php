@@ -19,6 +19,9 @@ class CRM_TwingleCampaign_BAO_Configuration {
    */
   public static function set(array $settings) {
 
+    // Remove possibly illegal data from settings
+    $settings = array_intersect_key($settings, array_flip(self::$settingsKeys));
+
       // Set twinglecampaign_soft_credits to '0' if checkbox is unchecked
       if (!array_key_exists('twinglecampaign_soft_credits', $settings)) {
         Civi::settings()->set('twinglecampaign_soft_credits', 0);
