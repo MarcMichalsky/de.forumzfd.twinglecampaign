@@ -141,7 +141,17 @@ class CRM_TwingleCampaign_Utils_APIWrapper {
           ['event_id' => $apiRequest['params']['custom_fields']['event']]
         );
       } catch (CiviCRM_API3_Exception $e) {
-        // Do nothing
+        // If no event was found, sync all Events and try it again
+        try {
+          $test = civicrm_api3('TwingleEvent', 'sync');
+          $targetCampaign = civicrm_api3(
+            'TwingleEvent',
+            'getsingle',
+            ['event_id' => $apiRequest['params']['custom_fields']['event']]
+          );
+        } catch (CiviCRM_API3_Exception $e) {
+          // there's nothing left to do
+        }
       }
     }
     else {

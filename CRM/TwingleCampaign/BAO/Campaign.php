@@ -181,8 +181,10 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
     // Translate keys
     foreach ($field_translations as $origin => $translation) {
-      $values[$translation] = $values[$origin];
-      unset($values[$origin]);
+      if (isset($values[$origin])) {
+        $values[$translation] = $values[$origin];
+        unset($values[$origin]);
+      }
     }
   }
 
