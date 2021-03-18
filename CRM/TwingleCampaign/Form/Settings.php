@@ -70,6 +70,9 @@ class CRM_TwingleCampaign_Form_Settings extends CRM_Core_Form {
     // Set configuration values
     Configuration::set($this->exportValues());
     parent::postProcess();
+
+    // Display message
+    CRM_Utils_System::setUFMessage(E::ts('TwingleCampaign configuration saved'));
   }
 
   /**
