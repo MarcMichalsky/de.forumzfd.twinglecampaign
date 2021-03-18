@@ -6,6 +6,7 @@ use CRM_TwingleCampaign_BAO_CustomGroup as CustomGroup;
 use CRM_TwingleCampaign_BAO_Configuration as Configuration;
 use CRM_TwingleCampaign_BAO_OptionValue as OptionValue;
 use CRM_TwingleCampaign_Utils_ExtensionCache as Cache;
+use CRM_TwingleCampaign_ExtensionUtil as E;
 
 /**
  * Collection of upgrade steps.
@@ -55,6 +56,30 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
       $ov = new OptionValue($option_value);
       $ov->create();
     }
+
+    // setup cron job to trigger synchronization
+    try {
+      civicrm_api3('Job', 'create', [
+        'run_frequency' => "Hourly",
+        'name'          => "TwingleSync",
+        'api_entity'    => "TwingleSync",
+        'api_action'    => "sync",
+        'description'   => E::ts("Syncronizes all TwingleProjects an TwingleEvents between CiviCRM and Twingle"),
+        'is_active'     => 1,
+      ]);
+    } catch (CiviCRM_API3_Exception $e) {
+      Civi::log()->error(
+        E::LONG_NAME .
+        ' could not create scheduled job on extension installation: ' .
+        $e->getMessage()
+      );
+      CRM_Core_Session::setStatus(
+        E::ts('Could not create scheduled job "TwingleSync".'),
+        E::ts('Scheduled Job'),
+        error
+      );
+      CRM_Utils_System::setUFMessage(E::ts('Could not create scheduled job "TwingleSync". Your Campaigns will not get synchronized to Twingle.'));
+    }
   }
 
   /**
@@ -93,21 +118,87 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
     // Delete all settings for this extension
     Configuration::deleteAll();
 
+    // Delete cron job
+    try {
+      $jobId = civicrm_api3('Job', 'getsingle', [
+        'name' => "TwingleSync",
+      ])['id'];
+      civicrm_api3('Job', 'delete', [
+        'id' => $jobId,
+      ]);
+    } catch (CiviCRM_API3_Exception $e) {
+      Civi::log()->error(
+        E::LONG_NAME .
+        ' could not delete scheduled job on extension uninstallation: ' .
+        $e->getMessage()
+      );
+      CRM_Core_Session::setStatus(
+        E::ts('Could not delete scheduled job "TwingleSync".'),
+        E::ts('Scheduled Job'),
+        error
+      );
+    }
+
   }
 
   /**
    * @throws \Exception
    */
   public function enable() {
-
+    // Enable cron job
+    try {
+    $jobId = civicrm_api3('Job', 'getsingle', [
+      'name' => "TwingleSync",
+    ])['id'];
+    civicrm_api3('Job', 'create', [
+      'id'        => $jobId,
+      'is_active' => 1,
+    ]);
+    } catch (CiviCRM_API3_Exception $e) {
+      Civi::log()->error(
+        E::LONG_NAME .
+        ' could not activate scheduled job on extension activation: ' .
+        $e->getMessage()
+      );
+      CRM_Core_Session::setStatus(
+        E::ts('Could not activate scheduled job "TwingleSync". Your Campaigns will not get synchronized to Twingle.'),
+        E::ts('Scheduled Job'),
+        error
+      );
+    }
   }
 
   /**
    * @throws \Exception
    */
- public function disable() {
+  public function disable() {
 
- }
+    // Disable cron job
+    try {
+      $jobId = civicrm_api3('Job', 'getsingle', [
+        'name' => 'TwingleSync',
+      ])['id'];
+      civicrm_api3('Job', 'create', [
+        'id'        => $jobId,
+        'is_active' => 0,
+      ]);
+    } catch (CiviCRM_API3_Exception $e) {
+      Civi::log()->error(
+        E::LONG_NAME .
+        ' could not disable scheduled job on extension deactivation: ' .
+        $e->getMessage()
+      );
+      CRM_Core_Session::setStatus(
+        E::ts('Could not disable scheduled job "TwingleSync".'),
+        E::ts('Scheduled Job'),
+        error
+      );
+    }
+
+    // Remove Twingle api key from settings
+    Civi::settings()->revert('twingle_api_key');
+
+  }
 
  /**
  * Example: Run a couple simple queries.
