@@ -391,7 +391,9 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     if (
     $dateTime = DateTime::createFromFormat('U', $input)
     ) {
-      return $dateTime->format('Y-m-d H:i:s');
+      return $dateTime
+        ->setTimezone(new DateTimeZone(date_default_timezone_get()))
+        ->format('Y-m-d H:i:s');
     }
     // ... or a DateTime string
     elseif (
