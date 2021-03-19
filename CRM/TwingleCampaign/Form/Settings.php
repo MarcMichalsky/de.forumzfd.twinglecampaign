@@ -102,6 +102,7 @@ class CRM_TwingleCampaign_Form_Settings extends CRM_Core_Form {
     try {
       $result = civicrm_api3('CaseType', 'get', [
         'sequential' => 1,
+        'options' => ['limit' => 0]
       ]);
       if (is_array($result['values'])) {
         foreach ($result['values'] as $case) {

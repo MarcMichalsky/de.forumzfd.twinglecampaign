@@ -73,11 +73,17 @@ function civicrm_api3_twingle_form_Get(array $params): array {
     unset($params['twingle_project_type']);
   }
 
-  $params['campaign_type_id'] = "twingle_project";
-  $params['is_active'] = 1;
+  // Set query parameters
+  $query = [
+    'campaign_type_id' => "twingle_project",
+    'is_active' => 1,
+    'options' => ['limit' => 0]
+  ];
+
+  $query = array_merge($params, $query);
 
   try {
-    $result = civicrm_api3('Campaign', 'get', $params);
+    $result = civicrm_api3('Campaign', 'get', $query);
 
     if ($result['is_error'] == 0) {
       foreach($result['values'] as $value) {
@@ -92,7 +98,7 @@ function civicrm_api3_twingle_form_Get(array $params): array {
             'counter' => $value[$custom_field_mapping['twingle_project_counter']]
           ];
       }
-      return civicrm_api3_create_success($returnValues, $params, 'TwingleForm', 'Get');
+      return civicrm_api3_create_success($returnValues, $query, 'TwingleForm', 'Get');
     }
     else {
       return civicrm_api3_create_error($result['message']);

@@ -126,6 +126,9 @@ function civicrm_api3_twingle_campaign_Get(array $params): array {
     // Include campaign type ot TwingleCampaigns in $params
     $params['campaign_type_id'] = $twingle_campaign_campaign_type_id;
 
+    // Do not limit the number of results
+    $params['options'] = ['limit' => 0];
+
     // Get TwingleCampaign children campaigns of the TwingleProject
     $campaigns = civicrm_api3('Campaign',
       'get',

@@ -241,6 +241,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
     $parentCampaign = civicrm_api3('Campaign', 'get', [
       'sequential'   => 1,
       $cf_project_id => $this->values['project_id'],
+      'options' => ['limit' => 0]
     ]);
     if ($parentCampaign['is_error'] == 0) {
       return (int) $parentCampaign['id'];

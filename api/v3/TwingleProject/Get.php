@@ -123,7 +123,8 @@ function civicrm_api3_twingle_project_Get(array $params): array {
   $custom_field_mapping_reverse = array_flip($custom_field_mapping);
 
   $params['campaign_type_id'] = 'twingle_project';
-  $query = [];
+  // Do not limit the number of results
+  $query = ['options' => ['limit' => 0]];
 
   foreach ($params as $key => $value) {
     if ( $key != 'id' &&
