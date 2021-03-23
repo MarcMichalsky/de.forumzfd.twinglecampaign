@@ -94,9 +94,17 @@ function civicrm_api3_twingle_form_Get(array $params): array {
             'title' => $value['title'],
             'name' => $value['name'],
             'project_type' => $value[$custom_field_mapping['twingle_project_type']],
-            'embed_code' => $value[$custom_field_mapping['twingle_project_widget']],
             'counter' => $value[$custom_field_mapping['twingle_project_counter']]
           ];
+        switch ($value[$custom_field_mapping['twingle_project_type']]) {
+          case 'event':
+            $returnValues[$value['id']]['embed_code'] =
+              $value[$custom_field_mapping['twingle_project_eventall']];
+            break;
+          default:
+            $returnValues[$value['id']]['embed_code'] =
+              $value[$custom_field_mapping['twingle_project_widget']];
+        }
       }
       return civicrm_api3_create_success($returnValues, $query, 'TwingleForm', 'Get');
     }
