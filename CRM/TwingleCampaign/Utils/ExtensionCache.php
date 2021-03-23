@@ -78,7 +78,11 @@ class CRM_TwingleCampaign_Utils_ExtensionCache {
       $campaign_type_id = civicrm_api3(
         'OptionValue',
         'get',
-        ['sequential' => 1, 'name' => $campaign_type['name']]
+        [
+          'sequential' => 1,
+          'name'       => $campaign_type['name'],
+          'options'    => ['limit' => 0],
+        ]
       )['values'];
       if ($campaign_type_id) {
         $this->campaigns['campaign_types'][$campaign_type['name']]['id'] =
