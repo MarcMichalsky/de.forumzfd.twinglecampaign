@@ -27,13 +27,11 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
     $this->id_custom_field = Cache::getInstance()
       ->getCustomFieldMapping()['twingle_event_id'];
 
-    if ($id) {
-      try {
-        $this->values['parent_id'] = $this->getParentCampaignId();
-      } catch (CiviCRM_API3_Exception $e) {
-        $errorMessage = $e->getMessage();
-        throw new Exception("Could not identify parent Campaign: $errorMessage");
-      }
+    try {
+      $this->values['parent_id'] = $this->getParentCampaignId();
+    } catch (CiviCRM_API3_Exception $e) {
+      $errorMessage = $e->getMessage();
+      throw new Exception("Could not identify parent Campaign: $errorMessage");
     }
   }
 
@@ -43,6 +41,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    * Returns _TRUE_ if creation was successful or _FALSE if it creation failed.
    *
    * @param bool $no_hook
+   *
    * @return bool
    * @throws \CiviCRM_API3_Exception
    * @throws \Exception
@@ -86,8 +85,10 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
   /**
    * ## Translate values between CiviCRM Campaigns and Twingle formats
    * Constants for **$direction**:<br>
-   * **TwingleProject::IN** translate array values from Twingle to CiviCRM format<br>
-   * **TwingleProject::OUT** translate array values from CiviCRM to Twingle format
+   * **TwingleProject::IN** translate array values from Twingle to CiviCRM
+   * format<br>
+   * **TwingleProject::OUT** translate array values from CiviCRM to Twingle
+   * format
    *
    * @param array $values
    * array of values to translate
@@ -241,7 +242,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
     $parentCampaign = civicrm_api3('Campaign', 'get', [
       'sequential'   => 1,
       $cf_project_id => $this->values['project_id'],
-      'options' => ['limit' => 0]
+      'options'      => ['limit' => 0],
     ]);
     if ($parentCampaign['is_error'] == 0) {
       return (int) $parentCampaign['id'];
@@ -285,4 +286,5 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
   function getEventId(): int {
     return (int) $this->values['id'];
   }
+
 }
