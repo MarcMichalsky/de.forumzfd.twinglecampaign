@@ -238,7 +238,7 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
       }
 
       // If this is a test, do not make db changes
-      if ($params['is_test']) {
+      if (isset($params['is_test']) && $params['is_test']) {
         $result_values[$event->getId()] =
           $event->getResponse('Ready to create TwingleEvent');
       }

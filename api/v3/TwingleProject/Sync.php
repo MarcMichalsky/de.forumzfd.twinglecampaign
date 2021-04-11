@@ -195,7 +195,7 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
           );
 
           // If this is a test, do not make db changes
-          if ($params['is_test']) {
+          if (isset($params['is_test']) && $params['is_test']) {
             $returnValues[$project->getId()] =
               $project->getResponse('Ready to create TwingleProject');
           }
