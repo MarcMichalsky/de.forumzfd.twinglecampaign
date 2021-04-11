@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>PHP</ID>
+  <OriginalElement>\CRM_TwingleCampaign_BAO_Campaign</OriginalElement>
+  <nodes>
+    <node x="1052.5454545454545" y="675.0">\CRM_TwingleCampaign_BAO_TwingleCampaign</node>
+    <node x="512.2727272727273" y="675.0">\CRM_TwingleCampaign_BAO_TwingleEvent</node>
+    <node x="-40.0" y="675.0">\CRM_TwingleCampaign_BAO_TwingleProject</node>
+    <node x="241.0" y="-47.27272727272725">\CRM_TwingleCampaign_BAO_Campaign</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="\CRM_TwingleCampaign_BAO_TwingleEvent" target="\CRM_TwingleCampaign_BAO_Campaign" relationship="GENERALIZATION">
+      <point x="0.0" y="-138.5" />
+      <point x="718.7727272727273" y="614.0" />
+      <point x="432.0" y="614.0" />
+      <point x="0.0" y="294.5" />
+    </edge>
+    <edge source="\CRM_TwingleCampaign_BAO_TwingleProject" target="\CRM_TwingleCampaign_BAO_Campaign" relationship="GENERALIZATION">
+      <point x="0.0" y="-174.5" />
+      <point x="172.5" y="614.0" />
+      <point x="432.0" y="614.0" />
+      <point x="0.0" y="294.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="0.55" showDependencies="false" x="821.0" y="542.9999999999999" />
+  <SelectedNodes>
+    <node>\CRM_TwingleCampaign_BAO_Campaign</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Methods</Category>
+  </Categories>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
