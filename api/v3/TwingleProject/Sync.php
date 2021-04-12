@@ -104,7 +104,6 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
 
       // instantiate project from CiviCRM
       $id = $result['id'];
-      unset($result['id']);
       $project = new TwingleProject($result, $id);
 
       // Synchronize projects
@@ -232,9 +231,10 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
       foreach ($projects_from_twingle as $project_from_twingle) {
         if ($project_from_twingle['id'] == $project_from_civicrm['project_id']) {
 
-          // store campaign id in $id
+          // store campaign id in $id and replace it with project_id
           $id = $project_from_civicrm['id'];
-          unset($project_from_civicrm['id']);
+          $project_from_civicrm['id'] = $project_from_civicrm['project_id'];
+          unset($project_from_civicrm['project_id']);
 
           // instantiate project with values from TwingleProject.Get
           $project = new TwingleProject($project_from_civicrm, $id);

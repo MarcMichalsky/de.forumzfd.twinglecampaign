@@ -41,6 +41,15 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    * CiviCRM Campaign id
    */
   public function __construct(array $values = [], int $id = NULL) {
+
+    // If the $values originally come from the TwingleProject.get API, they
+    // contain the internal CiviCRM id as 'id' and the external Twingle id as
+    // 'project_id'. In this case 'id' gets replaced with 'project_id'
+    if (isset($values['project_id'])) {
+      $values['id'] = $values['project_id'];
+      unset($values['project_id']);
+    }
+
     parent::__construct($values, $id);
 
     $this->prefix = 'twingle_project_';
