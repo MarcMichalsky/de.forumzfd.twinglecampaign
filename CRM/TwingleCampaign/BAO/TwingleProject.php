@@ -562,13 +562,17 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
       }
 
       // Change DateTime string into timestamp
-      $values['last_update'] =
-        self::getTimestamp($values['last_update']);
+      if (isset($values['last_update'])) {
+        $values['last_update'] =
+          self::getTimestamp($values['last_update']);
+      }
 
       // Default project_type to ''
-      $values['type'] = $values['type'] == 'default'
-        ? ''
-        : $values['type'];
+      if (isset($values['type'])) {
+        $values['type'] = $values['type'] == 'default'
+          ? ''
+          : $values['type'];
+      }
 
       // Cast project target to integer
       if (isset($values['project_target'])) {
