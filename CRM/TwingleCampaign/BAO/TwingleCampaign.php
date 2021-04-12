@@ -32,7 +32,7 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
     $this->id = $id ?? NULL;
     $this->values['campaign_type_id'] = 'twingle_campaign';
 
-    if ($this->id) {
+    if (!isset($this->id)) {
       $this->update($values);
       $this->getParentProject();
       $this->createCid();
@@ -341,10 +341,11 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    */
   private
   function update(array $values) {
-    $filter = ExtensionCache::getInstance()->getTemplates()['TwingleCampaign'];
+    $filter = ExtensionCache::getInstance()
+      ->getTemplates()['TwingleCampaign']['campaign_data'];
     foreach ($values as $key => $value) {
       if (in_array($key, $filter)) {
-        $this->values[$key] = $values[$key];
+        $this->values[$key] = $value;
       }
     }
   }

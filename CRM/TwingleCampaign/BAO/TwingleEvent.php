@@ -27,7 +27,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
     $this->id_custom_field = Cache::getInstance()
       ->getCustomFieldMapping()['twingle_event_id'];
 
-    if (isset($this->values['parent_id'])) {
+    if (!isset($this->values['parent_id'])) {
       try {
         $this->values['parent_id'] = $this->getParentCampaignId();
       } catch (CiviCRM_API3_Exception $e) {

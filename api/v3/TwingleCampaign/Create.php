@@ -62,7 +62,7 @@ function civicrm_api3_twingle_campaign_Create(array $params): array {
   $params = array_intersect_key($params, $allowed_params);
 
   // instantiate TwingleCampaign
-  $campaign = new TwingleCampaign($params, $params['id']);
+  $campaign = new TwingleCampaign($params);
 
   // Try to create the TwingleCampaign
   try {

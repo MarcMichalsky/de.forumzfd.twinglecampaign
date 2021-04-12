@@ -33,6 +33,13 @@ function _civicrm_api3_twingle_campaign_Get_spec(array &$spec) {
     'api.required' => 0,
     'description'  => E::ts('Twingle ID of the parent TwingleProject'),
   ];
+  $spec['parent_id'] = [
+    'name'         => 'parent_id',
+    'title'        => E::ts('Parent Project ID'),
+    'type'         => CRM_Utils_Type::T_INT,
+    'api.required' => 0,
+    'description'  => E::ts('ID of the parent TwingleProject'),
+  ];
   $spec['name'] = [
     'name'         => 'name',
     'title'        => E::ts('Campaign Name'),
@@ -122,6 +129,8 @@ function civicrm_api3_twingle_campaign_Get(array $params): array {
 
     // Include parent TwingleProject id in $params
     $params['parent_id'] = $project['id'];
+  }
+  elseif (isset($params['parent_id'])) {
 
     // Include campaign type ot TwingleCampaigns in $params
     $params['campaign_type_id'] = $twingle_campaign_campaign_type_id;
@@ -157,7 +166,7 @@ function civicrm_api3_twingle_campaign_Get(array $params): array {
   }
 
   // Translate custom fields
-  if (!empty($campaigns)) {
+  if (!empty($campaigns['values'])) {
     $custom_field_mapping_reverse =
       array_flip(Cache::getInstance()->getCustomFieldMapping());
 
@@ -171,7 +180,7 @@ function civicrm_api3_twingle_campaign_Get(array $params): array {
           $returnValues[$campaign['id']][$key] = $value;
         }
       }
-      foreach($returnValues[$campaign['id']] as $key => $value) {
+      foreach ($returnValues[$campaign['id']] as $key => $value) {
         if ($key != 'twingle_campaign_id' && strpos($key, 'twingle_campaign_') === 0) {
           $returnValues[$campaign['id']][str_replace('twingle_campaign_', '', $key)]
             = $value;

@@ -20,11 +20,18 @@ function _civicrm_api3_twingle_campaign_Sync_spec(array &$spec) {
     'description'  => E::ts('The Twingle Campaign ID'),
   ];
   $spec['project_id'] = [
-    'name'         => 'project_id',
+    'name'         => 'parent_project_id',
     'title'        => E::ts('Parent Twingle Project ID'),
     'type'         => CRM_Utils_Type::T_INT,
     'api.required' => 0,
     'description'  => E::ts('Twingle ID of the parent TwingleProject'),
+  ];
+  $spec['parent_id'] = [
+    'name'         => 'parent_id',
+    'title'        => E::ts('Parent Project ID'),
+    'type'         => CRM_Utils_Type::T_INT,
+    'api.required' => 0,
+    'description'  => E::ts('ID of the parent TwingleProject'),
   ];
 }
 
@@ -52,7 +59,17 @@ function civicrm_api3_twingle_campaign_Sync(array $params): array {
   $returnValues = [];
   $errors_occurred = 0;
 
-  if ($campaigns['is_error'] == 0 && $campaigns['count'] > 0) {
+  // Abort if TwingleProject does not have TingleCampaign children
+  if ($campaigns['count'] == 0) {
+    return civicrm_api3_create_success(
+      $returnValues,
+      $params,
+      'TwingleCampaign',
+      'Sync'
+    );
+  }
+
+  if ($campaigns['is_error'] == 0) {
 
     // Instantiate and re-create TwingleCampaigns
     foreach ($campaigns['values'] as $campaign) {
