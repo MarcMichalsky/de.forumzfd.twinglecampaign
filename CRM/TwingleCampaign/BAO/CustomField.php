@@ -108,16 +108,14 @@ class CRM_TwingleCampaign_BAO_CustomField {
             ->error("$this->extensionName could not create new custom field
             \"$this->name\" for group \"$this->custom_group_id\": 
             $this->result['error_message']");
-          CRM_Utils_System::setUFMessage("Creation of custom field '$this->name'
-      failed. Find more information in the logs.");
+          CRM_Utils_System::setUFMessage(E::ts('Creation of custom field \'%1\' failed. Find more information in the logs.', [1 => $this->name]));
         }
         // If there is not enough information: log simple error message
         else {
           Civi::log()
             ->error("$this->extensionName could not create new custom field: 
             $this->result['error_message']");
-          CRM_Utils_System::setUFMessage("Creation of custom field
-      failed. Find more information in the logs.");
+          CRM_Utils_System::setUFMessage(E::ts("Creation of custom field failed. Find more information in the logs."));
         }
       }
     }

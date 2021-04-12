@@ -12,6 +12,48 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Language: de_DE\n"
 
+#: CRM/TwingleCampaign/BAO/CustomField.php
+msgid ""
+"Creation of custom field '%1' failed. Find more information in the logs."
+msgstr ""
+"Erstellung von Custom Field  '%1' fehlgeschlagen. Mehr Informationen in den "
+"Logs."
+
+#: CRM/TwingleCampaign/BAO/CustomField.php
+msgid "Creation of custom field failed. Find more information in the logs."
+msgstr ""
+"Erstellung von Custom Field  '%1' fehlgeschlagen. Mehr Informationen in den "
+"Logs."
+
+#: CRM/TwingleCampaign/BAO/CustomField.php
+msgid ""
+"Creation of custom field '%1' failed, because a custom field with that name "
+"already exists. Find more information in the logs."
+msgstr ""
+"Erstellung der Custom Field '%1' fehlgeschlagen, weil bereits eine Custom "
+"Field mit selbem Namen existiert. Mehr Informationen in den Logs."
+
+#: CRM/TwingleCampaign/BAO/CustomGroup.php
+msgid ""
+"Creation of custom group '%1' failed. Find more information in the logs."
+msgstr ""
+"Erstellung von Custom Field  '%1' fehlgeschlagen. Mehr Informationen in den "
+"Logs."
+
+#: CRM/TwingleCampaign/BAO/CustomGroup.php
+msgid "Creation of custom group failed. Find more information in the logs."
+msgstr ""
+"Erstellung von Custom Field  '%1' fehlgeschlagen. Mehr Informationen in den "
+"Logs."
+
+#: CRM/TwingleCampaign/BAO/CustomGroup.php
+msgid ""
+"Creation of custom group '%1' failed, because a custom group with that name "
+"already exists. Find more information in the logs."
+msgstr ""
+"Erstellung der Custom Group '%1' fehlgeschlagen, weil bereits eine Custom "
+"Group mit selbem Namen existiert. Mehr Informationen in den Logs."
+
 #: CRM/TwingleCampaign/BAO/TwingleCampaign.php
 msgid ""
 "Could not determine parent TwingleProject URL. This URL is needed to create "
@@ -35,6 +77,37 @@ msgstr ""
 #: CRM/TwingleCampaign/BAO/TwingleCampaign.php
 msgid "No parent TwingleProject found"
 msgstr "Kein übergeordnetes TwingleProjekt gefunden"
+
+#: CRM/TwingleCampaign/BAO/TwingleProject.php
+msgid "BCC email invalid"
+msgstr "BCC-Email-Adresse ungültig"
+
+#: CRM/TwingleCampaign/BAO/TwingleProject.php
+msgid "Invalid hexadecimal value in color field: %1"
+msgstr "Ungültige Hexadezimalzahl in Farbfeld: %1"
+
+#: CRM/TwingleCampaign/BAO/TwingleProject.php
+msgid "Missing maximum donation value"
+msgstr "Maximale Spendenhöhe fehlt"
+
+#: CRM/TwingleCampaign/BAO/TwingleProject.php
+msgid "Maximum donation value must be higher than the minimum"
+msgstr "Die maximale Spendenhöhe muss höher als die minimale sein"
+
+#: CRM/TwingleCampaign/BAO/TwingleProject.php
+msgid "Default donation value must lie in between maximum and minimum values"
+msgstr ""
+"Die voreingestellte Spendenhöhe muss zwischen Minimum und Maximum liegen"
+
+#: CRM/TwingleCampaign/BAO/TwingleProject.php
+msgid "Donation values (Min, Max, Default) must be positive integers"
+msgstr ""
+"Die minimale, maximale und die voreingestellte Spendenhöhe müssen positive "
+"Ganzzahlen sein"
+
+#: CRM/TwingleCampaign/BAO/TwingleProject.php
+msgid "Invalid URL: %1"
+msgstr "Ungültige URL: %1"
 
 #: CRM/TwingleCampaign/Form/Settings.php api/v3/TwingleEvent/Delete.php
 #: api/v3/TwingleEvent/Sync.php api/v3/TwingleProject/Delete.php
@@ -108,6 +181,664 @@ msgstr ""
 #: CRM/TwingleCampaign/Upgrader.php
 msgid "Could not disable scheduled job \"TwingleSync\"."
 msgstr "Geplante Aufgabe \"TwingleSync\" konnte nicht deaktiviert werden."
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Twingle Information"
+msgstr "Twingle Informationen"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Twingle Settings"
+msgstr "Twingle Einstellungen"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Twingle Payment Methods"
+msgstr "Twingle Zahlungsarten"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Twingle Embed Codes"
+msgstr "Twingle Embed Codes"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Twingle Event Information"
+msgstr "Twingle Event Informationen"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Twingle Campaign Information"
+msgstr "Twingle Campaign Informationen"
+
+#: CRM/TwingleCampaign/resources/campaigns.php api/v3/TwingleEvent/Delete.php
+#: api/v3/TwingleEvent/Get.php api/v3/TwingleEvent/Getsingle.php
+#: api/v3/TwingleEvent/Sync.php api/v3/TwingleProject/Create.php
+#: api/v3/TwingleProject/Delete.php api/v3/TwingleProject/Get.php
+#: api/v3/TwingleProject/Getsingle.php api/v3/TwingleProject/Sync.php
+msgid "Twingle Project ID"
+msgstr "Twingle Project ID"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Organisation ID"
+msgstr "Organisations ID"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "identifier"
+msgstr "Kennung"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "An unique identifier for a project (auto generated)"
+msgstr "Eindeutige Kennung eines Projekts (automatisch generiert)"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Type"
+msgstr "Typ"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Default"
+msgstr "Default"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Events"
+msgstr "Events"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Membership"
+msgstr "Mitgliedschaft"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid ""
+"Choose the project type. Allow users to create own events or to pay a "
+"membership fee."
+msgstr ""
+"Wähle den Projekt-Typ: erlaube Benutzern ihre eigenen Spenden-Events "
+"anzulegen oder eine Mitgliedschaft zu bezahlen."
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "allow more"
+msgstr "Mehr zulassen"
+
+#: CRM/TwingleCampaign/resources/campaigns.php api/v3/TwingleProject/Create.php
+#: api/v3/TwingleProject/Get.php api/v3/TwingleProject/Getsingle.php
+msgid "Allow to donate more than is defined in the target"
+msgstr "Zulassen, dass mehr gespendet wird als im Spendenziel angegeben ist"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "transaction type"
+msgstr "Transaktionstyp"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "URL"
+msgstr "URL"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Widget"
+msgstr "Widget"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Form"
+msgstr "Formular"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Widget Single"
+msgstr "Einzelnes Widget"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Form Single"
+msgstr "Formular Widget"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "All Events"
+msgstr "Alle Events"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Event List"
+msgstr "Event-Liste"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Counter"
+msgstr "Zähler"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Page"
+msgstr "Seite"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Confirmation Mail"
+msgstr "Bestätigungsmail"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Send confirmation mail"
+msgstr "Sende Bestätigungs-E-Mail"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Donation Receipt"
+msgstr "Spendenbescheinigung"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Offer donation receipts"
+msgstr "Biete Spendenbescheinigungen an"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Contact Data"
+msgstr "Kontaktdaten"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Donation Rhythm"
+msgstr "Spendenrhythmus"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "yearly"
+msgstr "jährlich"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "halfyearly"
+msgstr "halbjährlich"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "quarterly"
+msgstr "vierteljährlich"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "monthly"
+msgstr "monatlich"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "one time"
+msgstr "einmalig"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid ""
+"The selected options are available for selection in the donation widget."
+msgstr "Die ausgewählten Optionen stehen im Spenden-Widget zur Verfügung"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Default Rhythm"
+msgstr "Standard Spendenrhythmus"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Which donation rhythm should be displayed as selected by default?"
+msgstr "Welcher Spendenrhythmus soll standardmäßig ausgewählt sein?"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Newsletter Registration"
+msgstr "Newsletter-Registrierung"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Enable newsletter registration"
+msgstr "Registrierung für Newsletter aktivieren"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Postinfo Registration"
+msgstr "Postinfo-Registrierung"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Enable post info registration"
+msgstr "Registrierung für Postinfos aktivieren"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Background Color"
+msgstr "Hintergrundfarbe"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Hex color code (e.g. ffffff for white)"
+msgstr "Hex-Farbcode (z.B. ffffff für weiß)"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Primary Color"
+msgstr "Primärfarbe"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Font Color"
+msgstr "Schriftfarbe"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "BCC Email"
+msgstr "BCC-E-Mail"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid ""
+"Email address used as bcc addresses for confirmation mail which is send to "
+"an user"
+msgstr "E-Mail-Adresse für den BBC beim Versenden der Bestätigungs-E-Mail"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Donation Min"
+msgstr "Spendenminimum"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Minimum donation value"
+msgstr "Mindestspendenbetrag"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Donation Max"
+msgstr "Spendenmaximum"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Maximum donation value"
+msgstr "Höchstspendenbetrag"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Donation Default"
+msgstr "Standardspendenhöhe"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Default donation value"
+msgstr "Standardspendenbetrag"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Contact Fields"
+msgstr "Kontaktfelder"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Salutation"
+msgstr "Anrede"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "First name"
+msgstr "Vorname"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Last name"
+msgstr "Nachname"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Company"
+msgstr "Firma"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Birthday"
+msgstr "Geburtsdatum"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Street"
+msgstr "Straße"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Postal Code"
+msgstr "Postleitzahl"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "City"
+msgstr "Stadt"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Country"
+msgstr "Land"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Telephone"
+msgstr "Telefon"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Fields to include in contact form"
+msgstr "Felder für Kontaktformular"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Mandatory Contact Fields"
+msgstr "Pflicht-Kontaktfelder"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Fields that must get filled in the contact form."
+msgstr "Pflichtfelder für Kontaktformular"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Custom CSS"
+msgstr "Benutzerdefiniertes CSS"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "URL to a custom CSS file that will be included in the frontend"
+msgstr ""
+"URL einer benutzerdefinierten CSS-Datei, die im Frontend eingebunden wird"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Share URL"
+msgstr "Teilen-URL"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "URL for the sharing component on the last page and doi page"
+msgstr "URL für Teilen-Elemente auf der letzten Seite und auf der DOI-Seite"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Contact Mandatory"
+msgstr "Kontaktdaten sind Pflicht"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "If the contact data should be requested mandatory as second step"
+msgstr "Die Kontaktdaten als Pflichtangaben im zweiten Schritt abfragen"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Double Opt-In"
+msgstr "Doppeltes Opt-In"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid ""
+"Enable Twingle's double opt-in (Do not enable, if you use CiviCRM's double "
+"opt-in!)"
+msgstr ""
+"Tingles doppelten Opt-In aktivieren (Nicht aktivieren, wenn der doppelte Opt-"
+"In von CiviCRM verwendet wird!)"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Force Donation Taget as Button"
+msgstr "Spendenziel-Knopf erzwingen"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Force showing the donation targets as buttons"
+msgstr "Erzwingen der Anzeige der Spendenziele als Knöpfe"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Slider Icon"
+msgstr "Icon für Schieberegler"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Heart"
+msgstr "Herz"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Asterisk"
+msgstr "Sternchen"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Animal"
+msgstr "Pfote"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Lifebelt"
+msgstr "Rettungsring"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Angellist"
+msgstr "Peace-Hand"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Handshake"
+msgstr "Handschütteln"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Dollar"
+msgstr "Dollar"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Menue"
+msgstr "Menübalken"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Office"
+msgstr "Büro"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Leaf"
+msgstr "Blatt"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Cog"
+msgstr "Zahnrad"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "SVG"
+msgstr "SVG"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Euro"
+msgstr "Euro"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Stats"
+msgstr "Statistik"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Circle"
+msgstr "Kreis"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Water drop outline"
+msgstr "Wassertropfen (Umriss)"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Water drop"
+msgstr "Wassertropfen"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Gift"
+msgstr "Geschenk"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Bee"
+msgstr "Biene"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Flower"
+msgstr "Blume"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Train"
+msgstr "Zug"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "No Icon"
+msgstr "Kein Icon"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Hidden Logo"
+msgstr "Verstecktes Logo"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Hide the Logo on the project page"
+msgstr "Verstecke das Logo auf der Projektseite"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Target Format"
+msgstr "Spendenzielformat in Euro"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Format of the reached portion of the donation target"
+msgstr "Format des Spendenstands"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Donation Purpose as Textfield"
+msgstr "Spendenzweck als Textfeld"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Let donors enter their own donation purpose"
+msgstr "Erlaubt Spendern, ihre eigenen Spendenzwecke einzutragen"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Activate CiviCRM Support"
+msgstr "CiviCRM-Unterstützung aktivieren"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Activate support for Twingle Extension (de.systopia.twingle)"
+msgstr ""
+"Aktiviert die Unterstützung für die Twingle-Erweiterung (de.systopia.twingle)"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Show Step Index"
+msgstr "Zeige Fortschrittsanzeige"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Show a step index during donation process"
+msgstr "Fortschrittsanzeige beim Spendenprozess anzeigen"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Languages"
+msgstr "Sprachen"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "German"
+msgstr "Deutsch"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "English"
+msgstr "Englisch"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "French"
+msgstr "Französisch"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Spanish"
+msgstr "Spanisch"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Buttons"
+msgstr "Knöpfe"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid ""
+"Up to four buttons can be configured. If you leave the amount blank, the "
+"button will not be displayed."
+msgstr ""
+"Bis zu vier Knöpfe können konfiguriert werden. Wenn Sie den Wert frei "
+"lassen, wird der Knopf nicht angezeigt."
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Slider"
+msgstr "Schieberegler"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Show a slider that allows the donor to choose the donation amount."
+msgstr ""
+"Zeige einen Schieberegler, der es dem Spender erlaubt, einen Betrag zu wählen"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Button 1"
+msgstr "Knopf 1"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Amount to be displayed on Button 1"
+msgstr "Betrag der auf Knopf 1 angezeigt wird"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Button 2"
+msgstr "Knopf 2"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Amount to be displayed on Button 2"
+msgstr "Betrag der auf Knopf 2 angezeigt wird"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Button 3"
+msgstr "Knopf 3"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Amount to be displayed on Button 3"
+msgstr "Betrag der auf Knopf 3 angezeigt wird"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Button 4"
+msgstr "Knopf 4"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Amount to be displayed on Button 4"
+msgstr "Betrag der auf Knopf 4 angezeigt wird"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Newsletter Name Requested"
+msgstr "Name für Newsletter abfragen"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Must a donor give his name for newsletter sign-up?"
+msgstr ""
+"Muss ein Spender seinen Namen für die Newsletter-Registrierung angeben?"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Show List of Donations"
+msgstr "Spendenliste anzeigen"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Display a list of public donations"
+msgstr "Zeigt eine liste öffentlicher Spenden an"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Payment Methods"
+msgstr "Zahlungsarten"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "PayPal"
+msgstr "PayPal"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Banktransfer"
+msgstr "Banküberweisung"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Debit"
+msgstr "Bankeinzug"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Sofortüberweisung"
+msgstr "Sofortüberweisung"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid ""
+"Chose which payment methods should be available. NOTE: You might have to "
+"activate them first in the Twingle-Manager configuration."
+msgstr ""
+"Wählen Sie aus, welche Zahlungsarten verfügbar sein sollen. WICHTIG: Sie "
+"müssen die Zahlungsarten eventuell erst im Twingle-Manager konfigurieren."
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Recurring Payment Methods"
+msgstr "Wiederkehrende Zahlungsarten"
+
+#: CRM/TwingleCampaign/resources/campaigns.php api/v3/TwingleEvent/Delete.php
+#: api/v3/TwingleEvent/Get.php api/v3/TwingleEvent/Getsingle.php
+#: api/v3/TwingleEvent/Sync.php
+msgid "Twingle Event ID"
+msgstr "Twingle Event ID"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Identifier"
+msgstr "Kennung"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Initiator"
+msgstr "Initiator"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Initiator Email"
+msgstr "Initiator E-Mail"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Is public"
+msgstr "Ist öffentlich"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Deleted"
+msgstr "Gelöscht"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Confirmed At"
+msgstr "Bestätigt am"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Created At"
+msgstr "Erstellt am"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Creation URL"
+msgstr "Erstell-URL"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Internal URL"
+msgstr "Interne URL"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "External URL"
+msgstr "Externe URL"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Edit Internal URL"
+msgstr "Interne Bearbeitungs-URL"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Edit External URL"
+msgstr "Externe Bearbeitungs-URL"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Parent TwingleProject ID"
+msgstr "Twingle ID des Eltern-TwingleProject"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "CID"
+msgstr "CID"
 
 #: api/v3/TwingleCampaign/Create.php api/v3/TwingleCampaign/Delete.php
 #: api/v3/TwingleCampaign/Get.php api/v3/TwingleCampaign/Getsingle.php
@@ -231,7 +962,7 @@ msgstr "Ist diese Kampagne aktiviert oder deaktiviert/abgesagt?"
 msgid ""
 "A unique identifier for a TwingleCampaign generated by a hashing its id + "
 "name"
-msgstr ""
+msgstr "Einmalige Kennung einer TwingleCampaign"
 
 #: api/v3/TwingleEvent/Delete.php api/v3/TwingleEvent/Get.php
 #: api/v3/TwingleEvent/Getsingle.php api/v3/TwingleEvent/Sync.php
@@ -247,24 +978,11 @@ msgstr "Kampagnen ID"
 msgid "Unique Campaign ID"
 msgstr "Einzigartige Kampagnen ID"
 
-#: api/v3/TwingleEvent/Delete.php api/v3/TwingleEvent/Get.php
-#: api/v3/TwingleEvent/Getsingle.php api/v3/TwingleEvent/Sync.php
-#: api/v3/TwingleProject/Create.php api/v3/TwingleProject/Delete.php
-#: api/v3/TwingleProject/Get.php api/v3/TwingleProject/Getsingle.php
-#: api/v3/TwingleProject/Sync.php
-msgid "Twingle Project ID"
-msgstr "Twingle Project ID"
-
 #: api/v3/TwingleEvent/Delete.php api/v3/TwingleEvent/Sync.php
 #: api/v3/TwingleProject/Delete.php api/v3/TwingleProject/Get.php
 #: api/v3/TwingleProject/Getsingle.php api/v3/TwingleProject/Sync.php
 msgid "Twingle ID for this project"
 msgstr "Twingle ID dieses Projekts"
-
-#: api/v3/TwingleEvent/Delete.php api/v3/TwingleEvent/Get.php
-#: api/v3/TwingleEvent/Getsingle.php api/v3/TwingleEvent/Sync.php
-msgid "Twingle Event ID"
-msgstr "Twingle Event ID"
 
 #: api/v3/TwingleEvent/Delete.php api/v3/TwingleEvent/Get.php
 #: api/v3/TwingleEvent/Getsingle.php api/v3/TwingleEvent/Sync.php
@@ -380,11 +1098,6 @@ msgstr "Typ des Twingle Projects"
 msgid "Allow more"
 msgstr "Mehr zulassen"
 
-#: api/v3/TwingleProject/Create.php api/v3/TwingleProject/Get.php
-#: api/v3/TwingleProject/Getsingle.php
-msgid "Allow to donate more than is defined in the target"
-msgstr "Zulassen, dass mehr gespendet wird als im Spendenziel angegeben ist"
-
 #: api/v3/TwingleProject/Create.php
 msgid "Project Target"
 msgstr "Spendenziel"
@@ -416,3 +1129,31 @@ msgstr "Allgemeine Einstellungen"
 #: templates/CRM/TwingleCampaign/Form/Settings.tpl
 msgid "Twingle Event Settings"
 msgstr "Twingle Event Einstellungen"
+
+#: twinglecampaign.php
+msgid "Campaign cloning failed"
+msgstr "Klonen der Kampagne fehlgeschlagen"
+
+#: twinglecampaign.php
+msgid "TwingleCampaign update failed"
+msgstr "TwingleCampaign-Update fehlgeschlagen"
+
+#: twinglecampaign.php
+msgid "TwingleCampaign was saved."
+msgstr "TwingleCampaign wurde gespeichert"
+
+#: twinglecampaign.php
+msgid "TwingleProject creation failed"
+msgstr "Erstellung des TwingleProjects fehlgeschlagen"
+
+#: twinglecampaign.php
+msgid "Could not retrieve Twingle API key"
+msgstr "Twingle-API-Schlüssel nicht gefunden"
+
+#: twinglecampaign.php
+msgid "TwingleProject synchronization failed: %1"
+msgstr "Synchronisation des TwingleProjects fehlgeschlagen: %1"
+
+#: twinglecampaign.php
+msgid "Input validation failed"
+msgstr "Eingabeüberprüfung fehlgeschlagen"

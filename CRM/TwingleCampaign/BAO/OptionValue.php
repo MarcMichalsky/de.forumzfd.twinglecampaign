@@ -144,10 +144,9 @@ class CRM_TwingleCampaign_BAO_OptionValue {
     if (!$name) {
       $result = [];
 
-      // Get json file with all custom fields for this extension
-      $json_file = file_get_contents(E::path() .
-        '/CRM/TwingleCampaign/resources/option_values.json');
-      $option_values = json_decode($json_file, TRUE);
+      // Get all custom fields for this extension from option_values.php
+      $option_values =
+        include(E::path() . '/CRM/TwingleCampaign/resources/option_values.php');
 
       // Log an error and throw an exception if the file cannot get read
       if (!$option_values) {
