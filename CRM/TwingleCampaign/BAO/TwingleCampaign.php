@@ -212,7 +212,7 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    */
   private
   function createCid() {
-    $this->values['cid'] = md5($this->id . '_' . $this->values['name']);
+    $this->values['cid'] = uniqid();
   }
 
 
