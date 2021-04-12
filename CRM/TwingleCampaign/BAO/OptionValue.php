@@ -33,11 +33,6 @@ class CRM_TwingleCampaign_BAO_OptionValue {
       if (array_key_exists($var, $attributes)) {
         $this->$var = $attributes[$var];
       }
-
-      // translate description
-      if ($this->description) {
-        $this->description = E::ts($this->description);
-      }
     }
   }
 

@@ -127,7 +127,7 @@ function civicrm_api3_twingle_project_Get(array $params): array {
   $query = ['options' => ['limit' => 0]];
 
   foreach ($params as $key => $value) {
-    if ( $key != 'id' &&
+    if ($key != 'id' &&
       array_key_exists('twingle_project_' . $key, $custom_field_mapping)
     ) {
       $query[$custom_field_mapping['twingle_project_' . $key]] = $value;

@@ -53,11 +53,6 @@ class CRM_TwingleCampaign_BAO_CustomField {
       if (array_key_exists($var, $attributes)) {
         $this->$var = $attributes[$var];
       }
-
-      // translate help_post
-      if ($this->help_post) {
-        $this->help_post = E::ts($this->help_post);
-      }
     }
   }
 
@@ -162,16 +157,9 @@ class CRM_TwingleCampaign_BAO_CustomField {
     if (!$name) {
       $result = [];
 
-      // Get json file with all custom fields for this extension
-      $json_file = file_get_contents(E::path() .
-        '/CRM/TwingleCampaign/resources/campaigns.json');
-      $campaign_info = json_decode($json_file, TRUE);
-
-      // Log an error and throw an exception if the file cannot get read
-      if (!$campaign_info) {
-        Civi::log()->error("Could not read json file");
-        throw new Exception('Could not read json file');
-      }
+      // Get array with all custom fields for this extension
+      $campaign_info =
+        require E::path() . '/CRM/TwingleCampaign/resources/campaigns.php';
 
       // Recursive method call with all custom field names from the json file
       foreach ($campaign_info['custom_fields'] as $customField) {

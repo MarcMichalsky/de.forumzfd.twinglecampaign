@@ -65,10 +65,12 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
    */
   public function install() {
     // Create campaign types, custom fields and custom groups by the contents
-    // of the json file "campaigns.json"
+    // of the campaigns.php file
 
-    $campaign_info = Cache::getInstance()->getCampaigns();
-    $option_values = Cache::getInstance()->getOptionValues();
+    $campaign_info = require E::path() .
+      '/CRM/TwingleCampaign/resources/campaigns.php';
+    $option_values = require E::path() .
+      '/CRM/TwingleCampaign/resources/option_values.php';
 
     // Create campaign types
     foreach ($campaign_info['campaign_types'] as $campaign_type) {
@@ -132,7 +134,8 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
    */
   public function uninstall() {
 
-    $campaign_info = Cache::getInstance()->getCampaigns();
+    $campaign_info = require E::path() .
+      '/CRM/TwingleCampaign/resources/campaigns.php';
     $option_values = Cache::getInstance()->getOptionValues();
 
     // Delete campaign types

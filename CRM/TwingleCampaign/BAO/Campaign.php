@@ -26,7 +26,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
   protected  $formattedValues;
 
-
   /**
    * ## Campaign constructor.
    *
@@ -55,7 +54,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
    * @throws \Exception
    */
   public function create(bool $no_hook = FALSE): bool {
-
     // Prepare project values for import into database
     $values_prepared_for_import = $this->values;
     $this->formatValues(

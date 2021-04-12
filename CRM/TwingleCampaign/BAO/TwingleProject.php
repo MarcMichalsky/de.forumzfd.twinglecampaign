@@ -677,18 +677,15 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
     return $response;
   }
 
-
   /**
    * ## Last update
    * Returns a timestamp of the last update of the TwingleProject campaign.
    *
-   * @return int|string|null
+   * @return int|null
    */
-  public
-  function lastUpdate(): ?int {
+  public function lastUpdate(): ?int {
     return self::getTimestamp($this->values['last_update']);
   }
-
 
   /**
    * ## Get project id
