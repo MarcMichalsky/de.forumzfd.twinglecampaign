@@ -129,10 +129,14 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
    */
   public function pushProject(array $project): array {
 
-    $projectOptions = $project['project_options'];
-    unset($project['project_options']);
-    $paymentMethods = $project['payment_methods'];
-    unset($project['payment_methods']);
+    if (isset($project['project_options'])) {
+      $projectOptions = $project['project_options'];
+      unset($project['project_options']);
+    }
+    if (isset($project['payment_methods'])) {
+      $paymentMethods = $project['payment_methods'];
+      unset($project['payment_methods']);
+    }
 
     try {
       if (!isset($project['id'])) {
@@ -153,32 +157,40 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
       }
 
       // Post project_options
-      $updatedProject['project_options'] =
-        $this->curlPost($url . '/options', $projectOptions);
+      if (isset($projectOptions)) {
+        $updatedProject['project_options'] =
+          $this->curlPost($url . '/options', $projectOptions);
+      }
+      else {
+        $updatedProject['project_options'] = $this->getProjectOptions($updatedProject['id']);
+      }
 
       // Post payment_methods
-      $this->curlPost($url . '/payment-methods', $paymentMethods);
-      $updatedProject['payment_methods'] =
-        $this->getProjectPaymentMethods($updatedProject['id']);
-
-      // Set last update time
-      $updatedProject['last_update'] = max(
-        $updatedProject['last_update'],
-        $updatedProject['project_options']['last_update'],
-        $updatedProject['payment_methods']['updated_at']
-      );
-      unset($updatedProject['project_options']['last_update']);
-      unset($updatedProject['payment_methods']['updated_at']);
-
-      return $updatedProject;
-    } catch (Exception $e) {
-      throw new Exception(
-        E::SHORT_NAME . 'Call to Twingle API failed: ' .
-        $e->getMessage()
-      );
-    }
+      if (isset ($paymentMethods)) {
+        $this->curlPost($url . '/payment-methods', $paymentMethods);
+      }
+        $updatedProject['payment_methods'] =
+          $this->getProjectPaymentMethods($updatedProject['id']);
 
 
+        // Set last update time
+        $updatedProject['last_update'] = max(
+          $updatedProject['last_update'],
+          $updatedProject['project_options']['last_update'],
+          $updatedProject['payment_methods']['updated_at']
+        );
+        unset($updatedProject['project_options']['last_update']);
+        unset($updatedProject['payment_methods']['updated_at']);
+
+        return $updatedProject;
+      }
+    catch
+      (Exception $e) {
+        throw new Exception(
+          E::SHORT_NAME . 'Call to Twingle API failed: ' .
+          $e->getMessage()
+        );
+      }
   }
 
 
@@ -194,48 +206,48 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
    * @throws Exception
    */
   public function getEvent(int $projectId, int $eventId = NULL): array {
-    $result = [];
+      $result = [];
 
-    // Construct url for curl
-    $url = empty($eventId)
-      ? $this->protocol . 'project' . $this->baseUrl . $projectId . '/event'
-      : $this->protocol . 'project' . $this->baseUrl . $projectId . '/event/'
-      . $eventId;
+      // Construct url for curl
+      $url = empty($eventId)
+        ? $this->protocol . 'project' . $this->baseUrl . $projectId . '/event'
+        : $this->protocol . 'project' . $this->baseUrl . $projectId . '/event/'
+        . $eventId;
 
-    $offset = 0;
-    $finished = FALSE;
+      $offset = 0;
+      $finished = FALSE;
 
-    // Get only as much results per call as configured in $this->limit
-    while (!$finished) {
-      $params = [
-        'orderby'   => 'id',
-        'direction' => 'desc',
-        'limit'     => $this->limit,
-        'offset'    => $offset,
-        'image'     => 'as-boolean',
-        'public'    => 0,
-      ];
-      $response = $this->curlGet($url, $params);
+      // Get only as much results per call as configured in $this->limit
+      while (!$finished) {
+        $params = [
+          'orderby'   => 'id',
+          'direction' => 'desc',
+          'limit'     => $this->limit,
+          'offset'    => $offset,
+          'image'     => 'as-boolean',
+          'public'    => 0,
+        ];
+        $response = $this->curlGet($url, $params);
 
-      // If no $eventId was given, expect one or more events.
-      // Store the events, increase the offset and ask again until there
-      // are no more events incoming.
-      if (!$eventId) {
-        $result = array_merge($result, $response['data']);
-        $offset = $offset + $this->limit;
-        $finished = count($response['data']) < $this->limit;
-      }
-      // If $eventId was given, expect only one event
-      else {
-        // If the response array contains 'message', the $eventId does not exist
-        if (!$response['message']) {
-          $result = $response;
+        // If no $eventId was given, expect one or more events.
+        // Store the events, increase the offset and ask again until there
+        // are no more events incoming.
+        if (!$eventId) {
+          $result = array_merge($result, $response['data']);
+          $offset = $offset + $this->limit;
+          $finished = count($response['data']) < $this->limit;
         }
-        $finished = TRUE;
+        // If $eventId was given, expect only one event
+        else {
+          // If the response array contains 'message', the $eventId does not exist
+          if (!$response['message']) {
+            $result = $response;
+          }
+          $finished = TRUE;
+        }
       }
+      return $result;
     }
-    return $result;
-  }
 
   /**
    * ## Get project embed data
@@ -248,47 +260,49 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
    */
   public function getProjectEmbedData($projectId): array {
 
-    $result = $this->getProject($projectId);
+      $result = $this->getProject($projectId);
 
-    if ($result['embed']) {
-      // Include counter url into embed data
-      $result['embed']['counter'] = $result['counter-url']['url'];
+      if ($result['embed']) {
+        // Include counter url into embed data
+        $result['embed']['counter'] = $result['counter-url']['url'];
 
-      return $result['embed'];
+        return $result['embed'];
+      }
+      else {
+        throw new Exception(
+          "Could not get embed data for project $projectId."
+        );
+      }
     }
-    else {
-      throw new Exception(
-        "Could not get embed data for project $projectId."
-      );
-    }
-  }
 
   /**
    * ## Get project options
    * Gets all project options from the Twingle API
+   *
    * @param $projectId
    *
    * @return array
    * @throws \Exception
    */
   public function getProjectOptions($projectId): array {
-    $url = $this->protocol . 'project' . $this->baseUrl . $projectId . '/options';
-    return $this->curlGet($url);
-  }
+      $url = $this->protocol . 'project' . $this->baseUrl . $projectId . '/options';
+      return $this->curlGet($url);
+    }
 
   /**
    * ## Get project payment methods
    * Gets all project payment methods from the Twingle API
+   *
    * @param $projectId
    *
    * @return array
    * @throws \Exception
    */
   public function getProjectPaymentMethods($projectId): array {
-    $url = $this->protocol . 'project' . $this->baseUrl . $projectId
-      . '/payment-methods';
-    return $this->curlGet($url);
-  }
+      $url = $this->protocol . 'project' . $this->baseUrl . $projectId
+        . '/payment-methods';
+      return $this->curlGet($url);
+    }
 
 
   /**
@@ -301,9 +315,9 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
    * @throws Exception
    */
   public function deleteProject(int $projectId): bool {
-    $url = $this->protocol . 'project' . $this->baseUrl . $projectId;
-    return $this->curlDelete($url);
-  }
+      $url = $this->protocol . 'project' . $this->baseUrl . $projectId;
+      return $this->curlDelete($url);
+    }
 
 
   /**
@@ -319,10 +333,10 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
    * @throws Exception
    */
   public function deleteEvent(int $projectId, int $eventId): bool {
-    $url = $this->protocol . 'project' . $this->baseUrl . $projectId .
-      '/event/' . $eventId;
-    return $this->curlDelete($url);
-  }
+      $url = $this->protocol . 'project' . $this->baseUrl . $projectId .
+        '/event/' . $eventId;
+      return $this->curlDelete($url);
+    }
 
 
   /**
@@ -360,7 +374,8 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
     }
     if ($curl_status_code == 404) {
       throw new Exception('http status code 404 (not found)');
-    } elseif ($curl_status_code == 500) {
+    }
+    elseif ($curl_status_code == 500) {
       throw new Exception('https status code 500 (internal error)');
     }
     return $response;
@@ -402,10 +417,11 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
     }
     if ($curl_status_code == 404) {
       throw new Exception('http status code 404 (not found)');
-    } elseif ($curl_status_code == 500) {
+    }
+    elseif ($curl_status_code == 500) {
       throw new Exception('https status code 500 (internal error)');
     }
-    if (sizeof($response) == 1 && isset($response['message'])){
+    if (sizeof($response) == 1 && isset($response['message'])) {
       throw new Exception($response['message']);
     }
     return $response;
@@ -448,7 +464,8 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
     }
     if ($curl_status_code == 404) {
       throw new Exception('http status code 404 (not found)');
-    } elseif ($curl_status_code == 500) {
+    }
+    elseif ($curl_status_code == 500) {
       throw new Exception('https status code 500 (internal error)');
     }
     return ($curl_status_code == 200);

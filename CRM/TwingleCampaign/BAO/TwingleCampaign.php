@@ -26,7 +26,7 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public function __construct(array $values, int $id = NULL) {
+  public function __construct(array $values = [], int $id = NULL) {
 
     $this->prefix = 'twingle_campaign_';
     $this->id = $id ?? NULL;

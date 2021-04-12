@@ -131,6 +131,20 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
       // instantiate project
       $project = new TwingleProject($result, $id);
 
+      // Send project information to Tingle and update project with the
+      // answer
+      $projectOptions = $project->getOptions();
+      $project->deleteOptions();
+      $paymentMethods = $project->getPaymentMethods();
+      $project->deletePaymentMethods();
+      $projectFromTwingle = $twingleApi->pushProject($project->export());
+      $project = new TwingleProject($projectFromTwingle, $project->getId());
+      $projectValues = $project->getValues();
+      $projectValues['project_options'] = $projectOptions;
+      $projectValues['payment_methods'] = $paymentMethods;
+      $project->update($projectValues);
+      $project->complement($projectFromTwingle);
+
       // Push project to Twingle
       return _pushProjectToTwingle($project, $twingleApi, $params);
     }
@@ -342,17 +356,19 @@ function _updateProjectLocally(array $project_from_twingle,
  * @param \CRM_TwingleCampaign_BAO_TwingleProject $project
  * @param \CRM_TwingleCampaign_BAO_TwingleApiCall $twingleApi
  * @param array $params
+ * @param bool $update Update project after push?
  *
  * @return array
  * @throws \CiviCRM_API3_Exception
  */
 function _pushProjectToTwingle(TwingleProject $project,
                                TwingleApiCall $twingleApi,
-                               array $params): array {
+                               array $params = [],
+                               bool $update = TRUE): array {
 
   // If this is a test, do not make db changes
-  if ($params['is_test']) {
-    $response[$project->getId] =
+  if (isset($params['is_test']) && $params['is_test']) {
+    $response[$project->getId()] =
       $project->getResponse('TwingleProject ready to push to Twingle');
     return civicrm_api3_create_success(
       $response,
@@ -379,43 +395,55 @@ function _pushProjectToTwingle(TwingleProject $project,
   }
 
   // Update local campaign with data returning from Twingle
-  if ($result) {
-    $project->update($result);
-    try {
-      // Create updated campaign
-      $project->create(TRUE);
-      $response[$project->getId()] =
-        $project->getResponse('TwingleProject pushed to Twingle');
-      return civicrm_api3_create_success(
-        $response,
-        $params,
-        'TwingleProject',
-        'Sync'
-      );
-    } catch (Exception $e) {
+  if ($update) {
+    if ($result) {
+      $project->update($result);
+      try {
+        // Create updated campaign
+        $project->create(TRUE);
+        $response[$project->getId()] =
+          $project->getResponse('TwingleProject pushed to Twingle');
+        return civicrm_api3_create_success(
+          $response,
+          $params,
+          'TwingleProject',
+          'Sync'
+        );
+      } catch (Exception $e) {
+        Civi::log()->error(
+          E::LONG_NAME .
+          ' pushed TwingleProject to Twingle but local update failed: ' .
+          $e->getMessage(),
+          $project->getResponse()
+        );
+        return civicrm_api3_create_error(
+          'TwingleProject was pushed to Twingle but local update failed: ' .
+          $e->getMessage(),
+          $project->getResponse()
+        );
+      }
+    }
+    // If the curl fails, the $result may be empty
+    else {
       Civi::log()->error(
         E::LONG_NAME .
-        ' pushed TwingleProject to Twingle but local update failed: ' .
-        $e->getMessage(),
+        ' could not push TwingleProject campaign',
         $project->getResponse()
       );
       return civicrm_api3_create_error(
-        'TwingleProject was pushed to Twingle but local update failed: ' .
-        $e->getMessage(),
+        "Could not push TwingleProject campaign",
         $project->getResponse()
       );
     }
   }
-  // If the curl fails, the $result may be empty
   else {
-    Civi::log()->error(
-      E::LONG_NAME .
-      ' could not push TwingleProject campaign',
-      $project->getResponse()
-    );
-    return civicrm_api3_create_error(
-      "Could not push TwingleProject campaign",
-      $project->getResponse()
+    $response[$project->getId()] =
+      $project->getResponse('TwingleProject pushed to Twingle');
+    return civicrm_api3_create_success(
+      $response,
+      $params,
+      'TwingleProject',
+      'Sync'
     );
   }
 }

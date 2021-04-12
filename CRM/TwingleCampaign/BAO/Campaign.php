@@ -33,7 +33,7 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
    * @param array $values
    * @param int|null $id
    */
-  protected function __construct(array $values, int $id = NULL) {
+  protected function __construct(array $values = [], int $id = NULL) {
 
     $this->id = $id;
     $tmpClassName = explode('_', get_class($this));

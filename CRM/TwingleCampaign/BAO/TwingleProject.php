@@ -40,7 +40,7 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    * @param int|null $id
    * CiviCRM Campaign id
    */
-  public function __construct(array $values, int $id = NULL) {
+  public function __construct(array $values = [], int $id = NULL) {
     parent::__construct($values, $id);
 
     $this->prefix = 'twingle_project_';
@@ -85,7 +85,9 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    * ## Int to bool
    * Changes all project values that are defined as CiviCRM 'Boolean' types
    * from strings to booleans.
+   *
    * @param array $values
+   *
    * @throws \Exception
    */
   private function intToBool(array &$values) {
@@ -104,7 +106,10 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
       }
       elseif (in_array($key, $boolArrays)) {
         foreach ($values[$key] as $_key => $_value) {
-          if (is_numeric($_value) && $_value < 2 || empty($_value)) {
+          if (is_bool($_value)) {
+            // nothing to do here
+          }
+          elseif (is_numeric($_value) && $_value < 2 || empty($_value)) {
             $values[$key][$_key] = (bool) $_value;
           }
           else {
@@ -122,7 +127,9 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    * ## Int to bool
    * Changes all project values that are strings but originally came as integers
    * back to integers.
+   *
    * @param array $values
+   *
    * @throws \Exception
    */
   private function strToInt(array &$values) {
@@ -214,8 +221,33 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
   }
 
   /**
-   * ## Clone this TwingleProject
+   * ## Complement campaign values
+   * Complement existing campaign values with new ones
    *
+   * @param array $arrayToComplement
+   *
+   * @overrides CRM_TwingleCampaign_BAO_Campaign
+   */
+  public function complement(array $arrayToComplement) {
+
+    // Set all contact fields to false
+    if (
+      isset($arrayToComplement['values']['project_options']['contact_fields'])
+    ) {
+    foreach (
+      $arrayToComplement['values']['project_options']['contact_fields']
+      as $key => $value
+    ) {
+      $arrayToComplement['values']['project_options']['contact_fields'][$key]
+        = FALSE;
+    }
+  }
+
+    parent::complement($arrayToComplement);
+  }
+
+  /**
+   * ## Clone this TwingleProject
    * This method removes the id and the identifier from this instance and in
    * the next step it pushes the clone as a new project with the same values to
    * Twingle.
@@ -223,9 +255,161 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    * @throws \Exception
    */
   public function clone() {
-    $this->values['id'] = 0;
-    $this->values['identifier'] = 0;
+    $this->values['id'] = '';
+    $this->values['identifier'] = '';
     $this->create(); // this will also trigger the postSave hook
+  }
+
+  /**
+   * ## Validate
+   * Validates project values and returns an array containing the result and
+   * another array with eventual error messages.
+   *
+   * @return array ['valid' => bool, 'messages' => array]
+   */
+  public function validate(): array {
+    $valid = TRUE;
+    $messages = [];
+
+    // Validate email address
+    if (
+      !filter_var(
+        $this->values['project_options']['bcc_email_address'],
+        FILTER_VALIDATE_EMAIL
+      )
+      && !empty($this->values['project_options']['bcc_email_address'])
+    ) {
+      $valid = FALSE;
+      $messages[] = E::ts("BCC email invalid");
+    }
+
+    // Validate hexadecimal color fields
+    $colorFields =
+      [
+        'design_background_color',
+        'design_primary_color',
+        'design_font_color',
+      ];
+    foreach ($colorFields as $colorField) {
+      if (
+        !empty($this->values['project_options'][$colorField]) &&
+        (
+          !(
+            ctype_xdigit($this->values['project_options'][$colorField]) ||
+            is_integer($this->values['project_options'][$colorField])
+          ) ||
+          strlen((string) $this->values['project_options'][$colorField]) > 6
+        )
+      ) {
+        $valid = FALSE;
+        $messages[] =
+          E::ts("Invalid hexadecimal value in color field: %1",
+            [1 => $colorField]);
+      }
+    }
+
+    // Check if donation values are integers and if proposed donation value
+    // lies between max and min values
+    if (
+      // Is integer and >= 0 or empty
+      (
+        empty($this->values['project_options']['donation_value_default']) ||
+        (
+          is_integer($this->values['project_options']['donation_value_default']) ||
+          ctype_digit($this->values['project_options']['donation_value_default'])
+        ) && (
+          $this->values['project_options']['donation_value_default'] >= 0
+        )
+      ) && (
+        empty($this->values['project_options']['donation_value_min']) ||
+        (
+          is_integer($this->values['project_options']['donation_value_min']) ||
+          ctype_digit($this->values['project_options']['donation_value_min'])
+        ) && (
+          $this->values['project_options']['donation_value_max'] >= 0
+        )
+      ) && (
+        empty($this->values['project_options']['donation_value_max']) ||
+        (
+          is_integer($this->values['project_options']['donation_value_max']) ||
+          ctype_digit($this->values['project_options']['donation_value_max'])
+        ) && (
+          $this->values['project_options']['donation_value_max'] >= 0
+        )
+      )
+    ) {
+      if (
+        // all empty
+        empty($this->values['project_options']['donation_value_default']) &&
+        empty($this->values['project_options']['donation_value_min']) &&
+        empty($this->values['project_options']['donation_value_max'])
+      ) {
+        // nothing to validate
+      }
+      elseif (
+        // Max empty, min not empty
+        (!empty($this->values['project_options']['donation_value_min']) &&
+          empty($this->values['project_options']['donation_value_max'])) ||
+        // Max empty, default not empty
+        (!empty($this->values['project_options']['donation_value_default']) &&
+          empty($this->values['project_options']['donation_value_max']))
+      ) {
+        $valid = FALSE;
+        $messages[] =
+          E::ts("Missing maximum donation value");
+      }
+      else {
+        if (
+          // Min >= Max
+          $this->values['project_options']['donation_value_min'] >=
+          $this->values['project_options']['donation_value_max']
+        ) {
+          $valid = FALSE;
+          $messages[] =
+            E::ts("Maximum donation value must be higher than the minimum");
+        }
+        elseif (
+          // Default < min or default > max
+          $this->values['project_options']['donation_value_default'] <
+          $this->values['project_options']['donation_value_min'] ||
+          $this->values['project_options']['donation_value_default'] >
+          $this->values['project_options']['donation_value_max']
+        ) {
+          $valid = FALSE;
+          $messages[] =
+            E::ts("Default donation value must lie in between maximum and minimum values");
+        }
+      }
+    }
+    else {
+      $valid = FALSE;
+      $messages[] =
+        E::ts("Donation values (Min, Max, Default) must be positive integers");
+    }
+
+    // Validate sharing url
+    $urlFields =
+      [
+        'custom_css',
+        'share_url',
+      ];
+
+    foreach ($urlFields as $urlField) {
+      if (!empty($this->values['project_options'][$urlField])) {
+        if (
+          !filter_var(
+            $this->values['project_options'][$urlField],
+            FILTER_VALIDATE_URL
+          ) || empty($this->values['project_options'][$urlField])
+        ) {
+          $valid = FALSE;
+          $messages[] =
+            E::ts("Invalid URL: %1", [1 => $urlField]);
+        }
+      }
+    }
+
+    return ['valid' => $valid, 'messages' => $messages];
   }
 
 
@@ -246,7 +430,8 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    *
    * @throws Exception
    */
-  public static function formatValues(array &$values, string $direction) {
+  public
+  static function formatValues(array &$values, string $direction) {
 
     if ($direction == self::IN) {
 
@@ -467,7 +652,8 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    * @return array
    *
    */
-  public function getResponse(string $status = NULL): array {
+  public
+  function getResponse(string $status = NULL): array {
     $project_type = empty($this->values['type']) ? 'default' : $this->values['type'];
     $response =
       [
@@ -489,7 +675,8 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    *
    * @return int|string|null
    */
-  public function lastUpdate() {
+  public
+  function lastUpdate(): ?int {
     return self::getTimestamp($this->values['last_update']);
   }
 
@@ -500,8 +687,72 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    *
    * @return int
    */
-  public function getProjectId(): int {
+  public
+  function getProjectId(): int {
     return (int) $this->values['id'];
+  }
+
+  /**
+   * ## Get the payment methods array of this project
+   *
+   * @return array
+   */
+  public function getValues(): array {
+    if (isset($this->values)) {
+      return $this->values;
+    }
+    else {
+      return [];
+    }
+  }
+
+  /**
+   * ## Get the project options array of this project
+   *
+   * @return array
+   */
+  public function getOptions(): array {
+    if (isset($this->values['project_options'])) {
+      return $this->values['project_options'];
+    }
+    else {
+      return [];
+    }
+  }
+
+  /**
+   * ## Get the payment methods array of this project
+   *
+   * @return array
+   */
+  public function getPaymentMethods(): array {
+    if (isset($this->values['payment_methods'])) {
+      return $this->values['payment_methods'];
+    }
+    else {
+      return [];
+    }
+  }
+
+  /**
+   * ## Get the payment methods array of this project
+   */
+  public function deleteValues(): void {
+    unset ($this->values);
+  }
+
+  /**
+   * ## Get the project options array of this project
+   */
+  public function deleteOptions(): void {
+    unset($this->values['project_options']);
+  }
+
+  /**
+   * ## Get the payment methods array of this project
+   */
+  public function deletePaymentMethods(): void {
+    unset($this->values['payment_methods']);
   }
 
 }
