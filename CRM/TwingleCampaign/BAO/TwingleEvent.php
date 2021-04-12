@@ -35,6 +35,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
         throw new Exception("Could not identify parent Campaign: $errorMessage");
       }
     }
+
   }
 
 

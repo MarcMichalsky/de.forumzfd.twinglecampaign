@@ -113,8 +113,7 @@ function civicrm_api3_twingle_campaign_Sync(array $params): array {
   }
   else {
     return civicrm_api3_create_error(
-      'Could not get TwingleCampaigns: ' .
-      $campaigns['error_message'],
+      'Could not get TwingleCampaigns: ' . $campaigns['error_message'],
       $params
     );
   }
