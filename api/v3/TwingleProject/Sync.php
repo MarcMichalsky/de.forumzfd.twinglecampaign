@@ -140,7 +140,7 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
   else {
 
     // Counter for sync errors
-    $errors_occurred = 0;
+    $errors = [];
 
     // Get all projects from Twingle
     $projects_from_twingle = $twingleApi->getProject();
@@ -172,7 +172,7 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
         // push project to Twingle
         $result = _pushProjectToTwingle($project, $twingleApi, $params);
         if ($result['is_error'] != 0) {
-          $errors_occurred++;
+          $errors[$result['id']] = $result['error_message'];
           $returnValues[$project->getId()] =
             $project->getResponse($result['error_message']);
         }
@@ -199,7 +199,7 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
           $returnValues[$project->getId()] =
             $project->getResponse('TwingleProject created');
         } catch (Exception $e) {
-          $errors_occurred++;
+          $errors[$result['id']] = $result['error_message'];
           Civi::log()->error(
             E::LONG_NAME .
             ' could not create TwingleProject: ' .
@@ -245,13 +245,29 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
     }
 
     // Return results
-    if ($errors_occurred > 0) {
-      $errorMessage = ($errors_occurred > 1)
-        ? "$errors_occurred synchronisation processes resulted with an error"
+    if (sizeof($errors) > 0) {
+
+      $errorCount = sizeof($errors);
+      $errorMessage = ($errorCount > 1)
+        ? "$errorCount synchronisation processes resulted with an error"
         : "1 synchronisation process resulted with an error";
+
+      // Log errors
+      Civi::log()->error(E::LONG_NAME . ': ' . $errorMessage, $errors);
+
+      // Return API Error
+      $errorMessage = $errorMessage . ': [';
+      foreach ($errors as $key => $value) {
+        $errorMessage =
+          $errorMessage .
+          " ['project_id' => '$key', 'error_message' => '$value'],";
+      }
+      $errorMessage =
+        substr($errorMessage, 0, strlen($errorMessage) - 1) . ' ]';
+
       return civicrm_api3_create_error(
         $errorMessage,
-        $returnValues
+        $errors
       );
     }
     else {
@@ -286,8 +302,10 @@ function _updateProjectLocally(array $project_from_twingle,
 
     // If this is a test, do not make db changes
     if (array_key_exists('is_test', $params) && $params['is_test']) {
+      $response[$project->getId()] =
+        $project->getResponse('TwingleProject ready to update');
       return civicrm_api3_create_success(
-        $project->getResponse('TwingleProject ready to update'),
+        $response,
         $params,
         'TwingleProject',
         'Sync'
@@ -295,7 +313,8 @@ function _updateProjectLocally(array $project_from_twingle,
     }
     // ... else, update local TwingleProject campaign
     $project->create(TRUE);
-    $response = $project->getResponse('TwingleProject updated successfully');
+    $response[$project->getId()] =
+      $project->getResponse('TwingleProject updated successfully');
     return civicrm_api3_create_success(
       $response,
       $params,
@@ -333,8 +352,10 @@ function _pushProjectToTwingle(TwingleProject $project,
 
   // If this is a test, do not make db changes
   if ($params['is_test']) {
+    $response[$project->getId] =
+      $project->getResponse('TwingleProject ready to push to Twingle');
     return civicrm_api3_create_success(
-      $project->getResponse('TwingleProject ready to push to Twingle'),
+      $response,
       $params,
       'TwingleProject',
       'Sync'
@@ -363,7 +384,8 @@ function _pushProjectToTwingle(TwingleProject $project,
     try {
       // Create updated campaign
       $project->create(TRUE);
-      $response = $project->getResponse('TwingleProject pushed to Twingle');
+      $response[$project->getId()] =
+        $project->getResponse('TwingleProject pushed to Twingle');
       return civicrm_api3_create_success(
         $response,
         $params,
@@ -441,7 +463,8 @@ function _projectSync(TwingleProject $project,
 
   // If both versions are still synchronized
   else {
-    $response = $project->getResponse('TwingleProject up to date');
+    $response[$project->getId()] =
+      $project->getResponse('TwingleProject up to date');
     return civicrm_api3_create_success(
       $response,
       $params,

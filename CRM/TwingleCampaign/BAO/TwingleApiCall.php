@@ -405,6 +405,9 @@ class CRM_TwingleCampaign_BAO_TwingleApiCall {
     } elseif ($curl_status_code == 500) {
       throw new Exception('https status code 500 (internal error)');
     }
+    if (sizeof($response) == 1 && isset($response['message'])){
+      throw new Exception($response['message']);
+    }
     return $response;
   }
 
