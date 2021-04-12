@@ -173,17 +173,17 @@ function twinglecampaign_postSave_campaign_callback (
       try {
         civicrm_api3('TwingleProject', 'sync', ['id' => $campaign_id]);
         CRM_Utils_System::setUFMessage('TwingleProject was saved.');
-      } catch (CiviCRM_API3_Exception $e) {
-        Civi::log()->error(
-          'twinglecampaign_postSave_callback ' . $e->getMessage()
-        );
-      }
-    } else {
-      try {
-        civicrm_api3('TwingleCampaign', 'create', ['id' => $campaign_id]);
-        CRM_Utils_System::setUFMessage('TwingleCampaign was saved.');
-      } catch (CiviCRM_API3_Exception $e) {
-        Civi::log()->error(
+
+function _get_campaign_type_id_twingle_project() {
+  return ExtensionCache::getInstance()
+      ->getCampaignIds()['campaign_types']['twingle_project']['id'];
+}
+
+function _get_campaign_type_id_twingle_campaign() {
+  return ExtensionCache::getInstance()
+      ->getCampaignIds()['campaign_types']['twingle_campaign']['id'];
+}
+
           'twinglecampaign_postSave_callback ' . $e->getMessage()
         );
       }
