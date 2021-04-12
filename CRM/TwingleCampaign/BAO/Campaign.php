@@ -104,12 +104,11 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     return TRUE;
   }
 
-
   /**
    * ## Update instance values
    * This method updates the **$values** array of this instance with the values
    * from the provided array if they are defined in
-   * *CRM/TwingleCampaign/resources/twingle_api_templates.json*
+   * *CRM/TwingleCampaign/resources/twingle_api_templates.php*
    *
    * @param array $values
    * Array with values to update
@@ -118,47 +117,33 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     // Update campaign values
     $filter = Cache::getInstance()->getTemplates()[$this->className];
     foreach ($values as $key => $value) {
-      if ($this->className == "TwingleProject" && $key == 'project_id') {
-        $this->values['id'] = $value;
-      }
-      elseif (in_array($key, $filter)) {
+      if ($this->in_array_r($key, $filter)) {
         $this->values[$key] = $value;
       }
-      elseif ($key == 'embed') {
-        self::setEmbedData($value);
-      }
-      elseif ($key == 'counter-url') {
-        self::setCounterUrl($value['url']);
-      }
     }
   }
-
 
   /**
-   * ## Set embed data fields
-   * This method sets all embed data fields that are defined in
-   * *CRM/TwingleCampaign/resources/twingle_api_templates.json*
-   *
-   * @param array $embedData
-   * Array with embed data from Twingle API
+   * ## Complement campaign values
+   * Complement existing campaign values with new ones
+   * @param array $arrayToComplement
    */
-  public function setEmbedData(array $embedData) {
+  public function complement(array $arrayToComplement) {
+    $this->complement_r($this->values, $arrayToComplement);
+    $this->values = $arrayToComplement;
+  }
 
-    // Get all embed_data keys from template
-    $embed_data_keys = Cache::getInstance()
-      ->getTemplates()['project_embed_data'];
-
-    // Transfer all embed_data values
-    foreach ($embed_data_keys as $key) {
-      if (array_key_exists($key, $embedData)) {
-        $this->values[$key] = $embedData[$key];
+  private function complement_r($orig, &$fill) {
+    foreach ($orig as $key => $value) {
+      if (is_array($value)) {
+        $this->complement_r($orig[$key], $fill[$key]);
+      } else {
+        $fill[$key] = $value;
       }
     }
   }
 
-
-  public abstract function formatValues(array &$values, string $direction);
-
+  public static abstract function formatValues(array &$values, string $direction);
 
   /**
    * ## Translate array keys between CiviCRM Campaigns and Twingle

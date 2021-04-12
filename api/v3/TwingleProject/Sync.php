@@ -189,11 +189,6 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
         $project = new TwingleProject($project_from_twingle);
 
         try {
-          // Get embed data
-          $project->setEmbedData(
-            $twingleApi->getProjectEmbedData($project->getProjectId())
-          );
-
           // If this is a test, do not make db changes
           if (isset($params['is_test']) && $params['is_test']) {
             $returnValues[$project->getId()] =
@@ -231,14 +226,18 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
           $project = new TwingleProject($project_from_civicrm, $id);
 
           // sync project
-          $result = _projectSync($project, $project_from_twingle, $twingleApi, $params);
-          if ($result['is_error'] != 0) {
-            $errors_occurred++;
+          $result = _projectSync(
+              $project,
+              $project_from_twingle,
+              $twingleApi,
+              $params);
+          if (!$result['is_error'] == 0) {
+            $errors[$result['id']] = $result['error_message'];
             $returnValues[$project->getId()] =
               $project->getResponse($result['error_message']);
           }
           else {
-            $returnValues[$project->getId()] = $result['values'];
+            $returnValues[$result['id']] = $result['values'][$result['id']];
           }
           break;
         }
@@ -284,9 +283,7 @@ function _updateProjectLocally(array $project_from_twingle,
 
   try {
     $project->update($project_from_twingle);
-    $project->setEmbedData(
-      $twingleApi->getProjectEmbedData($project->getProjectId())
-    );
+
     // If this is a test, do not make db changes
     if (array_key_exists('is_test', $params) && $params['is_test']) {
       return civicrm_api3_create_success(
@@ -346,7 +343,7 @@ function _pushProjectToTwingle(TwingleProject $project,
 
   // Push project to Twingle
   try {
-    $result = $twingleApi->pushProject($project);
+    $result = $twingleApi->pushProject($project->export());
   } catch (Exception $e) {
     Civi::log()->error(
       E::LONG_NAME .
@@ -363,11 +360,7 @@ function _pushProjectToTwingle(TwingleProject $project,
   // Update local campaign with data returning from Twingle
   if ($result) {
     $project->update($result);
-    // Get embed data
     try {
-      $project->setEmbedData(
-        $twingleApi->getProjectEmbedData($project->getProjectId())
-      );
       // Create updated campaign
       $project->create(TRUE);
       $response = $project->getResponse('TwingleProject pushed to Twingle');
@@ -432,6 +425,17 @@ function _projectSync(TwingleProject $project,
   // If the CiviCRM TwingleProject campaign was changed, update the project
   // on Twingle's side
   elseif ($project_from_twingle['last_update'] < $project->lastUpdate()) {
+    // Make sure that the project hast a correct project_id. This is important
+    // to avoid an accidental cloning of project.
+    if (empty($project->getProjectId())) {
+      throw new \CiviCRM_API3_Exception(
+        'Missing project_id for project that is meant to get updated on Twingle side.');
+    }
+
+    // By merging the project values with the values coming from Twingle, we
+    // make sure that the project contains all values needed to get pushed
+    $project->complement($project_from_twingle);
+
     return _pushProjectToTwingle($project, $twingleApi, $params);
   }
 
