@@ -10,6 +10,10 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
   // OUT means: coming from the CiviCRM database
   public const OUT = 'OUT';
 
+  public const PROJECT = 'TwingleProject';
+
+  public const EVENT = 'TwingleEvent';
+
   protected $className;
 
   protected $id;
@@ -60,6 +64,7 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     );
     $this->translateKeys(
       $values_prepared_for_import,
+      $this->className,
       self::IN
     );
     $this->formattedValues = $values_prepared_for_import;
@@ -74,6 +79,16 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     // Set a flag to not trigger the hook
     if ($no_hook) {
       $_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook'] = TRUE;
+    }
+
+    // Cast booleans to integers
+    foreach ($values_prepared_for_import as $key => $value) {
+      if ($value === false) {
+        $values_prepared_for_import[$key] = 0;
+      }
+      elseif ($value === true) {
+        $values_prepared_for_import[$key] = 1;
+      }
     }
 
     // Create campaign
@@ -156,17 +171,27 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
    *
    * @param array $values
    * array of keys to translate
-   *
+   * @param string $campaignType
+   * const: Campaign::PROJECT or Campaign::EVENT
    * @param string $direction
    * const: Campaign::OUT or Campaign::OUT
    *
-   * @throws Exception
+   * @throws \Exception
    */
-  public function translateKeys(array &$values, string $direction) {
+  public static function translateKeys(
+    array &$values,
+    string $campaignType,
+    string $direction) {
+
+    if ($campaignType != self::PROJECT && $campaignType != self::EVENT) {
+      throw new Exception(
+        "Invalid Parameter $campaignType for translateKeys()"
+      );
+    }
 
     // Get translations for fields
     $field_translations = Cache::getInstance()
-      ->getTranslations()[$this->className];
+      ->getTranslations()[$campaignType];
 
     // Set the direction of the translation
     if ($direction == self::OUT) {
@@ -187,7 +212,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
       }
     }
   }
-
 
   /**
    * ## Translate field names and custom field names
@@ -256,18 +280,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     }
   }
 
-
-  /**
-   * ## Set counter url
-   *
-   * @param String $counterUrl
-   * URL of the counter
-   */
-  public function setCounterUrl(string $counterUrl) {
-    $this->values['counter'] = $counterUrl;
-  }
-
-
   /**
    * ## Delete Campaign
    * Deletes this Campaign from CiviCRM
@@ -287,7 +299,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     return ($result['is_error'] == 0);
   }
 
-
   /**
    * ## Deactivate this campaign
    *
@@ -299,7 +310,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
   public function deactivate(): bool {
     return self::deactivateByid($this->id);
   }
-
 
   /**
    * ## Deactivate campaign by ID
@@ -335,9 +345,7 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     }
   }
 
-
   public abstract function getResponse(string $status): array;
-
 
   /**
    * ## Get timestamp
@@ -370,9 +378,7 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     }
   }
 
-
   public abstract function lastUpdate();
-
 
   /**
    * ## Get DateTime
@@ -407,7 +413,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     }
   }
 
-
   /**
    * ## Get id
    * Returns the **id** of this campaign.
@@ -418,4 +423,52 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     return (int) $this->id;
   }
 
+  /**
+   * Helper function to search a value in a multidimensional array.
+   *
+   * @param $needle
+   * @param $haystack
+   * @param bool $strict
+   *
+   * @return bool
+   */
+  protected function in_array_r($needle, $haystack, $strict = false): bool {
+    foreach ($haystack as $item) {
+      if (($strict ? $item === $needle : $item == $needle) ||
+        (is_array($item) && $this->in_array_r($needle, $item, $strict))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Helper function to check if the provided field is of type Boolean
+   *
+   * @param $fieldName
+   * @param string $campaignType Campaign::PROJECT or Campaign::EVENT
+   *
+   * @return bool
+   * @throws \Exception
+   */
+  public static function isBoolean($fieldName, string $campaignType): bool {
+    $fields = Cache::getInstance()->getCampaigns()['custom_fields'];
+    if ($campaignType == self::PROJECT) {
+      if (isset($fields['twingle_project_' . $fieldName])) {
+        return $fields['twingle_project_' . $fieldName]['data_type'] == 'Boolean';
+      }
+      else {
+        return FALSE;
+      }
+    }
+    elseif ($campaignType == self::EVENT) {
+      if (isset($fields['twingle_event_' . $fieldName])) {
+        return $fields['twingle_event_' . $fieldName]['data_type'] == 'Boolean';
+      }
+      else {
+        return FALSE;
+      }
+    }
+    throw new Exception('Unknown campaign type');
+  }
 }

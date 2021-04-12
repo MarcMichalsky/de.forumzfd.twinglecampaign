@@ -2,9 +2,34 @@
 
 use CRM_TwingleCampaign_Utils_ExtensionCache as Cache;
 use CRM_TwingleCampaign_BAO_Campaign as Campaign;
+use CRM_TwingleCampaign_Utils_StringOperations as StringOperations;
+use CRM_TwingleCampaign_ExtensionUtil as E;
 
 
 class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
+
+  // All available contact fields in Twingle project forms
+  const contactFields = [
+    'salutation',
+    'firstname',
+    'lastname',
+    'company',
+    'birthday',
+    'street',
+    'postal_code',
+    'city',
+    'country',
+    'telephone',
+  ];
+
+  // All available donation rhythms in Twingle project forms
+  const donationRhythm = [
+    'yearly',
+    'halfyearly',
+    'quarterly',
+    'monthly',
+    'one_time',
+  ];
 
   /**
    * ## TwingleProject constructor
@@ -25,36 +50,91 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
 
   }
 
-
   /**
    * ## Export values
-   * Ensures that only those values will be exported which the Twingle API
-   * expects. These values are defined in
-   * *CRM/TwingleCampaign/resources/twingle_api_templates.json*
+   * Change all values to a format accepted by the Twingle API.
    *
    * @return array
-   * Array with all values to send to the Twingle API
-   *
-   * @throws Exception
+   * Array with all values ready to send to the Twingle API
+   * @throws \Exception
    */
   public function export(): array {
-
+    // copy project values
     $values = $this->values;
-    self::formatValues($values, self::OUT);
 
-    // Get template for project
-    $project = Cache::getInstance()->getTemplates()['TwingleProject'];
+    // Strings to booleans
+    $this->intToBool($values);
 
-    // Replace array items which the Twingle API does not expect
-    foreach ($values as $key => $value) {
-      if (!in_array($key, $project)) {
-        unset($values[$key]);
-      }
+    // Strings to integers
+    $this->strToInt($values);
+
+    // Build counter-url array
+    if (isset($values['counter-url']) && is_string($values['counter-url'])) {
+      $url = $values['counter-url'];
+      unset($values['counter-url']);
+      $values['counter-url']['url'] = $url;
     }
+
+    // Remove campaign_type_id
+    unset($values['campaign_type_id']);
 
     return $values;
   }
 
+  /**
+   * ## Int to bool
+   * Changes all project values that are defined as CiviCRM 'Boolean' types
+   * from strings to booleans.
+   * @param array $values
+   * @throws \Exception
+   */
+  private function intToBool(array &$values) {
+
+    $boolArrays = [
+      'payment_methods',
+      'donation_rhythm',
+    ];
+
+    foreach ($values as $key => $value) {
+      if (CRM_TwingleCampaign_BAO_Campaign::isBoolean(
+        $key,
+        CRM_TwingleCampaign_BAO_Campaign::PROJECT
+      )) {
+        $values[$key] = (bool) $value;
+      }
+      elseif (in_array($key, $boolArrays)) {
+        foreach ($values[$key] as $_key => $_value) {
+          if (is_numeric($_value) && $_value < 2 || empty($_value)) {
+            $values[$key][$_key] = (bool) $_value;
+          }
+          else {
+            unset($values[$key][$_key]);
+          }
+        }
+      }
+      elseif (is_array($value)) {
+        $this->intToBool($values[$key]);
+      }
+    }
+  }
+
+  /**
+   * ## Int to bool
+   * Changes all project values that are strings but originally came as integers
+   * back to integers.
+   * @param array $values
+   * @throws \Exception
+   */
+  private function strToInt(array &$values) {
+    foreach ($values as $key => $value) {
+      if (ctype_digit($value)) {
+        $values[$key] = intval($value);
+      }
+      elseif (is_array($value)) {
+        $this->strToInt($values[$key]);
+      }
+    }
+  }
 
   /**
    * ## Create this TwingleProject as a campaign in CiviCRM
@@ -80,6 +160,58 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
     }
   }
 
+  /**
+   * ## Update instance values
+   *
+   * @param array $values
+   *
+   * @override CRM_TwingleCampaign_BAO_Campaign::update()
+   */
+  public function update(array $values) {
+
+    // Remove old values
+    unset($this->values);
+
+    // Get allowed values
+    $projectOptionsKeys = Cache::getInstance()
+      ->getTemplates()['TwingleProject']['project_options'];
+    $projectEmbedDataKeys = Cache::getInstance()
+      ->getTemplates()['TwingleProject']['project_embed_data'];
+    $projectPaymentMethodsKeys = Cache::getInstance()
+      ->getTemplates()['TwingleProject']['payment_methods'];
+
+    // Sort allowed values into arrays
+    foreach ($values as $key => $value) {
+      if ($key == 'project_options') {
+        foreach ($value as $optionKey => $optionValue) {
+          if (in_array($optionKey, $projectOptionsKeys)) {
+            $this->values['project_options'][$optionKey] = $optionValue;
+          }
+        }
+      }
+      elseif ($key == 'embed') {
+        foreach ($value as $embedKey => $embedValue) {
+          if (in_array($embedKey, $projectEmbedDataKeys)) {
+            $this->values['embed'][$embedKey] = $embedValue;
+          }
+        }
+      }
+      elseif ($key == 'payment_methods') {
+        foreach ($value as $paymentMethodKey => $paymentMethodValue) {
+          if (in_array($paymentMethodKey, $projectPaymentMethodsKeys)) {
+            $this->values['payment_methods'][$paymentMethodKey] =
+              $paymentMethodValue;
+          }
+        }
+      }
+      elseif ($key == 'counter-url' && is_array($value)) {
+        $this->values['counter-url'] = $value['url'];
+      }
+      else {
+        parent::update([$key => $value]);
+      }
+    }
+  }
 
   /**
    * ## Clone this TwingleProject
@@ -114,22 +246,126 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    *
    * @throws Exception
    */
-  public function formatValues(array &$values, string $direction) {
+  public static function formatValues(array &$values, string $direction) {
 
     if ($direction == self::IN) {
 
       // Change timestamp into DateTime string
-      if ($values['last_update']) {
+      if (isset($values['last_update'])) {
         $values['last_update'] =
           self::getDateTime($values['last_update']);
       }
 
       // empty project_type to 'default'
-      if (!$values['type']) {
+      if (empty($values['type'])) {
         $values['type'] = 'default';
+      }
+
+      // Flatten project options array
+      foreach ($values['project_options'] as $key => $value) {
+        $values[$key] = $value;
+      }
+      unset($values['project_options']);
+
+      // Flatten embed codes array
+      foreach ($values['embed'] as $key => $value) {
+        $values[$key] = $value;
+      }
+      unset($values['embed']);
+
+      // Flatten button array
+      if (isset($values['buttons'])) {
+        foreach (
+          $values['buttons'] as $button_key => $button
+        ) {
+          $values[$button_key] = $button['amount'];
+        }
+        unset($values['buttons']);
+      }
+
+      // Invert and explode exclude_contact_fields
+      if (isset($values['exclude_contact_fields'])) {
+        $values['contact_fields'] =
+          array_diff(
+            self::contactFields,
+            explode(',', $values['exclude_contact_fields'])
+          );
+        unset($values['exclude_contact_fields']);
+      }
+
+      // Explode mandatory_contact_fields
+      if (isset($values['mandatory_contact_fields'])) {
+        $values['mandatory_contact_fields'] =
+          explode(
+            ',',
+            $values['mandatory_contact_fields']
+          );
+        unset($values['mandatory_contact_fields']);
+      }
+
+      // Explode languages
+      if (isset($values['languages'])) {
+        $values['languages'] =
+          explode(',', $values['languages']);
+      }
+
+      // Divide payment methods array into one time and recurring payment
+      // methods arrays containing only TRUE payment methods
+      foreach ($values['payment_methods'] as $key => $value) {
+        if ($value) {
+          if (StringOperations::endsWith($key, 'recurring')) {
+            $values['payment_methods_recurring'][] = $key;
+          }
+          else {
+            $values['payment_methods'][] = $key;
+          }
+        }
+        unset($values['payment_methods'][$key]);
+      }
+
+      // Transform donation rhythm array to contain only TRUE elements
+      foreach ($values['donation_rhythm'] as $key => $value) {
+        if ($value) {
+          $values['donation_rhythm'][] = $key;
+        }
+        unset($values['donation_rhythm'][$key]);
       }
     }
     elseif ($direction == self::OUT) {
+
+      $projectOptionsKeys = Cache::getInstance()
+        ->getTemplates()['TwingleProject']['project_options'];
+      $projectEmbedDataKeys = Cache::getInstance()
+        ->getTemplates()['TwingleProject']['project_embed_data'];
+
+      // Merge payment_methods and payment_methods_recurring arrays and change
+      // keys to values and values to TRUE
+      if (isset($values['payment_methods'])) {
+        foreach ($values['payment_methods'] as $key => $value) {
+          unset($values['payment_methods'][$key]);
+          $values['payment_methods'][$value] = TRUE;
+        }
+      }
+      if (isset($values['payment_methods_recurring'])) {
+        foreach ($values['payment_methods_recurring'] as $value) {
+          $values['payment_methods'][$value] = TRUE;
+        }
+        unset($values['payment_methods_recurring']);
+      }
+
+      // Move options, embed data and payment methods into own arrays
+      foreach ($values as $key => $value) {
+        if (in_array($key, $projectOptionsKeys)) {
+          $values['project_options'][$key]
+            = $value;
+          unset($values[$key]);
+        }
+        elseif (in_array($key, $projectEmbedDataKeys)) {
+          $values['embed_data'][$key]
+            = $value;
+          unset($values[$key]);
+        }
+      }
 
       // Change DateTime string into timestamp
       $values['last_update'] =
@@ -141,19 +377,80 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
         : $values['type'];
 
       // Cast project target to integer
-      $values['project_target'] = (int) $values['project_target'];
+      if (isset($values['project_target'])) {
+        $values['project_target'] = (int) $values['project_target'];
+      }
 
       // Set default for 'allow_more'
-      $values['allow_more'] = empty($values['allow_more'])
-        ? FALSE
-        : TRUE;
+      $values['allow_more'] = !empty($values['allow_more']);
+
+      // Invert and concatenate contact fields
+      if (isset($values['project_options']['contact_fields'])) {
+        // Invert contact_fields to exclude_contact_fields
+        $values['project_options']['exclude_contact_fields'] =
+          array_diff(
+            self::contactFields,
+            $values['project_options']['contact_fields']
+          );
+        unset($values['project_options']['contact_fields']);
+        // Concatenate contact_fields array
+        $values['project_options']['exclude_contact_fields'] =
+          implode(
+            ',',
+            $values['project_options']['exclude_contact_fields']
+          );
+      }
+
+      // Concatenate mandatory project contact fields
+      if (isset($values['project_options']['mandatory_contact_fields'])) {
+        $values['project_options']['mandatory_contact_fields'] =
+          implode(
+            ',',
+            $values['project_options']['mandatory_contact_fields']
+          );
+      }
+
+      // Concatenate project languages
+      if (isset($values['project_options']['languages'])) {
+        $values['project_options']['languages'] =
+          implode(',', $values['project_options']['languages']);
+      }
+
+      // Build donation_rhythm array
+      if (isset($values['project_options']['donation_rhythm'])) {
+        $tmp_array = [];
+        foreach (self::donationRhythm as $donationRhythm) {
+          $tmp_array[$donationRhythm] =
+            in_array(
+              $donationRhythm,
+              $values['project_options']['donation_rhythm']
+            );
+        }
+        $values['project_options']['donation_rhythm'] = $tmp_array;
+      }
+
+      // Build payment_methods_array
+      if (isset($values['payment_methods'])) {
+        $payment_methods = array_fill_keys(Cache::getInstance()
+          ->getTemplates()['TwingleProject']['payment_methods'],
+          FALSE);
+        $values['payment_methods'] =
+          array_merge($payment_methods, $values['payment_methods']);
+      }
+
+      // Build buttons array
+      for ($i = 1; $i <= 4; $i++) {
+        if (isset($values['button' . $i])) {
+          $values['project_options']['buttons']['button' . $i] =
+            ['amount' => $values['button' . $i]];
+          unset($values['button' . $i]);
+        }
+      }
     }
     else {
-
       throw new Exception(
         "Invalid Parameter $direction for formatValues()"
       );
-
     }
   }
 
