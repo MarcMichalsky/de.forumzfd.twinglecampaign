@@ -29,7 +29,7 @@ class CRM_TwingleCampaign_BAO_CampaignType {
   /**
    * @throws \CiviCRM_API3_Exception
    */
-  public function create() {
+  public function create(bool $upgrade = false) {
 
     $field = civicrm_api3(
       'OptionValue',
@@ -59,13 +59,16 @@ class CRM_TwingleCampaign_BAO_CampaignType {
       for \"$this->label\": $error_message");
       }
     }
-    else {
+    elseif (!$upgrade) {
       $campaignType = self::fetch($this->name);
       foreach ($this as $var => $value) {
         if (array_key_exists($var, $campaignType->getSetAttributes())) {
           $this->$var = $campaignType->getSetAttributes()[$var];
         }
       }
+    }
+    else {
+      $this->value = $field['values'][0]['value'];
     }
   }
 

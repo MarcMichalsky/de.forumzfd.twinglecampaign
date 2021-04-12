@@ -41,9 +41,12 @@ class CRM_TwingleCampaign_BAO_CustomGroup {
   }
 
   /**
+   * @param bool $upgrade
+   * If true: Does not show UF message if custom group already exists
+   *
    * @throws \CiviCRM_API3_Exception
    */
-  public function create() {
+  public function create(bool $upgrade = false) {
 
     $field = civicrm_api3(
       'CustomGroup',
@@ -85,6 +88,11 @@ class CRM_TwingleCampaign_BAO_CustomGroup {
         }
 
       }
+    }
+    elseif (!$upgrade) {
+      CRM_Utils_System::setUFMessage(E::ts('Creation of custom group \'%1\' failed, because a custom group with that name already exists. Find more information in the logs.', [1 => $this->name]));
+      Civi::log()
+        ->error("$this->extensionName could not create new custom group \"$this->name\" because a group with that name already exists.");
     }
   }
 
