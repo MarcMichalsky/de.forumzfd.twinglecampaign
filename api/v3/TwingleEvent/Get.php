@@ -157,6 +157,7 @@ function civicrm_api3_twingle_event_Get(array $params): array {
         $tmp_event = new TwingleEvent([]);
         $tmp_event->translateKeys(
           $returnValues[$event['id']],
+          TwingleEvent::EVENT,
           TwingleEvent::OUT
         );
         TwingleEvent::formatValues(

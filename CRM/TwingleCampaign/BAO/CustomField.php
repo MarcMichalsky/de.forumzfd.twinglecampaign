@@ -53,11 +53,6 @@ class CRM_TwingleCampaign_BAO_CustomField {
       if (array_key_exists($var, $attributes)) {
         $this->$var = $attributes[$var];
       }
-
-      // translate help_post
-      if ($this->help_post) {
-        $this->help_post = E::ts($this->help_post);
-      }
     }
   }
 
@@ -65,9 +60,12 @@ class CRM_TwingleCampaign_BAO_CustomField {
   /**
    * Creates a CustomField by calling CiviCRM API v.3
    *
+   * @param bool $upgrade
+   * If true: Does not show UF message if custom field already exists
+   *
    * @throws \CiviCRM_API3_Exception
    */
-  public function create() {
+  public function create(bool $upgrade = false) {
 
     // Check if the field already exists
     $field = civicrm_api3(
@@ -105,27 +103,21 @@ class CRM_TwingleCampaign_BAO_CustomField {
             ->error("$this->extensionName could not create new custom field
             \"$this->name\" for group \"$this->custom_group_id\": 
             $this->result['error_message']");
-          CRM_Utils_System::setUFMessage("Creation of custom field '$this->name'
-      failed. Find more information in the logs.");
+          CRM_Utils_System::setUFMessage(E::ts('Creation of custom field \'%1\' failed. Find more information in the logs.', [1 => $this->name]));
         }
         // If there is not enough information: log simple error message
         else {
           Civi::log()
             ->error("$this->extensionName could not create new custom field: 
             $this->result['error_message']");
-          CRM_Utils_System::setUFMessage("Creation of custom field
-      failed. Find more information in the logs.");
+          CRM_Utils_System::setUFMessage(E::ts("Creation of custom field failed. Find more information in the logs."));
         }
       }
     }
-    else {
-      CRM_Utils_System::setUFMessage("Creation of custom field '$this->name'
-      failed, because a custom field with that name already exists.
-      Find more information in the logs.");
+    elseif (!$upgrade) {
+      CRM_Utils_System::setUFMessage(E::ts('Creation of custom field \'%1\' failed, because a custom field with that name already exists. Find more information in the logs.', [1 => $this->name]));
       Civi::log()
-        ->error("$this->extensionName could not create new custom field
-            \"$this->name\" for group \"$this->custom_group_id\" because a 
-            field with that name already exists.");
+        ->error("$this->extensionName could not create new custom field \"$this->name\" for group \"$this->custom_group_id\" because a field with that name already exists.");
     }
   }
 
@@ -165,16 +157,9 @@ class CRM_TwingleCampaign_BAO_CustomField {
     if (!$name) {
       $result = [];
 
-      // Get json file with all custom fields for this extension
-      $json_file = file_get_contents(E::path() .
-        '/CRM/TwingleCampaign/resources/campaigns.json');
-      $campaign_info = json_decode($json_file, TRUE);
-
-      // Log an error and throw an exception if the file cannot get read
-      if (!$campaign_info) {
-        Civi::log()->error("Could not read json file");
-        throw new Exception('Could not read json file');
-      }
+      // Get array with all custom fields for this extension
+      $campaign_info =
+        require E::path() . '/CRM/TwingleCampaign/resources/campaigns.php';
 
       // Recursive method call with all custom field names from the json file
       foreach ($campaign_info['custom_fields'] as $customField) {

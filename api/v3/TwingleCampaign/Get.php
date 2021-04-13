@@ -105,11 +105,11 @@ function civicrm_api3_twingle_campaign_Get(array $params): array {
   // Get campaign type id for TwingleCampaign
   $twingle_campaign_campaign_type_id =
     Cache::getInstance()
-      ->getCampaigns()['campaign_types']['twingle_campaign']['id'];
+      ->getCampaignIds()['campaign_types']['twingle_campaign']['id'];
 
-  // If no id but a project_id is provided, get all TwingleCampaign children of
-  // this TwingleProject
-  if (array_key_exists('project_id', $params) && $params['project_id']) {
+  // If no id but a parent_id or a project_id is provided, get all
+  // TwingleCampaign children of this TwingleProject
+  if (isset($params['project_id']) && !isset($params['parent_id'])) {
 
     // Get TwingleProject
     $project = civicrm_api3('TwingleProject',

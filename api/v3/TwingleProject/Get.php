@@ -127,7 +127,7 @@ function civicrm_api3_twingle_project_Get(array $params): array {
   $query = ['options' => ['limit' => 0]];
 
   foreach ($params as $key => $value) {
-    if ( $key != 'id' &&
+    if ($key != 'id' &&
       array_key_exists('twingle_project_' . $key, $custom_field_mapping)
     ) {
       $query[$custom_field_mapping['twingle_project_' . $key]] = $value;
@@ -156,22 +156,28 @@ function civicrm_api3_twingle_project_Get(array $params): array {
           $returnValues[$project['id']][$key] = $value;
         }
       }
-      foreach($returnValues[$project['id']] as $key => $value) {
+      foreach ($returnValues[$project['id']] as $key => $value) {
         if ($key != 'twingle_project_id' && strpos($key, 'twingle_project_') === 0) {
-          $returnValues[$project['id']][str_replace('twingle_project_', '', $key)]
-            = $value;
+          $key_short = str_replace('twingle_project_', '', $key);
+          $returnValues[$project['id']][$key_short] = $value;
           unset($returnValues[$project['id']][$key]);
-        } elseif($key == 'twingle_project_id'){
+        }
+        elseif ($key == 'twingle_project_id') {
           $returnValues[$project['id']]['project_id'] = $value;
           unset($returnValues[$project['id']]['twingle_project_id']);
         }
       }
       try {
-        $tmp_project = new TwingleProject([]);
-        $tmp_project->translateKeys($returnValues[$project['id']], TwingleProject::OUT);
-        $tmp_project->formatValues($returnValues[$project['id']], TwingleProject::OUT);
-      }
-      catch (Exception $e) {
+        TwingleProject::translateKeys(
+          $returnValues[$project['id']],
+          TwingleProject::PROJECT,
+          TwingleProject::OUT
+        );
+        TwingleProject::formatValues(
+          $returnValues[$project['id']],
+          TwingleProject::OUT
+        );
+      } catch (Exception $e) {
         throw new API_Exception($e->getMessage());
       }
     }

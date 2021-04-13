@@ -27,9 +27,12 @@ class CRM_TwingleCampaign_BAO_CampaignType {
   }
 
   /**
+   * @param bool $upgrade
+   * If true: Does not show UF message if campaign type already exists
+   *
    * @throws \CiviCRM_API3_Exception
    */
-  public function create() {
+  public function create(bool $upgrade = false) {
 
     $field = civicrm_api3(
       'OptionValue',
@@ -41,8 +44,7 @@ class CRM_TwingleCampaign_BAO_CampaignType {
       ]
     );
 
-    if ($field['count'] == 0)
-    {
+    if ($field['count'] == 0) {
       $this->results = civicrm_api3('OptionValue', 'create', $this->getSetAttributes());
 
       $this->value = array_column($this->results['values'], 'value')[0];
@@ -55,17 +57,19 @@ class CRM_TwingleCampaign_BAO_CampaignType {
       }
       else {
         $error_message = $this->results['error_message'];
-        Civi::log()->error("Twingle Extension could not create new campaign type
-      for \"$this->label\": $error_message");
+        Civi::log()->error("Twingle Extension could not create new campaign type for \"$this->label\": $error_message");
       }
     }
-    else {
+    elseif (!$upgrade) {
       $campaignType = self::fetch($this->name);
       foreach ($this as $var => $value) {
         if (array_key_exists($var, $campaignType->getSetAttributes())) {
           $this->$var = $campaignType->getSetAttributes()[$var];
         }
       }
+    }
+    else {
+      $this->value = $field['values'][0]['value'];
     }
   }
 

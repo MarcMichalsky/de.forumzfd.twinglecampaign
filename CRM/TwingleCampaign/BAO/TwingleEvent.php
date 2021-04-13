@@ -19,7 +19,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    *
    * @throws \Exception
    */
-  public function __construct(array $event, int $id = NULL) {
+  public function __construct(array $event = [], int $id = NULL) {
     parent::__construct($event, $id);
 
     $this->prefix = 'twingle_event_';
@@ -100,7 +100,7 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
    *
    * @throws Exception
    */
-  public function formatValues(array &$values, string $direction) {
+  public static function formatValues(array &$values, string $direction) {
 
     if ($direction == self::IN) {
 

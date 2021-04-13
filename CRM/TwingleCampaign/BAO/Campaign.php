@@ -10,6 +10,10 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
   // OUT means: coming from the CiviCRM database
   public const OUT = 'OUT';
 
+  public const PROJECT = 'TwingleProject';
+
+  public const EVENT = 'TwingleEvent';
+
   protected $className;
 
   protected $id;
@@ -22,14 +26,13 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
   protected  $formattedValues;
 
-
   /**
    * ## Campaign constructor.
    *
    * @param array $values
    * @param int|null $id
    */
-  protected function __construct(array $values, int $id = NULL) {
+  protected function __construct(array $values = [], int $id = NULL) {
 
     $this->id = $id;
     $tmpClassName = explode('_', get_class($this));
@@ -51,7 +54,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
    * @throws \Exception
    */
   public function create(bool $no_hook = FALSE): bool {
-
     // Prepare project values for import into database
     $values_prepared_for_import = $this->values;
     $this->formatValues(
@@ -60,6 +62,7 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     );
     $this->translateKeys(
       $values_prepared_for_import,
+      $this->className,
       self::IN
     );
     $this->formattedValues = $values_prepared_for_import;
@@ -69,11 +72,23 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     );
 
     // Set id
-    $values_prepared_for_import['id'] = $this->id;
+    if (isset($this->id)) {
+      $values_prepared_for_import['id'] = $this->id;
+    }
 
     // Set a flag to not trigger the hook
     if ($no_hook) {
       $_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook'] = TRUE;
+    }
+
+    // Cast booleans to integers
+    foreach ($values_prepared_for_import as $key => $value) {
+      if ($value === false) {
+        $values_prepared_for_import[$key] = 0;
+      }
+      elseif ($value === true) {
+        $values_prepared_for_import[$key] = 1;
+      }
     }
 
     // Create campaign
@@ -89,12 +104,11 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     return TRUE;
   }
 
-
   /**
    * ## Update instance values
    * This method updates the **$values** array of this instance with the values
    * from the provided array if they are defined in
-   * *CRM/TwingleCampaign/resources/twingle_api_templates.json*
+   * *CRM/TwingleCampaign/resources/twingle_api_templates.php*
    *
    * @param array $values
    * Array with values to update
@@ -103,47 +117,33 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     // Update campaign values
     $filter = Cache::getInstance()->getTemplates()[$this->className];
     foreach ($values as $key => $value) {
-      if ($this->className == "TwingleProject" && $key == 'project_id') {
-        $this->values['id'] = $value;
-      }
-      elseif (in_array($key, $filter)) {
+      if ($this->in_array_r($key, $filter)) {
         $this->values[$key] = $value;
       }
-      elseif ($key == 'embed') {
-        self::setEmbedData($value);
-      }
-      elseif ($key == 'counter-url') {
-        self::setCounterUrl($value['url']);
-      }
     }
   }
-
 
   /**
-   * ## Set embed data fields
-   * This method sets all embed data fields that are defined in
-   * *CRM/TwingleCampaign/resources/twingle_api_templates.json*
-   *
-   * @param array $embedData
-   * Array with embed data from Twingle API
+   * ## Complement campaign values
+   * Complement existing campaign values with new ones
+   * @param array $arrayToComplement
    */
-  public function setEmbedData(array $embedData) {
+  public function complement(array $arrayToComplement) {
+    $this->complement_r($this->values, $arrayToComplement);
+    $this->values = $arrayToComplement;
+  }
 
-    // Get all embed_data keys from template
-    $embed_data_keys = Cache::getInstance()
-      ->getTemplates()['project_embed_data'];
-
-    // Transfer all embed_data values
-    foreach ($embed_data_keys as $key) {
-      if (array_key_exists($key, $embedData)) {
-        $this->values[$key] = $embedData[$key];
+  private function complement_r($orig, &$fill) {
+    foreach ($orig as $key => $value) {
+      if (is_array($value)) {
+        $this->complement_r($orig[$key], $fill[$key]);
+      } else {
+        $fill[$key] = $value;
       }
     }
   }
 
-
-  public abstract function formatValues(array &$values, string $direction);
-
+  public static abstract function formatValues(array &$values, string $direction);
 
   /**
    * ## Translate array keys between CiviCRM Campaigns and Twingle
@@ -156,17 +156,27 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
    *
    * @param array $values
    * array of keys to translate
-   *
+   * @param string $campaignType
+   * const: Campaign::PROJECT or Campaign::EVENT
    * @param string $direction
    * const: Campaign::OUT or Campaign::OUT
    *
-   * @throws Exception
+   * @throws \Exception
    */
-  public function translateKeys(array &$values, string $direction) {
+  public static function translateKeys(
+    array &$values,
+    string $campaignType,
+    string $direction) {
+
+    if ($campaignType != self::PROJECT && $campaignType != self::EVENT) {
+      throw new Exception(
+        "Invalid Parameter $campaignType for translateKeys()"
+      );
+    }
 
     // Get translations for fields
     $field_translations = Cache::getInstance()
-      ->getTranslations()[$this->className];
+      ->getTranslations()[$campaignType];
 
     // Set the direction of the translation
     if ($direction == self::OUT) {
@@ -187,7 +197,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
       }
     }
   }
-
 
   /**
    * ## Translate field names and custom field names
@@ -256,18 +265,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     }
   }
 
-
-  /**
-   * ## Set counter url
-   *
-   * @param String $counterUrl
-   * URL of the counter
-   */
-  public function setCounterUrl(string $counterUrl) {
-    $this->values['counter'] = $counterUrl;
-  }
-
-
   /**
    * ## Delete Campaign
    * Deletes this Campaign from CiviCRM
@@ -287,7 +284,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     return ($result['is_error'] == 0);
   }
 
-
   /**
    * ## Deactivate this campaign
    *
@@ -299,7 +295,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
   public function deactivate(): bool {
     return self::deactivateByid($this->id);
   }
-
 
   /**
    * ## Deactivate campaign by ID
@@ -335,9 +330,7 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     }
   }
 
-
   public abstract function getResponse(string $status): array;
-
 
   /**
    * ## Get timestamp
@@ -370,9 +363,7 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     }
   }
 
-
   public abstract function lastUpdate();
-
 
   /**
    * ## Get DateTime
@@ -407,7 +398,6 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     }
   }
 
-
   /**
    * ## Get id
    * Returns the **id** of this campaign.
@@ -418,4 +408,52 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
     return (int) $this->id;
   }
 
+  /**
+   * Helper function to search a value in a multidimensional array.
+   *
+   * @param $needle
+   * @param $haystack
+   * @param bool $strict
+   *
+   * @return bool
+   */
+  protected function in_array_r($needle, $haystack, $strict = false): bool {
+    foreach ($haystack as $item) {
+      if (($strict ? $item === $needle : $item == $needle) ||
+        (is_array($item) && $this->in_array_r($needle, $item, $strict))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Helper function to check if the provided field is of type Boolean
+   *
+   * @param $fieldName
+   * @param string $campaignType Campaign::PROJECT or Campaign::EVENT
+   *
+   * @return bool
+   * @throws \Exception
+   */
+  public static function isBoolean($fieldName, string $campaignType): bool {
+    $fields = Cache::getInstance()->getCampaigns()['custom_fields'];
+    if ($campaignType == self::PROJECT) {
+      if (isset($fields['twingle_project_' . $fieldName])) {
+        return $fields['twingle_project_' . $fieldName]['data_type'] == 'Boolean';
+      }
+      else {
+        return FALSE;
+      }
+    }
+    elseif ($campaignType == self::EVENT) {
+      if (isset($fields['twingle_event_' . $fieldName])) {
+        return $fields['twingle_event_' . $fieldName]['data_type'] == 'Boolean';
+      }
+      else {
+        return FALSE;
+      }
+    }
+    throw new Exception('Unknown campaign type');
+  }
 }

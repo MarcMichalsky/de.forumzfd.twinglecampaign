@@ -1,3 +1,27 @@
+#: ./CRM/TwingleCampaign/BAO/CustomField.php
+msgid "Creation of custom field '%1' failed. Find more information in the logs."
+msgstr ""
+
+#: ./CRM/TwingleCampaign/BAO/CustomField.php
+msgid "Creation of custom field failed. Find more information in the logs."
+msgstr ""
+
+#: ./CRM/TwingleCampaign/BAO/CustomField.php
+msgid "Creation of custom field '%1' failed, because a custom field with that name already exists. Find more information in the logs."
+msgstr ""
+
+#: ./CRM/TwingleCampaign/BAO/CustomGroup.php
+msgid "Creation of custom group '%1' failed. Find more information in the logs."
+msgstr ""
+
+#: ./CRM/TwingleCampaign/BAO/CustomGroup.php
+msgid "Creation of custom group failed. Find more information in the logs."
+msgstr ""
+
+#: ./CRM/TwingleCampaign/BAO/CustomGroup.php
+msgid "Creation of custom group '%1' failed, because a custom group with that name already exists. Find more information in the logs."
+msgstr ""
+
 #: ./CRM/TwingleCampaign/BAO/TwingleCampaign.php
 msgid "Could not determine parent TwingleProject URL. This URL is needed to create the TwingleEvent URL. Please check the logs."
 msgstr ""
@@ -12,6 +36,34 @@ msgstr ""
 
 #: ./CRM/TwingleCampaign/BAO/TwingleCampaign.php
 msgid "No parent TwingleProject found"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/BAO/TwingleProject.php
+msgid "BCC email invalid"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/BAO/TwingleProject.php
+msgid "Invalid hexadecimal value in color field: %1"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/BAO/TwingleProject.php
+msgid "Missing maximum donation value"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/BAO/TwingleProject.php
+msgid "Maximum donation value must be higher than the minimum"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/BAO/TwingleProject.php
+msgid "Default donation value must lie in between maximum and minimum values"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/BAO/TwingleProject.php
+msgid "Donation values (Min, Max, Default) must be positive integers"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/BAO/TwingleProject.php
+msgid "Invalid URL: %1"
 msgstr ""
 
 #: ./CRM/TwingleCampaign/Form/Settings.php ./api/v3/TwingleEvent/Delete.php ./api/v3/TwingleEvent/Sync.php ./api/v3/TwingleProject/Delete.php ./api/v3/TwingleProject/Sync.php ./api/v3/TwingleSync/Sync.php
@@ -72,6 +124,634 @@ msgstr ""
 
 #: ./CRM/TwingleCampaign/Upgrader.php
 msgid "Could not disable scheduled job \"TwingleSync\"."
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Twingle Information"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Twingle Settings"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Twingle Payment Methods"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Twingle Embed Codes"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Twingle Event Information"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Twingle Campaign Information"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php ./api/v3/TwingleEvent/Delete.php ./api/v3/TwingleEvent/Get.php ./api/v3/TwingleEvent/Getsingle.php ./api/v3/TwingleEvent/Sync.php ./api/v3/TwingleProject/Create.php ./api/v3/TwingleProject/Delete.php ./api/v3/TwingleProject/Get.php ./api/v3/TwingleProject/Getsingle.php ./api/v3/TwingleProject/Sync.php
+msgid "Twingle Project ID"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Organisation ID"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "identifier"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "An unique identifier for a project (auto generated)"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Type"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Default"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Events"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Membership"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Choose the project type. Allow users to create own events or to pay a membership fee."
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "allow more"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php ./api/v3/TwingleProject/Create.php ./api/v3/TwingleProject/Get.php ./api/v3/TwingleProject/Getsingle.php
+msgid "Allow to donate more than is defined in the target"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "transaction type"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "URL"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Widget"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Form"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Widget Single"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Form Single"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "All Events"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Event List"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Counter"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Page"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Confirmation Mail"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Send confirmation mail"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Donation Receipt"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Offer donation receipts"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Contact Data"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Donation Rhythm"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "yearly"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "halfyearly"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "quarterly"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "monthly"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "one time"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "The selected options are available for selection in the donation widget."
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Default Rhythm"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Which donation rhythm should be displayed as selected by default?"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Newsletter Registration"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Enable newsletter registration"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Postinfo Registration"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Enable post info registration"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Background Color"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Hex color code (e.g. ffffff for white)"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Primary Color"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Font Color"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "BCC Email"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Email address used as bcc addresses for confirmation mail which is send to an user"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Donation Min"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Minimum donation value"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Donation Max"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Maximum donation value"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Donation Default"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Default donation value"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Contact Fields"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Salutation"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "First name"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Last name"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Company"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Birthday"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Street"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Postal Code"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "City"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Country"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Telephone"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Fields to include in contact form"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Mandatory Contact Fields"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Fields that must get filled in the contact form."
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Custom CSS"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "URL to a custom CSS file that will be included in the frontend"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Share URL"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "URL for the sharing component on the last page and doi page"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Contact Mandatory"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "If the contact data should be requested mandatory as second step"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Double Opt-In"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Enable Twingle's double opt-in (Do not enable, if you use CiviCRM's double opt-in!)"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Force Donation Taget as Button"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Force showing the donation targets as buttons"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Slider Icon"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Heart"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Asterisk"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Animal"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Lifebelt"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Angellist"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Handshake"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Dollar"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Menue"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Office"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Leaf"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Cog"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "SVG"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Euro"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Stats"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Circle"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Water drop outline"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Water drop"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Gift"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Bee"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Flower"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Train"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "No Icon"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Hidden Logo"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Hide the Logo on the project page"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Target Format"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Format of the reached portion of the donation target"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Donation Purpose as Textfield"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Let donors enter their own donation purpose"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Activate CiviCRM Support"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Activate support for Twingle Extension (de.systopia.twingle)"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Show Step Index"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Show a step index during donation process"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Languages"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "German"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "English"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "French"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Spanish"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Buttons"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Up to four buttons can be configured. If you leave the amount blank, the button will not be displayed."
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Slider"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Show a slider that allows the donor to choose the donation amount."
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Button 1"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Amount to be displayed on Button 1"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Button 2"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Amount to be displayed on Button 2"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Button 3"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Amount to be displayed on Button 3"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Button 4"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Amount to be displayed on Button 4"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Newsletter Name Requested"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Must a donor give his name for newsletter sign-up?"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Show List of Donations"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Display a list of public donations"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Payment Methods"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "PayPal"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Banktransfer"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Debit"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Sofortüberweisung"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Chose which payment methods should be available. NOTE: You might have to activate them first in the Twingle-Manager configuration."
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Recurring Payment Methods"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php ./api/v3/TwingleEvent/Delete.php ./api/v3/TwingleEvent/Get.php ./api/v3/TwingleEvent/Getsingle.php ./api/v3/TwingleEvent/Sync.php
+msgid "Twingle Event ID"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Identifier"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Initiator"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Initiator Email"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Is public"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Deleted"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Confirmed At"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Created At"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Creation URL"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Internal URL"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "External URL"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Edit Internal URL"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Edit External URL"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Parent TwingleProject ID"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "CID"
 msgstr ""
 
 #: ./api/v3/TwingleCampaign/Create.php ./api/v3/TwingleCampaign/Delete.php ./api/v3/TwingleCampaign/Get.php ./api/v3/TwingleCampaign/Getsingle.php ./api/v3/TwingleCampaign/Sync.php
@@ -178,16 +858,8 @@ msgstr ""
 msgid "Unique Campaign ID"
 msgstr ""
 
-#: ./api/v3/TwingleEvent/Delete.php ./api/v3/TwingleEvent/Get.php ./api/v3/TwingleEvent/Getsingle.php ./api/v3/TwingleEvent/Sync.php ./api/v3/TwingleProject/Create.php ./api/v3/TwingleProject/Delete.php ./api/v3/TwingleProject/Get.php ./api/v3/TwingleProject/Getsingle.php ./api/v3/TwingleProject/Sync.php
-msgid "Twingle Project ID"
-msgstr ""
-
 #: ./api/v3/TwingleEvent/Delete.php ./api/v3/TwingleEvent/Sync.php ./api/v3/TwingleProject/Delete.php ./api/v3/TwingleProject/Get.php ./api/v3/TwingleProject/Getsingle.php ./api/v3/TwingleProject/Sync.php
 msgid "Twingle ID for this project"
-msgstr ""
-
-#: ./api/v3/TwingleEvent/Delete.php ./api/v3/TwingleEvent/Get.php ./api/v3/TwingleEvent/Getsingle.php ./api/v3/TwingleEvent/Sync.php
-msgid "Twingle Event ID"
 msgstr ""
 
 #: ./api/v3/TwingleEvent/Delete.php ./api/v3/TwingleEvent/Get.php ./api/v3/TwingleEvent/Getsingle.php ./api/v3/TwingleEvent/Sync.php
@@ -286,10 +958,6 @@ msgstr ""
 msgid "Allow more"
 msgstr ""
 
-#: ./api/v3/TwingleProject/Create.php ./api/v3/TwingleProject/Get.php ./api/v3/TwingleProject/Getsingle.php
-msgid "Allow to donate more than is defined in the target"
-msgstr ""
-
 #: ./api/v3/TwingleProject/Create.php
 msgid "Project Target"
 msgstr ""
@@ -320,5 +988,33 @@ msgstr ""
 
 #: ./templates/CRM/TwingleCampaign/Form/Settings.tpl
 msgid "Twingle Event Settings"
+msgstr ""
+
+#: ./twinglecampaign.php
+msgid "Campaign cloning failed"
+msgstr ""
+
+#: ./twinglecampaign.php
+msgid "TwingleCampaign update failed"
+msgstr ""
+
+#: ./twinglecampaign.php
+msgid "TwingleCampaign was saved."
+msgstr ""
+
+#: ./twinglecampaign.php
+msgid "TwingleProject creation failed"
+msgstr ""
+
+#: ./twinglecampaign.php
+msgid "Could not retrieve Twingle API key"
+msgstr ""
+
+#: ./twinglecampaign.php
+msgid "TwingleProject synchronization failed: %1"
+msgstr ""
+
+#: ./twinglecampaign.php
+msgid "Input validation failed"
 msgstr ""
 

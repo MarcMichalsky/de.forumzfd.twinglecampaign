@@ -51,4 +51,24 @@ class CRM_TwingleCampaign_Utils_StringOperations {
     }
     return $string;
   }
+
+  /**
+   * Checks if a string ands with another string.
+   * @param $haystack
+   * @param $needle
+   * @return bool
+   */
+  public static function endsWith($haystack, $needle): bool {
+    return substr_compare($haystack, $needle, -strlen($needle)) === 0;
+  }
+
+  /**
+   * Checks if a string starts with another string.
+   * @param $haystack
+   * @param $needle
+   * @return bool
+   */
+  public static function startsWith($haystack, $needle): bool {
+    return substr_compare($haystack, $needle, 0, strlen($needle)) === 0;
+  }
 }

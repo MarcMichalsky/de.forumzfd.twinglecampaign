@@ -26,7 +26,7 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public function __construct(array $values, int $id = NULL) {
+  public function __construct(array $values = [], int $id = NULL) {
 
     $this->prefix = 'twingle_campaign_';
     $this->id = $id ?? NULL;
@@ -96,7 +96,7 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
     // Get campaign type id for TwingleProject
     $twingle_project_campaign_type_id =
       ExtensionCache::getInstance()
-        ->getCampaigns()['campaign_types']['twingle_project']['id'];
+        ->getCampaignIds()['campaign_types']['twingle_project']['id'];
 
     // Determine the parent project id by looping through the campaign tree
     // until the parent campaign type is a TwingleProject

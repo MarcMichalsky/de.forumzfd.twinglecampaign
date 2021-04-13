@@ -13,13 +13,7 @@ class CRM_TwingleCampaign_Utils_ExtensionCache {
 
   private $customFieldMapping;
 
-  private $translations;
-
-  private $campaigns;
-
-  private $templates;
-
-  private $option_values;
+  private $campaignIds;
 
   /**
    * ## Get an instance (singleton)
@@ -44,37 +38,11 @@ class CRM_TwingleCampaign_Utils_ExtensionCache {
     // Get a mapping of custom fields
     $this->customFieldMapping = CustomField::getMapping();
 
-    // Initialize json files as arrays
-    $file_paths = [
-      'translations'  => '/CRM/TwingleCampaign/resources/dictionary.json',
-      'templates'     => '/CRM/TwingleCampaign/resources/twingle_api_templates.json',
-      'campaigns'     => '/CRM/TwingleCampaign/resources/campaigns.json',
-      'option_values' => '/CRM/TwingleCampaign/resources/option_values.json',
-    ];
-
-    foreach ($file_paths as $key => $file_path) {
-
-      // Get array from json file
-      $file_path = E::path() . $file_path;
-      $json_file = file_get_contents($file_path);
-      $json_file_name = pathinfo($file_path)['filename'];
-      $array = json_decode($json_file, TRUE);
-
-      // Throw and log an error if json file can't be read
-      if (!$array) {
-        $message = ($json_file_name)
-          ? "Could not read json file $json_file_name"
-          : "Could not locate json file in path: $file_path";
-        Civi::log()->error($message);
-        throw new Exception($message);
-      }
-
-      // Set attribute
-      $this->$key = $array;
-    }
-
     // Get ids for Twingle related campaign types
-    foreach ($this->campaigns['campaign_types'] as $campaign_type) {
+    $this->campaignIds = require(
+      E::path() . '/CRM/TwingleCampaign/resources/campaigns.php'
+    );
+    foreach ($this->campaignIds['campaign_types'] as $campaign_type) {
       $campaign_type_id = civicrm_api3(
         'OptionValue',
         'get',
@@ -85,7 +53,7 @@ class CRM_TwingleCampaign_Utils_ExtensionCache {
         ]
       )['values'];
       if ($campaign_type_id) {
-        $this->campaigns['campaign_types'][$campaign_type['name']]['id'] =
+        $this->campaignIds['campaign_types'][$campaign_type['name']]['id'] =
           $campaign_type_id[0]['value'];
       }
     }
@@ -114,28 +82,43 @@ class CRM_TwingleCampaign_Utils_ExtensionCache {
    * @return array
    */
   public function getTranslations(): array {
-    return $this->translations;
+    return require(
+      E::path() . '/CRM/TwingleCampaign/resources/dictionary.php'
+    );
   }
 
   /**
    * @return array
    */
   public function getCampaigns(): array {
-    return $this->campaigns;
+    return require(
+      E::path() . '/CRM/TwingleCampaign/resources/campaigns.php'
+    );
+  }
+
+  /**
+   * @return array
+   */
+  public function getCampaignIds(): array {
+    return $this->campaignIds;
   }
 
   /**
    * @return array
    */
   public function getTemplates(): array {
-    return $this->templates;
+    return require(
+      E::path() . '/CRM/TwingleCampaign/resources/twingle_api_templates.php'
+    );
   }
 
   /**
    * @return mixed
    */
   public function getOptionValues() {
-    return $this->option_values;
+    return require(
+      E::path() . '/CRM/TwingleCampaign/resources/option_values.php'
+    );
   }
 
 }
