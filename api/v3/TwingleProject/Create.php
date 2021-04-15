@@ -86,8 +86,7 @@ function civicrm_api3_twingle_project_Create(array $params): array {
       unset($result['project_id']);
       $project = new TwingleProject($result, $params['id']);
       unset($params['id']);
-      $project->update($params);
-      $project->setEmbedData($params);
+      $project->merge($params);
     }
     // If no id is provided, try to create a new project with provided values
     else {

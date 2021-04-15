@@ -62,26 +62,36 @@ function twinglecampaign_civicrm_postSave_civicrm_campaign($dao) {
   if (empty($_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook']) ||
     $_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook'] != TRUE) {
 
+    // If request is not an API-Call
+    if ($_GET['action'] != 'create') {
 
-    // If the db transaction is still running, add a function to it that will
-    // be called afterwards
-    if (CRM_Core_Transaction::isActive()) {
+      // If the db transaction is still running, add a function to it that will
+      // be called afterwards
+      if (CRM_Core_Transaction::isActive()) {
 
-      if (_validateAndSendInput($dao->id, $dao->campaign_type_id)) {
+        if (_validateAndSendInput($dao->id, $dao->campaign_type_id)) {
 
-        CRM_Core_Transaction::addCallback(
-          CRM_Core_Transaction::PHASE_POST_COMMIT,
-          'twinglecampaign_postSave_campaign_update_callback',
-          [$dao->id, $dao->campaign_type_id]
-        );
+          CRM_Core_Transaction::addCallback(
+            CRM_Core_Transaction::PHASE_POST_COMMIT,
+            'twinglecampaign_postSave_campaign_update_callback',
+            [$dao->id, $dao->campaign_type_id]
+          );
+        }
       }
-    }
 
-    // If the transaction is already finished, call the function directly
+      // If the transaction is already finished, call the function directly
+      else {
+        twinglecampaign_postSave_campaign_update_callback($dao->id, $dao->campaign_type_id);
+      }
+
+    }
     else {
-      twinglecampaign_postSave_campaign_update_callback($dao->id, $dao->campaign_type_id);
+      CRM_Core_Transaction::addCallback(
+        CRM_Core_Transaction::PHASE_POST_COMMIT,
+        'twinglecampaign_postSave_campaign_update_callback',
+        [$dao->id, $dao->campaign_type_id]
+      );
     }
-
   }
   // Remove no hook flag
   unset($_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook']);

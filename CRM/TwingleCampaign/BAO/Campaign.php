@@ -125,7 +125,9 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
 
   /**
    * ## Complement campaign values
-   * Complement existing campaign values with new ones
+   * Complement existing campaign values with new ones.
+   * Existing values will not get overwritten.
+   *
    * @param array $arrayToComplement
    */
   public function complement(array $arrayToComplement) {
@@ -134,6 +136,27 @@ abstract class CRM_TwingleCampaign_BAO_Campaign {
   }
 
   private function complement_r($orig, &$fill) {
+    foreach ($orig as $key => $value) {
+      if (is_array($value)) {
+        $this->complement_r($orig[$key], $fill[$key]);
+      } else {
+        $fill[$key] = $value;
+      }
+    }
+  }
+
+  /**
+   * ## Merge campaign values
+   * Merge existing campaign values with new ones.
+   * Existing values will be overwritten!
+   *
+   * @param array $arrayToMerge
+   */
+  public function merge(array $arrayToMerge) {
+    $this->complement_r($arrayToMerge, $this->values);
+  }
+
+  private function merge_r($orig, &$fill) {
     foreach ($orig as $key => $value) {
       if (is_array($value)) {
         $this->complement_r($orig[$key], $fill[$key]);

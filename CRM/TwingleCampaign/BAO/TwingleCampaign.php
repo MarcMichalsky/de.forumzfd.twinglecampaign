@@ -32,15 +32,14 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
     $this->id = $id ?? NULL;
     $this->values['campaign_type_id'] = 'twingle_campaign';
 
-    if (!isset($this->id)) {
-      $this->update($values);
-      $this->getParentProject();
+    $this->update($values);
+    $this->getParentProject();
+    if (!isset($this->values['cid'])) {
       $this->createCid();
-      $this->createUrl();
     }
-    else {
-      $this->update($values);
-    }
+    $this->createUrl();
+
+
   }
 
 
@@ -102,8 +101,8 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
     // until the parent campaign type is a TwingleProject
     $parent_id = $this->values['parent_id'];
     $parent_id = $parent_id ?? civicrm_api3(
-      'TwingleCampaign',
-      'getsingle',
+        'TwingleCampaign',
+        'getsingle',
         ['id' => $this->id]
       )['parent_id'];
 
@@ -318,7 +317,15 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    */
   public
   function getResponse(string $status = NULL): array {
-    $keys = ['id', 'name', 'title', 'parent_project_id', 'parent_id', 'cid', 'url'];
+    $keys = [
+      'id',
+      'name',
+      'title',
+      'parent_project_id',
+      'parent_id',
+      'cid',
+      'url',
+    ];
     $response = [];
     foreach ($keys as $key) {
       if (isset($this->values[$key])) {
@@ -366,6 +373,7 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
 
   /**
    * ## Get ID
+   *
    * @return mixed|null
    */
   public function getId(): int {
