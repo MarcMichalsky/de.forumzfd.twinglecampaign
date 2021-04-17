@@ -41,6 +41,13 @@ function _civicrm_api3_twingle_event_Sync_spec(array &$spec) {
     'api.required' => 0,
     'description'  => E::ts('If this is set true, no database change will be made'),
   ];
+  $spec['pull'] = [
+    'name'         => 'pull',
+    'title'        => E::ts('Pull'),
+    'type'         => CRM_Utils_Type::T_BOOLEAN,
+    'api.required' => 0,
+    'description'  => E::ts('If this is set true, the event(s) will be pulled from Twingle and updated locally'),
+  ];
   $spec['twingle_api_key'] = [
     'name'         => 'twingle_api_key',
     'title'        => E::ts('Twingle API key'),
@@ -111,6 +118,10 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
     Civi::cache('long')->set('twinglecampaign_twingle_api', $twingleApi);
   }
 
+  // Set pull flag
+  $pull = (isset($params['pull']) && $params['pull']);
+  unset($params['pull']);
+
   // If an id or a event_id is provided, synchronize only this one campaign
   if (isset($params['id']) || isset($params['event_id'])) {
 
@@ -141,7 +152,13 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
         }
         // Synchronize events
         if (!empty($event_from_twingle)) {
-          return _eventSync($event, $event_from_twingle, $twingleApi, $params);
+          return _eventSync(
+            $event,
+            $event_from_twingle,
+            $twingleApi,
+            $params,
+            $pull
+          );
         }
 
         // If Twingle does not know an event with the given event_id, give error
@@ -271,7 +288,13 @@ function civicrm_api3_twingle_event_Sync(array $params): array {
         $event = _instantiateEvent($event_from_civicrm, $event_from_civicrm['id']);
 
         // sync event
-        $result = _eventSync($event, $event_from_twingle, $twingleApi, $params);
+        $result = _eventSync(
+          $event,
+          $event_from_twingle,
+          $twingleApi,
+          $params,
+          $pull
+        );
         if ($result['is_error'] != 0) {
           $errors_occurred++;
           $result_values[$event->getId()] =
@@ -394,6 +417,7 @@ function _updateEventLocally(array $event_from_twingle,
  * @param array $event_from_twingle
  * @param \CRM_TwingleCampaign_BAO_TwingleApiCall $twingleApi
  * @param array $params
+ * @param bool $pull Force pulling event from Twingle and update local campaign
  *
  * @return array
  * @throws \CiviCRM_API3_Exception
@@ -401,12 +425,13 @@ function _updateEventLocally(array $event_from_twingle,
 function _eventSync(TwingleEvent $event,
               array $event_from_twingle,
               TwingleApiCall $twingleApi,
-              array $params): array {
+              array $params,
+              bool $pull = FALSE): array {
 
   // If Twingle's timestamp of the event differs from the timestamp of the
   // CiviCRM TwingleEvent campaign, update the campaign on CiviCRM's side.
   // NOTE: Changes on TwingleEvents are not meant to get pushed to Twingle
-  if ($event_from_twingle['updated_at'] != $event->lastUpdate()) {
+  if ($event_from_twingle['updated_at'] != $event->lastUpdate() || $pull) {
     return _updateEventLocally($event_from_twingle, $event, $params, $twingleApi);
   }
 

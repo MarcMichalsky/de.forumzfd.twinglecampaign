@@ -99,11 +99,7 @@ msgid "Upgrade %1 to revision %2"
 msgstr ""
 
 #: ./CRM/TwingleCampaign/Upgrader.php
-msgid "Syncronizes all TwingleProjects an TwingleEvents between CiviCRM and Twingle"
-msgstr ""
-
-#: ./CRM/TwingleCampaign/Upgrader.php
-msgid "Could not create scheduled job \"TwingleSync\"."
+msgid "Could not pull campaigns from Twingle to fill the campaign fields that were created within this update: %1"
 msgstr ""
 
 #: ./CRM/TwingleCampaign/Upgrader.php
@@ -111,7 +107,11 @@ msgid "Scheduled Job"
 msgstr ""
 
 #: ./CRM/TwingleCampaign/Upgrader.php
-msgid "Could not create scheduled job \"TwingleSync\". Your Campaigns will not get synchronized to Twingle."
+msgid "Syncronizes all TwingleProjects an TwingleEvents between CiviCRM and Twingle"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/Upgrader.php
+msgid "Could not create scheduled job \"TwingleSync\"."
 msgstr ""
 
 #: ./CRM/TwingleCampaign/Upgrader.php
@@ -802,6 +802,14 @@ msgstr ""
 msgid "Twingle ID of the parent TwingleProject"
 msgstr ""
 
+#: ./api/v3/TwingleCampaign/Get.php ./api/v3/TwingleCampaign/Sync.php
+msgid "Parent Project ID"
+msgstr ""
+
+#: ./api/v3/TwingleCampaign/Get.php ./api/v3/TwingleCampaign/Sync.php
+msgid "ID of the parent TwingleProject"
+msgstr ""
+
 #: ./api/v3/TwingleCampaign/Get.php ./api/v3/TwingleCampaign/Getsingle.php ./api/v3/TwingleEvent/Get.php ./api/v3/TwingleEvent/Getsingle.php ./api/v3/TwingleProject/Get.php ./api/v3/TwingleProject/Getsingle.php
 msgid "Campaign Name"
 msgstr ""
@@ -888,6 +896,14 @@ msgstr ""
 
 #: ./api/v3/TwingleEvent/Get.php ./api/v3/TwingleEvent/Getsingle.php
 msgid "When the Event was confirmed by its initiator"
+msgstr ""
+
+#: ./api/v3/TwingleEvent/Sync.php
+msgid "Pull"
+msgstr ""
+
+#: ./api/v3/TwingleEvent/Sync.php
+msgid "If this is set true, the event(s) will be pulled from Twingle and updated locally"
 msgstr ""
 
 #: ./api/v3/TwingleEvent/Sync.php ./api/v3/TwingleSync/Sync.php
@@ -980,6 +996,14 @@ msgstr ""
 
 #: ./api/v3/TwingleProject/Get.php ./api/v3/TwingleProject/Getsingle.php
 msgid "Your Twingle Organisation ID"
+msgstr ""
+
+#: ./api/v3/TwingleProject/Sync.php
+msgid "Pull from Twingle"
+msgstr ""
+
+#: ./api/v3/TwingleProject/Sync.php
+msgid "If this is set true, the project(s) will be pulled from Twingle and updated locally"
 msgstr ""
 
 #: ./templates/CRM/TwingleCampaign/Form/Settings.tpl

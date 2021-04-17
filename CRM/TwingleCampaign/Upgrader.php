@@ -13,13 +13,14 @@ use CRM_TwingleCampaign_ExtensionUtil as E;
  */
 class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
 
-  // By convention, functions that look like "function upgrade_NNNN()" are
-  // upgrade tasks. They are executed in order (like Drupal's hook_update_N).
-
   /**
+   * This update function checks whether all custom fields defined in
+   * CRM/TwingleCampaign/resources/campaigns.php exist and creates them if not.
+   * To ensure that all newly created custom fields get filled with data, all
+   * changed campaigns will get pulled from Twingle.
    * @throws \CiviCRM_API3_Exception
    */
-  public function upgrade_01() {
+  public function upgrade_01(): bool {
 
     $campaign_info = require E::path() .
       '/CRM/TwingleCampaign/resources/campaigns.php';
@@ -31,7 +32,7 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
       new CampaignType($campaign_type);
     }
     foreach (CampaignType::getCampaignTypes() as $campaign_type) {
-      $campaign_type->create(true);
+      $campaign_type->create(TRUE);
     }
 
     // Create custom groups
@@ -42,13 +43,61 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
         }
       }
       $cg = new CustomGroup($custom_group);
-      $cg->create(true);
+      $cg->create(TRUE);
     }
+
+    // If new fields get created during the update, set a flag to set all
+    // last_update values of the affected campaigns to "0" and trigger a
+    // synchronization. This ensures that settings on Twingle's side will not
+    // get overwritten with empty values.
+    $updatedCampaignTypes = [];
 
     // Create custom fields
     foreach ($campaign_info['custom_fields'] as $custom_field) {
       $cf = new CustomField($custom_field);
-      $cf->create(true);
+      $result = $cf->create(TRUE);
+
+      if (!empty($result)) {
+        preg_match(
+          '/^Twingle_[a-yA-Z]*/',
+          $cf->getCustomGroupId(),
+          $updatedCampaignTypes[]
+        );
+      }
+    }
+
+    // Filter changed campaign types
+    foreach ($updatedCampaignTypes as $key => $value) {
+      $updatedCampaignTypes[str_replace('_', '', $value[0])]
+        = TRUE;
+      unset($updatedCampaignTypes[$key]);
+    }
+
+    // Pull changed campaigns to fill new created fields with data
+    try {
+      foreach ($updatedCampaignTypes as $key => $value) {
+        if ($value === TRUE) {
+          civicrm_api3(
+            $key,
+            'sync',
+            ['pull' => TRUE]
+          );
+        }
+      }
+    } catch (Exception $e) {
+      Civi::log()->error(
+        E::LONG_NAME .
+        ' could not pull campaigns from Twingle to fill the campaign fields that were created on update.' .
+        $e->getMessage()
+      );
+      CRM_Core_Session::setStatus(
+        E::ts(
+          'Could not pull campaigns from Twingle to fill the campaign fields that were created within this update: %1',
+          [1 => $e->getMessage()]
+        ),
+        E::ts('Scheduled Job'),
+        error
+      );
     }
 
     // Create option values
@@ -124,7 +173,6 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
         E::ts('Scheduled Job'),
         error
       );
-      CRM_Utils_System::setUFMessage(E::ts('Could not create scheduled job "TwingleSync". Your Campaigns will not get synchronized to Twingle.'));
     }
   }
 

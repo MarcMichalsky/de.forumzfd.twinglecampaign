@@ -145,6 +145,18 @@ msgstr "Upgrade %1 auf Revision %2"
 
 #: CRM/TwingleCampaign/Upgrader.php
 msgid ""
+"Could not pull campaigns from Twingle to fill the campaign fields that were "
+"created within this update: %1"
+msgstr ""
+"Die zusätzlichen Kampagnenfelder, die in diesem Update erstellt wurden, "
+"konnten nicht von Twingle bezogen werden: %1"
+
+#: CRM/TwingleCampaign/Upgrader.php
+msgid "Scheduled Job"
+msgstr "Geplante Audgabe"
+
+#: CRM/TwingleCampaign/Upgrader.php
+msgid ""
 "Syncronizes all TwingleProjects an TwingleEvents between CiviCRM and Twingle"
 msgstr ""
 "Synchronisiert alle TwingleProjects und TwingleEvents zwischen CiviCRM und "
@@ -153,18 +165,6 @@ msgstr ""
 #: CRM/TwingleCampaign/Upgrader.php
 msgid "Could not create scheduled job \"TwingleSync\"."
 msgstr "Geplante Aufgabe \"TwingleSync\" konnte nicht erstellt werden."
-
-#: CRM/TwingleCampaign/Upgrader.php
-msgid "Scheduled Job"
-msgstr "Geplante Audgabe"
-
-#: CRM/TwingleCampaign/Upgrader.php
-msgid ""
-"Could not create scheduled job \"TwingleSync\". Your Campaigns will not get "
-"synchronized to Twingle."
-msgstr ""
-"Geplante Aufgabe \"TwingleSync\" konnte nicht erstellt werden. Ihre "
-"Kampagnen werden nicht mit Twingle synchronisiert werden."
 
 #: CRM/TwingleCampaign/Upgrader.php
 msgid "Could not delete scheduled job \"TwingleSync\"."
@@ -892,6 +892,14 @@ msgstr "Eltern Twingle Project ID"
 msgid "Twingle ID of the parent TwingleProject"
 msgstr "Twingle ID des Eltern-TwingleProject"
 
+#: api/v3/TwingleCampaign/Get.php api/v3/TwingleCampaign/Sync.php
+msgid "Parent Project ID"
+msgstr "Eltern-Projekt-ID"
+
+#: api/v3/TwingleCampaign/Get.php api/v3/TwingleCampaign/Sync.php
+msgid "ID of the parent TwingleProject"
+msgstr "ID des Eltern-TWinglePRoject"
+
 #: api/v3/TwingleCampaign/Get.php api/v3/TwingleCampaign/Getsingle.php
 #: api/v3/TwingleEvent/Get.php api/v3/TwingleEvent/Getsingle.php
 #: api/v3/TwingleProject/Get.php api/v3/TwingleProject/Getsingle.php
@@ -1021,6 +1029,18 @@ msgstr "Bestätigt am"
 msgid "When the Event was confirmed by its initiator"
 msgstr "Wenn das Event vom Initiator bestätigt wurrde"
 
+#: api/v3/TwingleEvent/Sync.php
+msgid "Pull"
+msgstr "Ziehen"
+
+#: api/v3/TwingleEvent/Sync.php
+msgid ""
+"If this is set true, the event(s) will be pulled from Twingle and updated "
+"locally"
+msgstr ""
+"Wenn dies auf wahr gesetzt ist, werden die Events von Twingle gezogen und "
+"lokal geupdated."
+
 #: api/v3/TwingleEvent/Sync.php api/v3/TwingleSync/Sync.php
 msgid "Limit"
 msgstr "Limit"
@@ -1121,6 +1141,18 @@ msgstr "Twingle Organisations ID"
 #: api/v3/TwingleProject/Get.php api/v3/TwingleProject/Getsingle.php
 msgid "Your Twingle Organisation ID"
 msgstr "Ihre Twingle Organisations ID"
+
+#: api/v3/TwingleProject/Sync.php
+msgid "Pull from Twingle"
+msgstr "Von Twingle ziehen"
+
+#: api/v3/TwingleProject/Sync.php
+msgid ""
+"If this is set true, the project(s) will be pulled from Twingle and updated "
+"locally"
+msgstr ""
+"Wenn dies auf wahr gesetzt ist, werden die Projekte von Twingle gezogen und "
+"lokal geupdated."
 
 #: templates/CRM/TwingleCampaign/Form/Settings.tpl
 msgid "General Settings"
