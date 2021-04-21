@@ -765,4 +765,14 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
     unset($this->values['payment_methods']);
   }
 
+
+  /**
+   * ## Set project name
+   *
+   * @param string $name
+   */
+  public function setName(string $name): void {
+    $this->values['name'] = $name;
+  }
+
 }

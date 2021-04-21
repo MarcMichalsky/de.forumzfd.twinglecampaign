@@ -269,6 +269,9 @@ function _validateAndSendInput($id, $campaign_type_id): bool {
     // Update project
     $project->update($customFields);
 
+    // Set name
+    $project->setName($_POST['title']);
+
     // Validate project values
     $validation = $project->validate();
 
