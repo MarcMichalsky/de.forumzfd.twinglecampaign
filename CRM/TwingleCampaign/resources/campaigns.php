@@ -1,6 +1,7 @@
 <?php
 
 use CRM_TwingleCampaign_ExtensionUtil as E;
+require_once E::path() . '/CRM/TwingleCampaign/Utils/CaseTypes.php';
 
 return [
   "campaign_types" => [
@@ -120,6 +121,21 @@ return [
       "weight" => 2,
       "help_post" => E::ts("Choose the project type. Allow users to create own events or to pay a membership fee."),
       "default_value" => "default"
+    ],
+    "twingle_project_case" => [
+      "custom_group_id" => "Twingle_Project_Information",
+      "label" => E::ts("Case"),
+      "name" => "twingle_project_case",
+      "is_required" => FALSE,
+      "is_searchable" => 1,
+      "data_type" => "String",
+      "html_type" => "Select",
+      "option_values" => getCaseTypes(),
+      "text_length" => 32,
+      "is_active" => 1,
+      "is_view" => FALSE,
+      "weight" => 3,
+      "help_post" => E::ts("Which case should get opened for event creators?")
     ],
     "twingle_project_allow_more" => [
       "custom_group_id" => "Twingle_Project_Information",

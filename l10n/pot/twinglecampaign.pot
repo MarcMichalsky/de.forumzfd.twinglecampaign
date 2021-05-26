@@ -75,7 +75,7 @@ msgid "XCM Profile to match event initiators"
 msgstr ""
 
 #: ./CRM/TwingleCampaign/Form/Settings.php
-msgid "Start a case for event initiators"
+msgid "Default case to open for event initiators"
 msgstr ""
 
 #: ./CRM/TwingleCampaign/Form/Settings.php
@@ -88,10 +88,6 @@ msgstr ""
 
 #: ./CRM/TwingleCampaign/Form/Settings.php
 msgid "TwingleCampaign configuration saved"
-msgstr ""
-
-#: ./CRM/TwingleCampaign/Form/Settings.php
-msgid "none"
 msgstr ""
 
 #: ./CRM/TwingleCampaign/Upgrader/Base.php
@@ -124,6 +120,10 @@ msgstr ""
 
 #: ./CRM/TwingleCampaign/Upgrader.php
 msgid "Could not disable scheduled job \"TwingleSync\"."
+msgstr ""
+
+#: ./CRM/TwingleCampaign/Utils/CaseTypes.php
+msgid "none"
 msgstr ""
 
 #: ./CRM/TwingleCampaign/resources/campaigns.php
@@ -184,6 +184,14 @@ msgstr ""
 
 #: ./CRM/TwingleCampaign/resources/campaigns.php
 msgid "Choose the project type. Allow users to create own events or to pay a membership fee."
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Case"
+msgstr ""
+
+#: ./CRM/TwingleCampaign/resources/campaigns.php
+msgid "Which case should get triggered for event creators?"
 msgstr ""
 
 #: ./CRM/TwingleCampaign/resources/campaigns.php

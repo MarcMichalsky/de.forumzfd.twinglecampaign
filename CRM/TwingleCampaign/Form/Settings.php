@@ -4,6 +4,7 @@ use CRM_TwingleCampaign_BAO_Configuration as Configuration;
 use CRM_TwingleCampaign_ExtensionUtil as E;
 
 include_once E::path() . '/CRM/TwingleCampaign/BAO/Configuration.php';
+include_once E::path() . '/CRM/TwingleCampaign/Utils/CaseTypes.php';
 
 /**
  * Form controller class
@@ -32,9 +33,9 @@ class CRM_TwingleCampaign_Form_Settings extends CRM_Core_Form {
 
     $this->addElement(
       'select',
-      'twinglecampaign_start_case',
-      E::ts('Start a case for event initiators'),
-      $this->getCaseTypes(),
+      'twinglecampaign_default_case',
+      E::ts('Default case to open for event initiators'),
+      getCaseTypes(),
       ['class' => 'crm-select2 huge']
     );
 
@@ -90,31 +91,6 @@ class CRM_TwingleCampaign_Form_Settings extends CRM_Core_Form {
       }
     }
     return $xcmProfiles;
-  }
-
-  /**
-   * Retrieves all case types
-   *
-   * @return array
-   */
-  private function getCaseTypes(): array {
-    $caseTypes = [NULL => E::ts('none')];
-    try {
-      $result = civicrm_api3('CaseType', 'get', [
-        'sequential' => 1,
-        'options' => ['limit' => 0]
-      ]);
-      if (is_array($result['values'])) {
-        foreach ($result['values'] as $case) {
-          $caseTypes[$case['name']] = $case['title'];
-        }
-      }
-    } catch (CiviCRM_API3_Exception $e) {
-      Civi::log()->error(
-        E::LONG_NAME . ' could not retrieve case types: ' .
-        $e->getMessage());
-    }
-    return $caseTypes;
   }
 
 }
