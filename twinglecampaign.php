@@ -4,6 +4,7 @@ use CRM_TwingleCampaign_Utils_ExtensionCache as ExtensionCache;
 use CRM_TwingleCampaign_BAO_TwingleProject as TwingleProject;
 use CRM_TwingleCampaign_BAO_TwingleApiCall as TwingleApiCall;
 use CRM_TwingleCampaign_ExtensionUtil as E;
+use CRM_TwingleCampaign_BAO_CustomField as CustomField;
 
 require_once 'twinglecampaign.civix.php';
 
@@ -46,6 +47,14 @@ function twinglecampaign_civicrm_config(&$config) {
   }
 }
 
+function twinglecampaign_civicrm_postSave_civicrm_case_type() {
+  $twingle_project_case_custom_field =
+    CustomField::fetch('twingle_project_case');
+  $newCaseType = json_decode($_POST['json'], True);
+  $twingle_project_case_custom_field->addOptions(
+    [$newCaseType['name'] => $newCaseType['title']]
+  );
+}
 
 /**
  * Implements hook_civicrm_postSave_Campaign().

@@ -14,10 +14,10 @@ msgstr ""
 
 #: CRM/TwingleCampaign/BAO/CustomField.php
 msgid ""
-"Creation of custom field '%1' failed. Find more information in the logs."
+"%1: Creation of custom field '%2' failed. Find more information in the logs."
 msgstr ""
-"Erstellung von Custom Field  '%1' fehlgeschlagen. Mehr Informationen in den "
-"Logs."
+"%1: Erstellen des benutzerdefinierten Feldes '%2' fehlgeschlagen. Mehr "
+"Informationen in den Logs."
 
 #: CRM/TwingleCampaign/BAO/CustomField.php
 msgid "Creation of custom field failed. Find more information in the logs."
@@ -32,6 +32,29 @@ msgid ""
 msgstr ""
 "Erstellung der Custom Field '%1' fehlgeschlagen, weil bereits eine Custom "
 "Field mit selbem Namen existiert. Mehr Informationen in den Logs."
+
+#: CRM/TwingleCampaign/BAO/CustomField.php
+msgid ""
+"Creation of custom field '%1' failed. Find more information in the logs."
+msgstr ""
+"Erstellung von Custom Field  '%1' fehlgeschlagen. Mehr Informationen in den "
+"Logs."
+
+#: CRM/TwingleCampaign/BAO/CustomField.php
+msgid ""
+"%1 could not get option group id for custom field '%2'. Find more "
+"information in the logs."
+msgstr ""
+"%1 konnte die Option-Group-ID für das benutzerdefinierte Feld '%2' nicht "
+"finden. Mehr Informationen in den Logs."
+
+#: CRM/TwingleCampaign/BAO/CustomField.php
+msgid ""
+"%1 could not create additional option values for custom field '%2'. Find "
+"more information in the logs."
+msgstr ""
+"%1 konnte dem benutzerdefinierte Feld '%2' keine zusätzlichen Optionen "
+"hinzufügen. Mehr Informationen in den Logs."
 
 #: CRM/TwingleCampaign/BAO/CustomGroup.php
 msgid ""
@@ -255,7 +278,7 @@ msgid "Case"
 msgstr "Fall"
 
 #: CRM/TwingleCampaign/resources/campaigns.php
-msgid "Which case should get triggered for event creators?"
+msgid "Which case should get opened for event creators?"
 msgstr "Welcher Fall soll für Event-Initiatoren eröffnet werden?"
 
 #: CRM/TwingleCampaign/resources/campaigns.php

@@ -1,5 +1,5 @@
 #: ./CRM/TwingleCampaign/BAO/CustomField.php
-msgid "Creation of custom field '%1' failed. Find more information in the logs."
+msgid "%1: Creation of custom field '%2' failed. Find more information in the logs."
 msgstr ""
 
 #: ./CRM/TwingleCampaign/BAO/CustomField.php
@@ -8,6 +8,18 @@ msgstr ""
 
 #: ./CRM/TwingleCampaign/BAO/CustomField.php
 msgid "Creation of custom field '%1' failed, because a custom field with that name already exists. Find more information in the logs."
+msgstr ""
+
+#: ./CRM/TwingleCampaign/BAO/CustomField.php
+msgid "Creation of custom field '%1' failed. Find more information in the logs."
+msgstr ""
+
+#: ./CRM/TwingleCampaign/BAO/CustomField.php
+msgid "%1 could not get option group id for custom field '%2'. Find more information in the logs."
+msgstr ""
+
+#: ./CRM/TwingleCampaign/BAO/CustomField.php
+msgid "%1 could not create additional option values for custom field '%2'. Find more information in the logs."
 msgstr ""
 
 #: ./CRM/TwingleCampaign/BAO/CustomGroup.php
@@ -191,7 +203,7 @@ msgid "Case"
 msgstr ""
 
 #: ./CRM/TwingleCampaign/resources/campaigns.php
-msgid "Which case should get triggered for event creators?"
+msgid "Which case should get opened for event creators?"
 msgstr ""
 
 #: ./CRM/TwingleCampaign/resources/campaigns.php
