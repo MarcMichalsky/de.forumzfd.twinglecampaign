@@ -59,42 +59,53 @@ function twinglecampaign_civicrm_config(&$config) {
  */
 function twinglecampaign_civicrm_postSave_civicrm_campaign($dao) {
 
-  if (empty($_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook']) ||
-    $_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook'] != TRUE) {
+  $twingle_project_campaign_type_id = _get_campaign_type_id_twingle_project();
+  $twingle_campaign_campaign_type_id = _get_campaign_type_id_twingle_campaign();
 
-    // If request is not an API-Call
-    if ($_GET['action'] != 'create') {
+  // If $campaign_type_id is a TwingleProject or TwingleCampaign campaign,
+  // synchronize it
+  if (
+    $dao->campaign_type_id == $twingle_project_campaign_type_id ||
+    $dao->campaign_type_id == $twingle_campaign_campaign_type_id
+  ) {
 
-      // If the db transaction is still running, add a function to it that will
-      // be called afterwards
-      if (CRM_Core_Transaction::isActive()) {
+    if (empty($_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook']) ||
+      $_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook'] != TRUE) {
 
-        if (_validateAndSendInput($dao->id, $dao->campaign_type_id)) {
+      // If request is not an API-Call
+      if ($_GET['action'] != 'create' && $_POST['action'] != 'create') {
 
-          CRM_Core_Transaction::addCallback(
-            CRM_Core_Transaction::PHASE_POST_COMMIT,
-            'twinglecampaign_postSave_campaign_update_callback',
-            [$dao->id, $dao->campaign_type_id]
-          );
+        // If the db transaction is still running, add a function to it that will
+        // be called afterwards
+        if (CRM_Core_Transaction::isActive()) {
+
+          if (_validateAndSendInput($dao->id, $dao->campaign_type_id)) {
+
+            CRM_Core_Transaction::addCallback(
+              CRM_Core_Transaction::PHASE_POST_COMMIT,
+              'twinglecampaign_postSave_campaign_update_callback',
+              [$dao->id, $dao->campaign_type_id]
+            );
+          }
         }
-      }
 
-      // If the transaction is already finished, call the function directly
+        // If the transaction is already finished, call the function directly
+        else {
+          twinglecampaign_postSave_campaign_update_callback($dao->id, $dao->campaign_type_id);
+        }
+
+      }
       else {
-        twinglecampaign_postSave_campaign_update_callback($dao->id, $dao->campaign_type_id);
+        CRM_Core_Transaction::addCallback(
+          CRM_Core_Transaction::PHASE_POST_COMMIT,
+          'twinglecampaign_postSave_campaign_update_callback',
+          [$dao->id, $dao->campaign_type_id]
+        );
       }
-
     }
-    else {
-      CRM_Core_Transaction::addCallback(
-        CRM_Core_Transaction::PHASE_POST_COMMIT,
-        'twinglecampaign_postSave_campaign_update_callback',
-        [$dao->id, $dao->campaign_type_id]
-      );
-    }
+    // Remove no hook flag
+    unset($_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook']);
   }
-  // Remove no hook flag
-  unset($_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook']);
 }
 
 /**
@@ -115,78 +126,70 @@ function twinglecampaign_postSave_campaign_update_callback(
   $twingle_project_campaign_type_id = _get_campaign_type_id_twingle_project();
   $twingle_campaign_campaign_type_id = _get_campaign_type_id_twingle_campaign();
 
-  // If $campaign_type_id is a TwingleProject or TwingleCampaign campaign,
-  // synchronize it
-  if (
-    $campaign_type_id == $twingle_project_campaign_type_id ||
-    $campaign_type_id == $twingle_campaign_campaign_type_id
-  ) {
+  // Set $entity for $campaign_type_id
+  if ($campaign_type_id == $twingle_project_campaign_type_id) {
+    $entity = 'TwingleProject';
+  }
+  else {
+    $entity = 'TwingleCampaign';
+  }
 
-    // Set $entity for $campaign_type_id
-    if ($campaign_type_id == $twingle_project_campaign_type_id) {
-      $entity = 'TwingleProject';
-    }
-    else {
-      $entity = 'TwingleCampaign';
-    }
-
-    if (isset($_POST['action'])) {
-      if ($_POST['action'] == 'clone' && $entity == 'TwingleProject') {
-        unset($_POST['action']);
-        $result = civicrm_api3('TwingleProject', 'getsingle',
-          ['id' => $campaign_id]
-        );
-        $id = $result['id'];
-        unset($result['id']);
-        $project = new TwingleProject($result, $id);
-        try {
-          $project->clone();
-        } catch (Exception $e) {
-          Civi::log()->error(
-            E::LONG_NAME .
-            ' could not clone ' . $entity . ': ' . $e->getMessage()
-          );
-          CRM_Core_Session::setStatus(
-            $e->getMessage(),
-            E::ts("Campaign cloning failed"),
-            error,
-            [unique => TRUE]
-          );
-        }
-      }
-    }
-
-    // If a TwingleProject is getting saved
-    elseif ($entity == 'TwingleProject') {
-
-      // Synchronize all child TwingleCampaign campaigns
+  if (isset($_POST['action'])) {
+    if ($_POST['action'] == 'clone' && $entity == 'TwingleProject') {
+      $_POST['action'] = 'create';
+      $result = civicrm_api3('TwingleProject', 'getsingle',
+        ['id' => $campaign_id]
+      );
+      $id = $result['id'];
+      unset($result['id']);
+      $project = new TwingleProject($result, $id);
       try {
-        civicrm_api3(
-          'TwingleCampaign',
-          'sync',
-          ['parent_id' => $campaign_id]);
-      } catch (CiviCRM_API3_Exception $e) {
+        $project->clone();
+      } catch (Exception $e) {
+        Civi::log()->error(
+          E::LONG_NAME .
+          ' could not clone ' . $entity . ': ' . $e->getMessage()
+        );
         CRM_Core_Session::setStatus(
           $e->getMessage(),
-          E::ts("TwingleCampaign update failed"),
-          error, [unique => TRUE]
-        );
-        Civi::log()->error(
-          E::SHORT_NAME .
-          ' Update of TwingleCampaigns failed: ' . $e->getMessage()
+          E::ts("Campaign cloning failed"),
+          error,
+          [unique => TRUE]
         );
       }
     }
-    else {
-      try {
-        civicrm_api3('TwingleCampaign', 'create',
-          ['id' => $campaign_id, 'parent_id' => $_POST['parent_id']]);
-        CRM_Utils_System::setUFMessage(E::ts('TwingleCampaign was saved.'));
-      } catch (CiviCRM_API3_Exception $e) {
-        Civi::log()->error(
-          'twinglecampaign_postSave_callback ' . $e->getMessage()
-        );
-      }
+  }
+
+  // If a TwingleProject is getting saved
+  elseif ($entity == 'TwingleProject') {
+
+    // Synchronize all child TwingleCampaign campaigns
+    try {
+      civicrm_api3(
+        'TwingleCampaign',
+        'sync',
+        ['parent_id' => $campaign_id]);
+    } catch (CiviCRM_API3_Exception $e) {
+      CRM_Core_Session::setStatus(
+        $e->getMessage(),
+        E::ts("TwingleCampaign update failed"),
+        error, [unique => TRUE]
+      );
+      Civi::log()->error(
+        E::SHORT_NAME .
+        ' Update of TwingleCampaigns failed: ' . $e->getMessage()
+      );
+    }
+  }
+  else {
+    try {
+      civicrm_api3('TwingleCampaign', 'create',
+        ['id' => $campaign_id, 'parent_id' => $_POST['parent_id']]);
+      CRM_Utils_System::setUFMessage(E::ts('TwingleCampaign was saved.'));
+    } catch (CiviCRM_API3_Exception $e) {
+      Civi::log()->error(
+        'twinglecampaign_postSave_callback ' . $e->getMessage()
+      );
     }
   }
 }
@@ -203,6 +206,7 @@ function _get_campaign_type_id_twingle_campaign() {
 
 /**
  * Callback to sync a project after its creation.
+ *
  * @param int $campaign_id
  */
 function twinglecampaign_postSave_project_create_callback(
