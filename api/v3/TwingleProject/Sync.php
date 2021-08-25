@@ -234,7 +234,7 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
           $returnValues[$project->getId()] =
             $project->getResponse('TwingleProject created');
         } catch (Exception $e) {
-          $errors[$result['id']] = $result['error_message'];
+          $errors[$project_from_twingle['id']] = $e->getMessage();
           Civi::log()->error(
             E::LONG_NAME .
             ' could not create TwingleProject: ' .
