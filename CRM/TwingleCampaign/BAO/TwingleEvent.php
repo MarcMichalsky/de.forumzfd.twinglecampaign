@@ -53,32 +53,39 @@ class CRM_TwingleCampaign_BAO_TwingleEvent extends Campaign {
 
     if (parent::create()) {
 
-      // check for existence
-      $result = civicrm_api3('Case', 'get', [
-        'contact_id'   => $this->formattedValues['contact'],
-        'case_type_id' => Configuration::get('twinglecampaign_start_case'),
-        'subject'      => $this->formattedValues['title'] . ' | Event-ID: ' .
-          $this->formattedValues['id'],
-      ]);
+      // Get case type
+      $parentProject = civicrm_api3(
+        'TwingleProject',
+        'getsingle',
+        ['id' => $this->values['parent_id']]
+      );
+      $caseType = $parentProject['case']
+        ?? Configuration::get('twinglecampaign_default_case');
 
-      // Open a case
-      if (
-        Configuration::get('twinglecampaign_start_case') &&
-        $result['count'] == 0
-      ) {
-        $result = civicrm_api3('Case', 'create', [
+      if ($caseType) {
+        // check for existence
+        $result = civicrm_api3('Case', 'get', [
           'contact_id'   => $this->formattedValues['contact'],
-          'case_type_id' => Configuration::get('twinglecampaign_start_case'),
+          'case_type_id' => $caseType,
           'subject'      => $this->formattedValues['title'] . ' | Event-ID: ' .
             $this->formattedValues['id'],
-          'start_date'   => $this->formattedValues['created_at'],
-          'status_id'    => "Open",
         ]);
-      }
-      if ($result['is_error'] != 0) {
-        throw new Exception('Could not create case');
-      }
 
+        // Open a case
+        if ($result['count'] == 0) {
+          $result = civicrm_api3('Case', 'create', [
+            'contact_id'   => $this->formattedValues['contact'],
+            'case_type_id' => $caseType,
+            'subject'      => $this->formattedValues['title'] . ' | Event-ID: ' .
+              $this->formattedValues['id'],
+            'start_date'   => $this->formattedValues['created_at'],
+            'status_id'    => "Open",
+          ]);
+        }
+        if ($result['is_error'] != 0) {
+          throw new Exception('Could not create case');
+        }
+      }
       return TRUE;
     }
     return FALSE;

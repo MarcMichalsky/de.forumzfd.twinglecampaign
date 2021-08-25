@@ -20,7 +20,7 @@ class CRM_TwingleCampaign_Upgrader extends CRM_TwingleCampaign_Upgrader_Base {
    * changed campaigns will get pulled from Twingle.
    * @throws \CiviCRM_API3_Exception
    */
-  public function upgrade_01(): bool {
+  public function upgrade_02(): bool {
 
     $campaign_info = require E::path() .
       '/CRM/TwingleCampaign/resources/campaigns.php';

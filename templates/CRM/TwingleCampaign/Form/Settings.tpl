@@ -17,8 +17,8 @@
         <div class="clear"></div>
     </div>
     <div class="crm-section">
-        <div class="label">{$form.twinglecampaign_start_case.label}</div>
-        <div class="content">{$form.twinglecampaign_start_case.html}</div>
+        <div class="label">{$form.twinglecampaign_default_case.label}</div>
+        <div class="content">{$form.twinglecampaign_default_case.html}</div>
         <div class="clear"></div>
     </div>
     <div class="crm-section">

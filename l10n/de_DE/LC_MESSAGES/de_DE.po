@@ -7,17 +7,17 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.4.2\n"
+"X-Generator: Poedit 2.4.3\n"
 "Last-Translator: \n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Language: de_DE\n"
 
 #: CRM/TwingleCampaign/BAO/CustomField.php
 msgid ""
-"Creation of custom field '%1' failed. Find more information in the logs."
+"%1: Creation of custom field '%2' failed. Find more information in the logs."
 msgstr ""
-"Erstellung von Custom Field  '%1' fehlgeschlagen. Mehr Informationen in den "
-"Logs."
+"%1: Erstellen des benutzerdefinierten Feldes '%2' fehlgeschlagen. Mehr "
+"Informationen in den Logs."
 
 #: CRM/TwingleCampaign/BAO/CustomField.php
 msgid "Creation of custom field failed. Find more information in the logs."
@@ -32,6 +32,29 @@ msgid ""
 msgstr ""
 "Erstellung der Custom Field '%1' fehlgeschlagen, weil bereits eine Custom "
 "Field mit selbem Namen existiert. Mehr Informationen in den Logs."
+
+#: CRM/TwingleCampaign/BAO/CustomField.php
+msgid ""
+"Creation of custom field '%1' failed. Find more information in the logs."
+msgstr ""
+"Erstellung von Custom Field  '%1' fehlgeschlagen. Mehr Informationen in den "
+"Logs."
+
+#: CRM/TwingleCampaign/BAO/CustomField.php
+msgid ""
+"%1 could not get option group id for custom field '%2'. Find more "
+"information in the logs."
+msgstr ""
+"%1 konnte die Option-Group-ID für das benutzerdefinierte Feld '%2' nicht "
+"finden. Mehr Informationen in den Logs."
+
+#: CRM/TwingleCampaign/BAO/CustomField.php
+msgid ""
+"%1 could not create additional option values for custom field '%2'. Find "
+"more information in the logs."
+msgstr ""
+"%1 konnte dem benutzerdefinierte Feld '%2' keine zusätzlichen Optionen "
+"hinzufügen. Mehr Informationen in den Logs."
 
 #: CRM/TwingleCampaign/BAO/CustomGroup.php
 msgid ""
@@ -120,8 +143,8 @@ msgid "XCM Profile to match event initiators"
 msgstr "XCM-Profil zum Abgleichen von Event-Initiatoren"
 
 #: CRM/TwingleCampaign/Form/Settings.php
-msgid "Start a case for event initiators"
-msgstr "Einen Fall für Event-Initiatoren anlegen"
+msgid "Default case to open for event initiators"
+msgstr "Standarfdall, der für Event-Initiatoren eröffnet werden soll"
 
 #: CRM/TwingleCampaign/Form/Settings.php
 msgid "Create soft credits for event initiators"
@@ -134,10 +157,6 @@ msgstr "Speichern"
 #: CRM/TwingleCampaign/Form/Settings.php
 msgid "TwingleCampaign configuration saved"
 msgstr "TwingleCampaign Konfiguration gespeichert"
-
-#: CRM/TwingleCampaign/Form/Settings.php
-msgid "none"
-msgstr "keine"
 
 #: CRM/TwingleCampaign/Upgrader/Base.php
 msgid "Upgrade %1 to revision %2"
@@ -181,6 +200,10 @@ msgstr ""
 #: CRM/TwingleCampaign/Upgrader.php
 msgid "Could not disable scheduled job \"TwingleSync\"."
 msgstr "Geplante Aufgabe \"TwingleSync\" konnte nicht deaktiviert werden."
+
+#: CRM/TwingleCampaign/Utils/CaseTypes.php
+msgid "none"
+msgstr "keine"
 
 #: CRM/TwingleCampaign/resources/campaigns.php
 msgid "Twingle Information"
@@ -249,6 +272,14 @@ msgid ""
 msgstr ""
 "Wähle den Projekt-Typ: erlaube Benutzern ihre eigenen Spenden-Events "
 "anzulegen oder eine Mitgliedschaft zu bezahlen."
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Case"
+msgstr "Fall"
+
+#: CRM/TwingleCampaign/resources/campaigns.php
+msgid "Which case should get opened for event creators?"
+msgstr "Welcher Fall soll für Event-Initiatoren eröffnet werden?"
 
 #: CRM/TwingleCampaign/resources/campaigns.php
 msgid "allow more"

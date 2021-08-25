@@ -56,12 +56,12 @@ class CRM_TwingleCampaign_BAO_CustomField {
     }
   }
 
-
   /**
    * Creates a CustomField by calling CiviCRM API v.3
    *
    * @param bool $upgrade
    * If true: Does not show UF message if custom field already exists
+   *
    * @returns array Result of custom field creation api call
    * @throws \CiviCRM_API3_Exception
    */
@@ -79,38 +79,44 @@ class CRM_TwingleCampaign_BAO_CustomField {
 
     // If the field does not exist, create it
     if ($field['count'] == 0) {
-      $this->result = civicrm_api3(
-        'CustomField',
-        'create',
-        $this->getSetAttributes());
 
-      // Set field id
-      $this->id = $this->result['id'];
+      try {
+        $this->result = civicrm_api3(
+          'CustomField',
+          'create',
+          $this->getSetAttributes());
 
-      // Log field creation
-      if ($this->result['is_error'] == 0) {
-        Civi::log()->info("$this->extensionName has created a new custom field.
-      label: $this->label
-      name: $this->name
-      id: $this->id
-      group: $this->custom_group_id"
-        );
-        return $this->result;
-      }
-      // If the field could not get created: log error
-      else {
+        if ($this->result['is_error'] == 0) {
+
+          // Set field id
+          $this->id = $this->result['id'];
+
+          // Log field creation
+          Civi::log()->info("$this->extensionName has created a new custom field.
+            label: $this->label
+            name: $this->name
+            id: $this->id
+            group: $this->custom_group_id"
+          );
+          return $this->result;
+        }
+        else {
+          throw new CiviCRM_API3_Exception($this->result['error_message']);
+        }
+      } catch (CiviCRM_API3_Exception $e) {
+        $errorMessage = $e->getMessage();
+        // If the field could not get created: log error
         if ($this->name && $this->custom_group_id) {
           Civi::log()
-            ->error("$this->extensionName could not create new custom field
-            \"$this->name\" for group \"$this->custom_group_id\": 
-            $this->result['error_message']");
-          CRM_Utils_System::setUFMessage(E::ts('Creation of custom field \'%1\' failed. Find more information in the logs.', [1 => $this->name]));
+            ->error("$this->extensionName could not create new custom field \"$this->name\" for group \"$this->custom_group_id\": $errorMessage");
+          CRM_Utils_System::setUFMessage(E::ts('%1: Creation of custom field \'%2\' failed. Find more information in the logs.',
+            [1 => $this->extensionName, 2 => $this->name]
+          ));
         }
         // If there is not enough information: log simple error message
         else {
           Civi::log()
-            ->error("$this->extensionName could not create new custom field: 
-            $this->result['error_message']");
+            ->error("$this->extensionName could not create new custom field: $errorMessage");
           CRM_Utils_System::setUFMessage(E::ts("Creation of custom field failed. Find more information in the logs."));
         }
         return $this->result;
@@ -128,6 +134,101 @@ class CRM_TwingleCampaign_BAO_CustomField {
   }
 
   /**
+   * Update an existing custom field
+   *
+   * @returns array Result of custom field creation api call
+   */
+  public function update(): array {
+
+    try {
+      $this->result = civicrm_api3(
+        'CustomField',
+        'create',
+        $this->getSetAttributes());
+
+      // Log field creation
+      if ($this->result['is_error'] == 0) {
+        Civi::log()->info("$this->extensionName has updated a custom field.
+      label: $this->label
+      name: $this->name
+      id: $this->id
+      group: $this->custom_group_id"
+        );
+        return $this->result;
+      }
+      else {
+        throw new CiviCRM_API3_Exception($this->result['error_message']);
+      }
+    } catch (CiviCRM_API3_Exception $e) {
+      // If the field could not get created: log error
+      $errorMessage = $e->getMessage();
+      if ($this->name && $this->custom_group_id) {
+        Civi::log()
+          ->error("$this->extensionName could not create new custom field \"$this->name\" for group \"$this->custom_group_id\": $errorMessage");
+        CRM_Utils_System::setUFMessage(E::ts('Creation of custom field \'%1\' failed. Find more information in the logs.', [1 => $this->name]));
+      }
+      // If there is not enough information: log simple error message
+      else {
+        Civi::log()
+          ->error("$this->extensionName could not create new custom field: $errorMessage");
+        CRM_Utils_System::setUFMessage(E::ts("Creation of custom field failed. Find more information in the logs."));
+      }
+      return $this->result;
+    }
+  }
+
+  /**
+   * Add additional options to custom field
+   *
+   * @param array $options
+   *
+   * @return array
+   */
+  public function addOptions(array $options): array {
+    $result = [];
+
+    try {
+      $option_group_id = civicrm_api3(
+        'CustomField',
+        'getsingle',
+        ['id' => $this->id]
+      )['option_group_id'];
+    } catch (CiviCRM_API3_Exception $e) {
+      $errorMessage = $e->getMessage();
+      Civi::log()
+        ->error("$this->extensionName could not get get option group id for custom field \"$this->name\": $errorMessage");
+      CRM_Utils_System::setUFMessage(
+        E::ts('%1 could not get option group id for custom field \'%2\'. Find more information in the logs.',
+          [1 => $this->extensionName, 2 => $this->name])
+      );
+    }
+
+    try {
+      foreach ($options as $key => $value) {
+        $result[] = civicrm_api3(
+          'OptionValue',
+          'create',
+          [
+            'option_group_id' => $option_group_id,
+            'value'           => $key,
+            'label'           => $value,
+          ]
+        );
+      }
+    } catch (CiviCRM_API3_Exception $e) {
+      $errorMessage = $e->getMessage();
+      Civi::log()
+        ->error("$this->extensionName could not create additional option values for custom field \"$this->name\": $errorMessage");
+      CRM_Utils_System::setUFMessage(
+        E::ts('%1 could not create additional option values for custom field \'%2\'. Find more information in the logs.',
+          [1 => $this->extensionName, 2 => $this->name])
+      );
+    }
+
+    return $result;
+  }
+
+  /**
    * Gets all the set attributes of the object and returns them as an array.
    *
    * @return array
@@ -142,7 +243,6 @@ class CRM_TwingleCampaign_BAO_CustomField {
     }
     return $setAttributes;
   }
-
 
   /**
    * Get an instance of a CustomField by its name or get an array with all
@@ -362,6 +462,13 @@ class CRM_TwingleCampaign_BAO_CustomField {
    */
   public function getId() {
     return $this->id;
-  }#
+  }
+
+  /**
+   * @param mixed $option_values
+   */
+  public function setOptionValues($option_values): void {
+    $this->option_values = $option_values;
+  }
 
 }

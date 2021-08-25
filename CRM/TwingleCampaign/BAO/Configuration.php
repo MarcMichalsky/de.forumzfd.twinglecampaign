@@ -6,7 +6,7 @@ class CRM_TwingleCampaign_BAO_Configuration {
   private static $settingsKeys = [
     'twingle_api_key',
     'twinglecampaign_xcm_profile',
-    'twinglecampaign_start_case',
+    'twinglecampaign_default_case',
     'twinglecampaign_soft_credits'
   ];
 
