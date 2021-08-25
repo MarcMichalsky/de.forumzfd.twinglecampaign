@@ -103,9 +103,9 @@ function twinglecampaign_civicrm_postSave_civicrm_campaign($dao) {
         );
       }
     }
-    // Remove no hook flag
-    unset($_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook']);
   }
+  // Remove no hook flag
+  unset($_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook']);
 }
 
 /**
