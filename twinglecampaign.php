@@ -130,8 +130,21 @@ function twinglecampaign_postSave_campaign_update_callback(
   if ($campaign_type_id == $twingle_project_campaign_type_id) {
     $entity = 'TwingleProject';
   }
-  else {
+  elseif ($campaign_type_id == $twingle_campaign_campaign_type_id) {
     $entity = 'TwingleCampaign';
+  }
+  else {
+    Civi::log()->error(
+      E::SHORT_NAME .
+      " Update of TwingleCampaigns failed: Unknown campaign type (id: $campaign_type_id)"
+    );
+    CRM_Core_Session::setStatus(
+      E::ts('Unknown campaign type'),
+      E::ts('Campaign type id: %1', [1 => $campaign_type_id]),
+      error,
+      [unique => TRUE]
+    );
+    return;
   }
 
   if (isset($_POST['action'])) {
