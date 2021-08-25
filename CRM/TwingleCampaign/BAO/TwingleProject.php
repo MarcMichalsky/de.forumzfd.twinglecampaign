@@ -165,6 +165,11 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    */
   public function create(bool $no_hook = FALSE): bool {
 
+    # If this project is not meant to be synced, do not create a campaign
+    if (!$this->values['project_options']['has_civi_crm_activated']) {
+      return FALSE;
+    }
+
     $result = parent::create($no_hook);
 
     // Check if campaign was created successfully

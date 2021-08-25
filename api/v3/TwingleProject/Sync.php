@@ -230,9 +230,14 @@ function civicrm_api3_twingle_project_Sync(array $params): array {
               $project->getResponse('Ready to create TwingleProject');
           }
 
-          $project->create(TRUE);
-          $returnValues[$project->getId()] =
-            $project->getResponse('TwingleProject created');
+          if ($project->create(TRUE)) {
+            $returnValues[$project->getId()] =
+              $project->getResponse('TwingleProject created');
+          }
+          else {
+            $returnValues[$project->getId()] =
+              $project->getResponse('TwingleProject not selected for synchronization');
+          }
         } catch (Exception $e) {
           $errors[$project_from_twingle['id']] = $e->getMessage();
           Civi::log()->error(
