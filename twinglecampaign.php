@@ -149,7 +149,7 @@ function twinglecampaign_postSave_campaign_update_callback(
 
   if (isset($_POST['action'])) {
     if ($_POST['action'] == 'clone' && $entity == 'TwingleProject') {
-      $_POST['action'] = 'create';
+    unset($_POST['action']);
       $result = civicrm_api3('TwingleProject', 'getsingle',
         ['id' => $campaign_id]
       );
@@ -252,6 +252,7 @@ function twinglecampaign_postSave_project_create_callback(
  *
  * @return bool
  * @throws \CiviCRM_API3_Exception
+ * @throws \Exception
  */
 function _validateAndSendInput($id, $campaign_type_id): bool {
 
@@ -286,8 +287,10 @@ function _validateAndSendInput($id, $campaign_type_id): bool {
     // Update project
     $project->update($customFields);
 
-    // Set name
-    $project->setName($_POST['title']);
+    // Set name if provided
+    if (isset($_POST['title'])) {
+      $project->setName($_POST['title']);
+    }
 
     // Validate project values
     $validation = $project->validate();
