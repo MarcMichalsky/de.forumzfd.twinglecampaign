@@ -17,31 +17,30 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
 
   private $values;
 
-
   /**
    * ## TwingleCampaign constructor
    *
-   * @param array|null $values
-   * @param int|null $id
+   * @param array $values
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public function __construct(array $values = [], int $id = NULL) {
+  public function __construct(array $values = []) {
 
     $this->prefix = 'twingle_campaign_';
-    $this->id = $id ?? NULL;
+    $this->id = $values['id'] ?? NULL;
     $this->values['campaign_type_id'] = 'twingle_campaign';
 
+    if ($this->id != NULL) {
+      $this->fetch($this->id);
+    }
     $this->update($values);
+
     $this->getParentProject();
     if (!isset($this->values['cid'])) {
       $this->createCid();
     }
     $this->createUrl();
-
-
   }
-
 
   /**
    * ## Create TwingleCampaign
@@ -69,18 +68,16 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
     }
   }
 
-
   /**
    * ## Fetch TwingleCampaign
    * Populate this instance with values from an existing TwingleCampaign.
    *
    * @throws CiviCRM_API3_Exception
    */
-  public function fetch() {
+  public function fetch(int $id) {
     $this->values = civicrm_api3('TwingleCampaign', 'getsingle',
-      ['id' => $this->id]);
+      ['id' => $id]);
   }
-
 
   /**
    * ## Get Parent Project
@@ -127,7 +124,6 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
         break;
       }
     }
-
 
     // Set parent_project_id and retrieve parent_project_url
     if ($parent_campaign_type_id == $twingle_project_campaign_type_id) {
@@ -205,7 +201,6 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
       $this->values['parent_project_url'] . '?tw_cid=' . $this->values['cid'];
   }
 
-
   /**
    *
    */
@@ -213,7 +208,6 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
   function createCid() {
     $this->values['cid'] = uniqid();
   }
-
 
   /**
    * ## Translate field names and custom field names
@@ -283,7 +277,6 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
     }
   }
 
-
   /**
    * ## Delete TwingleCampaign
    * Deletes this TwingleCampaign from CiviCRM
@@ -302,7 +295,6 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
       }
     }
   }
-
 
   /**
    * ## Get a response
@@ -379,6 +371,5 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
   public function getId(): int {
     return (int) $this->id;
   }
-
 
 }
