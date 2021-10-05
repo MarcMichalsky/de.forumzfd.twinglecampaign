@@ -2,6 +2,7 @@
 
 use CRM_TwingleCampaign_Utils_ExtensionCache as ExtensionCache;
 use CRM_TwingleCampaign_ExtensionUtil as E;
+use CRM_TwingleCampaign_Exceptions_TwingleCampaignException as TwingleCampaignException;
 
 class CRM_TwingleCampaign_BAO_TwingleCampaign {
 
@@ -23,6 +24,7 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    * @param array $values
    *
    * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_TwingleCampaign_Exceptions_TwingleCampaignException
    */
   public function __construct(array $values = []) {
 
@@ -86,6 +88,7 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
    * deleted.
    *
    * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_TwingleCampaign_Exceptions_TwingleCampaignException
    */
   private function getParentProject(): void {
 
@@ -96,8 +99,7 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
 
     // Determine the parent project id by looping through the campaign tree
     // until the parent campaign type is a TwingleProject
-    $parent_id = $this->values['parent_id'];
-    $parent_id = $parent_id ?? civicrm_api3(
+    $parent_id = $this->values['parent_id'] ?? civicrm_api3(
         'TwingleCampaign',
         'getsingle',
         ['id' => $this->id]
@@ -117,7 +119,7 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
       }
 
       $parent_campaign_type_id = $parent_campaign['campaign_type_id'];
-      if (isset($parent_campaign['parent_id'])) {
+      if ($parent_campaign_type_id != $twingle_project_campaign_type_id && isset($parent_campaign['parent_id'])) {
         $parent_id = $parent_campaign['parent_id'];
       }
       else {
@@ -167,7 +169,7 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
             ' could not determine parent TwingleProject URL.',
             $this->getResponse()
           );
-          $this->delete();
+          throw new TwingleCampaignException('Parent project URL missing');
         }
       }
 
@@ -180,7 +182,7 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
         ts('No parent TwingleProject found'),
         'alert'
       );
-      $this->delete();
+      throw new TwingleCampaignException('No parent TwingleProject found');
     }
   }
 
@@ -288,7 +290,7 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
       } catch (CiviCRM_API3_Exception $e) {
         Civi::log()->error(
           E::LONG_NAME .
-          ' could delete TwingleCampaign: ' .
+          ' could not delete TwingleCampaign: ' .
           $e->getMessage(),
           $this->getResponse()
         );
