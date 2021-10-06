@@ -82,7 +82,11 @@ function twinglecampaign_civicrm_postSave_civicrm_campaign($dao) {
       $_SESSION['CiviCRM']['de.forumzfd.twinglecampaign']['no_hook'] != TRUE) {
 
       // If request is not an API-Call
-      if ($_GET['action'] != 'create' && $_POST['action'] != 'create') {
+      if (
+        ((isset($_GET['action']) && $_GET['action'] != 'create') ||
+          (isset($_POST['action']) && $_POST['action'] != 'create')) ||
+        (!isset($_GET['action']) && !isset($_POST['action']))
+      ) {
 
         // If the db transaction is still running, add a function to it that will
         // be called afterwards
