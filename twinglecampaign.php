@@ -180,6 +180,19 @@ function twinglecampaign_postSave_campaign_update_callback(
         );
       }
     }
+    if ($_POST['action'] == 'clone' && $entity == 'TwingleCampaign') {
+      unset($_POST['action']);
+      try {
+        civicrm_api3('TwingleCampaign', 'create',
+          ['id' => $campaign_id, 'clone' => true]
+        );
+        CRM_Utils_System::setUFMessage(E::ts('TwingleCampaign was cloned.'));
+      } catch (CiviCRM_API3_Exception $e) {
+        Civi::log()->error(
+          'twinglecampaign_postSave_callback ' . $e->getMessage()
+        );
+      }
+    }
   }
 
   // If a TwingleProject is getting saved

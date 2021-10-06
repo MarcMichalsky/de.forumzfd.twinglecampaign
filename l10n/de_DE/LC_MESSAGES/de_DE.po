@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
+"Last-Translator: \n"
 "Language-Team: \n"
+"Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.4.3\n"
-"Last-Translator: \n"
+"X-Generator: Poedit 3.0\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Language: de_DE\n"
 
 #: CRM/TwingleCampaign/BAO/CustomField.php
 msgid ""
@@ -907,6 +907,17 @@ msgstr "Elternkampagne"
 msgid "Optional parent id for this Campaign"
 msgstr "Optionale Eltern-ID für diese Kampagne"
 
+#: api/v3/TwingleCampaign/Create.php
+msgid "Clone"
+msgstr "Klonen"
+
+#: api/v3/TwingleCampaign/Create.php
+msgid ""
+"Set this value to true if this campaign is about to be cloned to recreate cid"
+msgstr ""
+"Setze diesen Wert auf true, wenn diese Kampagne gerade geklont wird, damit "
+"die cid neu berechnet wird"
+
 #: api/v3/TwingleCampaign/Get.php api/v3/TwingleCampaign/Getsingle.php
 msgid "Twingle Campaign CID"
 msgstr "Twingle Campaign CID"
@@ -1196,6 +1207,10 @@ msgstr "Twingle Event Einstellungen"
 #: twinglecampaign.php
 msgid "Campaign cloning failed"
 msgstr "Klonen der Kampagne fehlgeschlagen"
+
+#: twinglecampaign.php
+msgid "TwingleCampaign was cloned."
+msgstr "TwingleCampaign wurde geklont"
 
 #: twinglecampaign.php
 msgid "TwingleCampaign update failed"

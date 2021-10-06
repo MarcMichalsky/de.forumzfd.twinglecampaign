@@ -40,6 +40,13 @@ function _civicrm_api3_twingle_campaign_Create_spec(array &$spec) {
     'api.required' => 1,
     'description'  => E::ts('Optional parent id for this Campaign'),
   ];
+  $spec['clone'] = [
+    'name'         => 'clone',
+    'title'        => E::ts('Clone'),
+    'type'         => CRM_Utils_Type::T_BOOLEAN,
+    'api.required' => 0,
+    'description'  => E::ts('Set this value to true if this campaign is about to be cloned to recreate cid'),
+  ];
 }
 
 

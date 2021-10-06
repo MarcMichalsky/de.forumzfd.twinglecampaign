@@ -32,15 +32,30 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
     $this->id = $values['id'] ?? NULL;
     $this->values['campaign_type_id'] = 'twingle_campaign';
 
+    // If there is already an ID for this TwingleProject, get its values from
+    // the database
     if ($this->id != NULL) {
       $this->fetch($this->id);
     }
+
+    // Update the campaign values
     $this->update($values);
 
+    // Get the parent TwingleProject
+    // (it doesn't matter how many levels above in the campaign tree it is)
     $this->getParentProject();
-    if (!isset($this->values['cid'])) {
+
+    // If this is a new TwingleCampaign or if it is a cloned TwingleCampaign,
+    // calculate a cid
+    if (
+      !isset($this->values['cid']) ||
+      (isset($values['clone']) && $values['clone'])
+    ) {
       $this->createCid();
     }
+
+    // Create an url from the parent TwingleProject url and the cid of this
+    // TwingleCampaign
     $this->createUrl();
   }
 
@@ -349,20 +364,6 @@ class CRM_TwingleCampaign_BAO_TwingleCampaign {
         $this->values[$key] = $value;
       }
     }
-  }
-
-  /**
-   * ## Clone this TwingleProject
-   *
-   * This method removes the id from this instance and in the next step it
-   * creates the clone as a new TwingleCampaign with the same values to
-   * Twingle.
-   *
-   * @throws \CiviCRM_API3_Exception
-   */
-  public
-  function clone() {
-    // TODO: implement cloning
   }
 
   /**
