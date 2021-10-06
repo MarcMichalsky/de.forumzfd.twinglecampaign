@@ -40,6 +40,13 @@ function _civicrm_api3_twingle_campaign_Create_spec(array &$spec) {
     'api.required' => 1,
     'description'  => E::ts('Optional parent id for this Campaign'),
   ];
+  $spec['clone'] = [
+    'name'         => 'clone',
+    'title'        => E::ts('Clone'),
+    'type'         => CRM_Utils_Type::T_BOOLEAN,
+    'api.required' => 0,
+    'description'  => E::ts('Set this value to true if this campaign is about to be cloned to recreate cid'),
+  ];
 }
 
 
@@ -61,11 +68,10 @@ function civicrm_api3_twingle_campaign_Create(array $params): array {
   _civicrm_api3_twingle_campaign_Create_spec($allowed_params);
   $params = array_intersect_key($params, $allowed_params);
 
-  // instantiate TwingleCampaign
-  $campaign = new TwingleCampaign($params);
-
-  // Try to create the TwingleCampaign
   try {
+    // instantiate TwingleCampaign
+    $campaign = new TwingleCampaign($params);
+    // try to create the TwingleCampaign
     $campaign->create(TRUE);
     return civicrm_api3_create_success(
       $campaign->getResponse('TwingleCampaign created'),
@@ -74,15 +80,8 @@ function civicrm_api3_twingle_campaign_Create(array $params): array {
       'Create'
     );
   } catch(Exception $e){
-    Civi::log()->error(
-      E::LONG_NAME .
-      ' could not create TwingleCampaign: ' .
-      $e->getMessage(),
-      $campaign->getResponse()
-    );
     return civicrm_api3_create_error(
-      'Could not create TwingleCampaign: ' . $e->getMessage(),
-      $campaign->getResponse()
+      'Could not create TwingleCampaign: ' . $e->getMessage()
     );
   }
 

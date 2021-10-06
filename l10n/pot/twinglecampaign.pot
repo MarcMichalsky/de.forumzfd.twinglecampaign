@@ -806,6 +806,14 @@ msgstr ""
 msgid "Optional parent id for this Campaign"
 msgstr ""
 
+#: ./api/v3/TwingleCampaign/Create.php
+msgid "Clone"
+msgstr ""
+
+#: ./api/v3/TwingleCampaign/Create.php
+msgid "Set this value to true if this campaign is about to be cloned to recreate cid"
+msgstr ""
+
 #: ./api/v3/TwingleCampaign/Get.php ./api/v3/TwingleCampaign/Getsingle.php
 msgid "Twingle Campaign CID"
 msgstr ""
@@ -1036,6 +1044,10 @@ msgstr ""
 
 #: ./twinglecampaign.php
 msgid "Campaign cloning failed"
+msgstr ""
+
+#: ./twinglecampaign.php
+msgid "TwingleCampaign was cloned."
 msgstr ""
 
 #: ./twinglecampaign.php
