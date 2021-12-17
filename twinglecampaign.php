@@ -411,8 +411,7 @@ function _validateAndSendInput($id, $campaign_type_id): bool {
       CRM_Core_Session::setStatus(
         $errorMessage,
         E::ts("Input validation failed"),
-        error,
-        [unique => TRUE]
+        error
       );
       // Validation failed
       return FALSE;
