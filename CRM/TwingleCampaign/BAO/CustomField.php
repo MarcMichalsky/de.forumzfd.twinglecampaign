@@ -205,15 +205,40 @@ class CRM_TwingleCampaign_BAO_CustomField {
 
     try {
       foreach ($options as $key => $value) {
-        $result[] = civicrm_api3(
+
+        $option_value_exists = civicrm_api3(
           'OptionValue',
-          'create',
+          'get',
           [
+            'sequential'      => 1,
             'option_group_id' => $option_group_id,
             'value'           => $key,
-            'label'           => $value,
           ]
         );
+
+        // If the option value does not yet exist, create it
+        if ($option_value_exists['count'] == 0) {
+          $result[] = civicrm_api3(
+            'OptionValue',
+            'create',
+            [
+              'option_group_id' => $option_group_id,
+              'value'           => $key,
+              'label'           => $value,
+            ]
+          );
+        }
+        // If the option value already exist, update it
+        else {
+          $result[] = civicrm_api3(
+            'OptionValue',
+            'create',
+            [
+              'id'         => $option_value_exists['values'][0]['id'],
+              'label'      => $value,
+            ]
+          );
+        }
       }
     } catch (CiviCRM_API3_Exception $e) {
       $errorMessage = $e->getMessage();
