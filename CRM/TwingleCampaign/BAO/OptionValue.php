@@ -158,7 +158,7 @@ class CRM_TwingleCampaign_BAO_OptionValue {
     // If a specific option value is required
     try {
       $option_value = civicrm_api3(
-        'CustomValue',
+        'OptionValue',
         'get',
         [
           'sequential' => 1,
