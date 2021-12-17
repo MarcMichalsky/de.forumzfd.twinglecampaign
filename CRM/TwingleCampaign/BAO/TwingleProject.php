@@ -31,6 +31,13 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
     'one_time',
   ];
 
+  // All fields for hex color codes
+  const colorFields = [
+    'design_background_color',
+    'design_primary_color',
+    'design_font_color',
+  ];
+
   /**
    * ## TwingleProject constructor
    *
@@ -143,11 +150,13 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
    */
   private function strToInt(array &$values) {
     foreach ($values as $key => $value) {
-      if (ctype_digit($value)) {
-        $values[$key] = intval($value);
-      }
-      elseif (is_array($value)) {
-        $this->strToInt($values[$key]);
+      if (!in_array($key, self::colorFields)) {
+        if (ctype_digit($value)) {
+          $values[$key] = intval($value);
+        }
+        elseif (is_array($value)) {
+          $this->strToInt($values[$key]);
+        }
       }
     }
   }
@@ -298,21 +307,18 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
     }
 
     // Validate hexadecimal color fields
-    $colorFields =
-      [
-        'design_background_color',
-        'design_primary_color',
-        'design_font_color',
-      ];
-    foreach ($colorFields as $colorField) {
+    foreach (self::colorFields as $colorField) {
       if (
-        !empty($this->values['project_options'][$colorField]) &&
+        (
+          !empty($this->values['project_options'][$colorField]) ||
+          $this->values['project_options'][$colorField] === "0"
+        ) &&
         (
           !(
             ctype_xdigit($this->values['project_options'][$colorField]) ||
             is_integer($this->values['project_options'][$colorField])
           ) ||
-          strlen((string) $this->values['project_options'][$colorField]) > 6
+          strlen((string) $this->values['project_options'][$colorField]) != 6
         )
       ) {
         $valid = FALSE;
