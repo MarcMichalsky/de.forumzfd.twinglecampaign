@@ -36,6 +36,8 @@ class CRM_TwingleCampaign_BAO_TwingleProject extends Campaign {
     'design_background_color',
     'design_primary_color',
     'design_font_color',
+    'design_button_font_color',
+    'design_button_font_color_light',
   ];
 
   /**
